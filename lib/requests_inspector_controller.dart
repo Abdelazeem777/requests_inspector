@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ma3ak/widgets/other/requests_inspector/request_model.dart';
+import 'request_model.dart';
 
 ///Singleton
 class RequestsInspectorController extends ChangeNotifier {

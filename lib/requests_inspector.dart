@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:ma3ak/widgets/other/requests_inspector/request_model.dart';
-import 'package:ma3ak/widgets/other/requests_inspector/requests_inspector_controller.dart';
+import 'request_model.dart';
+import 'requests_inspector_controller.dart';
 import 'package:provider/provider.dart';
 
 class RequestsInspector extends StatelessWidget {
