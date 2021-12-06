@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+
 import 'request_model.dart';
 
 ///Singleton
 class RequestsInspectorController extends ChangeNotifier {
-  factory RequestsInspectorController() => _singleton;
-  RequestsInspectorController._internal();
-  static final _singleton = RequestsInspectorController._internal();
+  factory RequestsInspectorController([bool enabled = false]) =>
+      _singleton ??= RequestsInspectorController._internal(enabled);
+  RequestsInspectorController._internal(bool enabled) : _enabled = enabled;
+
+  static RequestsInspectorController? _singleton;
+
+  late final bool _enabled;
 
   final pageController = PageController(
     initialPage: 0,
@@ -41,6 +46,7 @@ class RequestsInspectorController extends ChangeNotifier {
   void hideInspector() => pageController.jumpToPage(0);
 
   void addNewRequest(RequestDetails request) {
+    if (!_enabled) return;
     _requestsList.insert(0, request);
     notifyListeners();
   }

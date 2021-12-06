@@ -1,28 +1,30 @@
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'request_model.dart';
 import 'requests_inspector_controller.dart';
-import 'package:provider/provider.dart';
 
 class RequestsInspector extends StatelessWidget {
   const RequestsInspector({
     Key? key,
-    bool enabled = false,
+    this.enabled = false,
     required Widget child,
-  })  : _enabled = enabled,
-        _child = child,
+  })  : _child = child,
         super(key: key);
 
-  final bool _enabled;
+  ///Require hot restart for showing its change
+  final bool enabled;
   final Widget _child;
   @override
   Widget build(BuildContext context) {
-    return _enabled
+    return enabled
         ? MaterialApp(
             home: ChangeNotifierProvider(
-              create: (context) => RequestsInspectorController(),
+              create: (context) => RequestsInspectorController(enabled),
               builder: (context, _) {
                 final viewModel = Provider.of<RequestsInspectorController>(
                     context,
@@ -252,13 +254,32 @@ class _RequestDetailsPage extends StatelessWidget {
   }
 
   Widget _buildSelectableText(text) {
-    const encoder = JsonEncoder.withIndent('  ');
-    final prettyprint = encoder.convert(text);
+    late final String prettyprint;
+    if (text is Map || text is String)
+      prettyprint = _convertToPrettyJsonFromMapOrJson(text);
+    else if (text is FormData)
+      prettyprint = 'FormData:\n' + _convertToPrettyFromFormData(text);
+    else
+      prettyprint = text.toString();
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: SelectableText(prettyprint),
     );
+  }
+
+  String _convertToPrettyJsonFromMapOrJson(text) {
+    const encoder = JsonEncoder.withIndent('  ');
+    return encoder.convert(text);
+  }
+
+  String _convertToPrettyFromFormData(FormData text) {
+    final map = {
+      for (final e in text.fields) e.key: e.value,
+      for (final e in text.files) e.key: e.value.filename
+    };
+
+    return _convertToPrettyJsonFromMapOrJson(map);
   }
 
   Widget _buildTitle(String title) {

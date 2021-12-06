@@ -10,7 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^6.0.1
+
+  provider:
+  dio:
 
 dev_dependencies:
   flutter_test:

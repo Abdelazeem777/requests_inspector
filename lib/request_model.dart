@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
-
 class RequestDetails {
   final String? requestName;
   final String requestMethod;
