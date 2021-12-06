@@ -2,13 +2,34 @@
 
 A new Flutter package project.
 
-## Getting Started
+## First, add it at the top of your `MaterialApp` with `enabled: true`.
 
-This project is a starting point for a Dart
-[package](https://flutter.dev/developing-packages/),
-a library module containing code that can be shared easily across
-multiple Flutter or Dart projects.
+```dart
+void main() {
+  runApp(const RequestsInspector(
+    enabled: true,
+    child: MyApp(),
+  ));
+}
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+```
+
+## Then, on your request add new `RequestDetails` using `RequestInspectorController`.
+
+```dart
+RequestsInspectorController().addNewRequest(
+    RequestDetails(
+        requestName: requestName,
+        requestMethod: RequestMethod.GET,
+        url: apiBaseUrl,
+        statusCode: response.statusCode,
+        headers: headers,
+        responseBody: response.data,
+        sentTime: DateTime.now()),
+    );
+```
+
+## And we are done!
+
+Note:
+you can access `RequestInspector` widget by long press on any place on your screen.

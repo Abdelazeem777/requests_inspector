@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'request_model.dart';
+import 'request_details.dart';
 import 'requests_inspector_controller.dart';
 
 class RequestsInspector extends StatelessWidget {
