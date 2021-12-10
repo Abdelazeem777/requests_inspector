@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'request_details.dart';
 import 'requests_inspector_controller.dart';
 
+///You can show the Inspector by **Shaking** your phone.
 class RequestsInspector extends StatelessWidget {
   const RequestsInspector({
     Key? key,
@@ -20,31 +20,29 @@ class RequestsInspector extends StatelessWidget {
   final bool enabled;
   final Widget _child;
   @override
-  Widget build(BuildContext context) {
-    return enabled
-        ? MaterialApp(
-            home: ChangeNotifierProvider(
-              create: (context) => RequestsInspectorController(enabled),
-              builder: (context, _) {
-                final viewModel = Provider.of<RequestsInspectorController>(
-                    context,
-                    listen: false);
-                return GestureDetector(
-                  child: PageView(
-                    controller: viewModel.pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      _child,
-                      const _Inspector(),
-                    ],
-                  ),
-                  onLongPress: viewModel.showInspector,
-                );
-              },
-            ),
-          )
-        : _child;
-  }
+  Widget build(BuildContext context) => enabled
+      ? MaterialApp(
+          home: ChangeNotifierProvider(
+            create: (context) => RequestsInspectorController(enabled),
+            builder: (context, _) {
+              final inspectorController =
+                  context.read<RequestsInspectorController>();
+              return WillPopScope(
+                onWillPop: () async =>
+                    inspectorController.pageController.page == 0,
+                child: PageView(
+                  controller: inspectorController.pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    _child,
+                    const _Inspector(),
+                  ],
+                ),
+              );
+            },
+          ),
+        )
+      : _child;
 }
 
 class _Inspector extends StatelessWidget {
@@ -52,20 +50,19 @@ class _Inspector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel =
-        Provider.of<RequestsInspectorController>(context, listen: false);
     return Scaffold(
-      appBar: _buildAppBar(viewModel),
+      appBar: _buildAppBar(context),
       body: _buildBody(),
     );
   }
 
-  AppBar _buildAppBar(RequestsInspectorController viewModel) {
+  AppBar _buildAppBar(BuildContext context) {
+    final inspectorController = context.read<RequestsInspectorController>();
     return AppBar(
       backgroundColor: Colors.black,
       title: const Text('Inspector'),
       leading: IconButton(
-        onPressed: viewModel.hideInspector,
+        onPressed: inspectorController.hideInspector,
         icon: const Icon(Icons.close),
         color: Colors.white,
       ),
@@ -74,7 +71,7 @@ class _Inspector extends StatelessWidget {
 
   Widget _buildBody() {
     return Selector<RequestsInspectorController, int>(
-      selector: (_, viewModel) => viewModel.selectedTab,
+      selector: (_, inspectorController) => inspectorController.selectedTab,
       builder: (context, selectedTab, _) => Column(
         children: [
           _buildHeaderTabBar(context, selectedTab: selectedTab),
@@ -85,19 +82,19 @@ class _Inspector extends StatelessWidget {
   }
 
   Widget _buildHeaderTabBar(BuildContext context, {required int selectedTab}) {
-    final viewModel =
-        Provider.of<RequestsInspectorController>(context, listen: false);
+    final inspectorController = context.read<RequestsInspectorController>();
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildTabItem(
           title: 'All requests',
           isSelected: selectedTab == 0,
-          onTap: () => viewModel.selectedTab = 0,
+          onTap: () => inspectorController.selectedTab = 0,
         ),
         _buildTabItem(
           title: 'SelectedTab requests',
           isSelected: selectedTab == 1,
-          onTap: () => viewModel.selectedTab = 1,
+          onTap: () => inspectorController.selectedTab = 1,
         ),
       ],
     );
@@ -112,11 +109,14 @@ class _Inspector extends StatelessWidget {
       child: InkWell(
         child: Container(
           padding: const EdgeInsets.all(12.0),
-          color: isSelected ? Colors.black : Colors.grey[700],
           alignment: Alignment.center,
+          color: isSelected ? Colors.black : Colors.grey[700],
           child: Text(
             title,
-            style: TextStyle(color: isSelected ? Colors.white : Colors.black),
+            style: TextStyle(
+              color: isSelected ? Colors.white : Colors.black,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w300,
+            ),
           ),
         ),
         onTap: onTap,
@@ -131,19 +131,21 @@ class _Inspector extends StatelessWidget {
   }
 
   Widget _buildAllRequests(BuildContext context) {
-    final viewModel =
-        Provider.of<RequestsInspectorController>(context, listen: false);
+    final inspectorController = context.read<RequestsInspectorController>();
     return Expanded(
       child: Selector<RequestsInspectorController, List<RequestDetails>>(
-        selector: (_, viewModel) => viewModel.requestsList,
+        selector: (_, controller) => controller.requestsList,
         shouldRebuild: (previous, next) => true,
-        builder: (context, allRequests, _) => ListView.builder(
-          itemCount: allRequests.length,
-          itemBuilder: (context, index) => _RequestItemWidget(
-            request: allRequests[index],
-            onTap: (request) => viewModel.selectedRequested = request,
-          ),
-        ),
+        builder: (context, allRequests, _) => allRequests.isEmpty
+            ? const Center(child: Text('No requests added yet'))
+            : ListView.builder(
+                itemCount: allRequests.length,
+                itemBuilder: (context, index) => _RequestItemWidget(
+                  request: allRequests[index],
+                  onTap: (request) =>
+                      inspectorController.selectedRequested = request,
+                ),
+              ),
       ),
     );
   }
@@ -168,9 +170,8 @@ class _RequestItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      tileColor: (_request.statusCode ?? 0) > 299
-          ? Colors.red[400]
-          : Colors.green[400],
+      tileColor:
+          _request.statusCode > 299 ? Colors.red[400] : Colors.green[400],
       leading: Text(_request.requestMethod),
       title: Text(_request.requestName ?? _request.url),
       subtitle: _request.requestName != null ? Text(_request.url) : null,
@@ -187,9 +188,10 @@ class _RequestDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Selector<RequestsInspectorController, RequestDetails?>(
-        selector: (_, viewModel) => viewModel.selectedRequested,
+        selector: (_, inspectorController) =>
+            inspectorController.selectedRequested,
         builder: (context, selectedRequest, _) => selectedRequest == null
-            ? const Center(child: Text('no request selected'))
+            ? const Center(child: Text('No request selected'))
             : _buildRequestDetails(context, selectedRequest),
       ),
     );
@@ -203,16 +205,20 @@ class _RequestDetailsPage extends StatelessWidget {
         _buildTitle('URL'),
         _buildSelectableText(request.url),
         const SizedBox(height: 8.0),
-        _buildTitle('Headers'),
-        _buildSelectableText(request.headers),
-        const SizedBox(height: 8.0),
+        if (request.headers != null) ...[
+          _buildTitle('Headers'),
+          _buildSelectableText(request.headers),
+          const SizedBox(height: 8.0),
+        ],
         if (request.requestBody != null) ...[
           _buildTitle('RequestBody'),
           _buildSelectableText(request.requestBody),
         ],
         const SizedBox(height: 8.0),
-        _buildTitle('ResponseBody'),
-        _buildSelectableText(request.responseBody),
+        if (request.responseBody != null) ...[
+          _buildTitle('ResponseBody'),
+          _buildSelectableText(request.responseBody),
+        ],
       ],
     );
   }
@@ -224,7 +230,7 @@ class _RequestDetailsPage extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              requestName ?? '',
+              requestName ?? 'No name',
               style:
                   const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             ),
@@ -255,7 +261,7 @@ class _RequestDetailsPage extends StatelessWidget {
 
   Widget _buildSelectableText(text) {
     late final String prettyprint;
-    if (text is Map || text is String)
+    if (text is Map || text is String || text is List)
       prettyprint = _convertToPrettyJsonFromMapOrJson(text);
     else if (text is FormData)
       prettyprint = 'FormData:\n' + _convertToPrettyFromFormData(text);

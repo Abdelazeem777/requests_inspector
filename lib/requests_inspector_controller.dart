@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shake/shake.dart';
 
 import 'request_details.dart';
 
@@ -6,7 +7,10 @@ import 'request_details.dart';
 class RequestsInspectorController extends ChangeNotifier {
   factory RequestsInspectorController([bool enabled = false]) =>
       _singleton ??= RequestsInspectorController._internal(enabled);
-  RequestsInspectorController._internal(bool enabled) : _enabled = enabled;
+
+  RequestsInspectorController._internal(bool enabled) : _enabled = enabled {
+    if (_enabled) ShakeDetector.autoStart(onPhoneShake: _showInspector);
+  }
 
   static RequestsInspectorController? _singleton;
 
@@ -41,7 +45,7 @@ class RequestsInspectorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void showInspector() => pageController.jumpToPage(1);
+  void _showInspector() => pageController.jumpToPage(1);
 
   void hideInspector() => pageController.jumpToPage(0);
 

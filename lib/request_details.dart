@@ -4,7 +4,7 @@ class RequestDetails {
   final String? requestName;
   final String requestMethod;
   final String url;
-  final int? statusCode;
+  final int statusCode;
   final dynamic headers;
   final dynamic requestBody;
   final dynamic responseBody;
@@ -13,7 +13,7 @@ class RequestDetails {
     this.requestName,
     required this.requestMethod,
     required this.url,
-    this.statusCode,
+    required this.statusCode,
     this.headers,
     this.requestBody,
     this.responseBody,
@@ -25,9 +25,9 @@ class RequestDetails {
     String? requestMethod,
     String? url,
     int? statusCode,
-    dynamic? headers,
-    dynamic? requestBody,
-    dynamic? responseBody,
+    headers,
+    requestBody,
+    responseBody,
     DateTime? sentTime,
   }) {
     return RequestDetails(

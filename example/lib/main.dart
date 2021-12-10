@@ -1,115 +1,177 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:convert';
 
-void main() {
-  runApp(const MyApp());
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:requests_inspector/request_details.dart';
+
+import 'package:requests_inspector/requests_inspector.dart';
+import 'package:requests_inspector/requests_inspector_controller.dart';
+import 'package:requests_inspector/requests_methods.dart';
+
+Future<List<Post>> fetchPosts() async {
+  final response =
+      await Dio().get('https://jsonplaceholder.typicode.com/posts');
+
+  final postsMap = response.data as List;
+  final posts = postsMap.map((postMap) => Post.fromMap(postMap)).toList();
+
+  RequestsInspectorController().addNewRequest(
+    RequestDetails(
+      requestMethod: RequestMethod.GET,
+      url: 'https://jsonplaceholder.typicode.com/posts',
+      statusCode: response.statusCode ?? 0,
+      responseBody: response.data,
+      sentTime: DateTime.now(),
+    ),
+  );
+
+  return posts;
 }
 
-class MyApp extends StatelessWidget {
+class Post {
+  final int userId;
+  final int id;
+  final String title;
+  final String body;
+  Post({
+    required this.userId,
+    required this.id,
+    required this.title,
+    required this.body,
+  });
+
+  Post copyWith({
+    int? userId,
+    int? id,
+    String? title,
+    String? body,
+  }) {
+    return Post(
+      userId: userId ?? this.userId,
+      id: id ?? this.id,
+      title: title ?? this.title,
+      body: body ?? this.body,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'userId': userId,
+      'id': id,
+      'title': title,
+      'body': body,
+    };
+  }
+
+  factory Post.fromMap(Map<String, dynamic> map) {
+    return Post(
+      userId: map['userId']?.toInt() ?? 0,
+      id: map['id']?.toInt() ?? 0,
+      title: map['title'] ?? '',
+      body: map['body'] ?? '',
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory Post.fromJson(String source) => Post.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return 'Post(userId: $userId, id: $id, title: $title, body: $body)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is Post &&
+        other.userId == userId &&
+        other.id == id &&
+        other.title == title &&
+        other.body == body;
+  }
+
+  @override
+  int get hashCode {
+    return userId.hashCode ^ id.hashCode ^ title.hashCode ^ body.hashCode;
+  }
+}
+
+void main() => runApp(
+      const RequestsInspector(
+        enabled: true,
+        child: MyApp(),
+      ),
+    );
+
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late Future<List<Post>> futurePosts;
+
+  @override
+  void initState() {
+    super.initState();
+    futurePosts = fetchPosts();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Fetch Data Example',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Fetch Data Example'),
+        ),
+        body: Center(
+          child: FutureBuilder<List<Post>>(
+            future: futurePosts,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return PostsListWidget(postsList: snapshot.data!);
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+
+              // By default, show a loading spinner.
+              return const CircularProgressIndicator();
+            },
+          ),
+        ),
+      ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+class PostsListWidget extends StatelessWidget {
+  const PostsListWidget({Key? key, required this.postsList}) : super(key: key);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
+  final List<Post> postsList;
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    return ListView.builder(
+      shrinkWrap: true,
+      itemCount: postsList.length,
+      itemBuilder: _buildPostItem,
+    );
+  }
+
+  Widget _buildPostItem(BuildContext context, int index) {
+    final post = postsList[index];
+    return ListTile(
+      leading: Text(post.id.toString()),
+      title: Text(post.title),
+      subtitle: Text(post.body),
     );
   }
 }
