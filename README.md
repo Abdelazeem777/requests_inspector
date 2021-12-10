@@ -1,8 +1,8 @@
-# requests_inspector
+# requests_inspector 🕵
 
-A new Flutter package project.
+A Flutter package for logging API requests and accessing it by **Shaking** your phone to get the `RequestsInspector` widget on your screen.
 
-## First, add it at the top of your `MaterialApp` with `enabled: true`.
+### First, add it at the top of your `MaterialApp` with `enabled: true`.
 
 ```dart
 void main() {
@@ -14,22 +14,26 @@ void main() {
 
 ```
 
-## Then, on your request add new `RequestDetails` using `RequestInspectorController`.
+**Note:** Don't forget to `enable` it!
+
+### Then, on your API request add a new `RequestDetails` using `RequestInspectorController` filled with the API data.
 
 ```dart
 RequestsInspectorController().addNewRequest(
     RequestDetails(
-        requestName: requestName,
+        requestName: 'Posts',
         requestMethod: RequestMethod.GET,
-        url: apiBaseUrl,
+        url: 'https://jsonplaceholder.typicode.com/posts',
         statusCode: response.statusCode,
-        headers: headers,
         responseBody: response.data,
-        sentTime: DateTime.now()),
+        sentTime: DateTime.now(),
+        ),
     );
 ```
 
-## And we are done!
+### Finlay, `Shake` your phone to get your `Inspector`
 
-Note:
-you can access `RequestInspector` widget by long press on any place on your screen.
+<img src = "./screenshots/Screenshot_20211211-004944.jpg" width ="300" />
+<img src = "./screenshots/Screenshot_20211211-004949.jpg" width ="300" />
+
+We are done 🎉️ 😁️

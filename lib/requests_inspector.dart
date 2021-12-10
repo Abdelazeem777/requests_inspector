@@ -12,17 +12,20 @@ class RequestsInspector extends StatelessWidget {
   const RequestsInspector({
     Key? key,
     this.enabled = false,
+    this.hideInspectorBanner = false,
     required Widget child,
   })  : _child = child,
         super(key: key);
 
   ///Require hot restart for showing its change
   final bool enabled;
+  final bool hideInspectorBanner;
   final Widget _child;
+
   @override
-  Widget build(BuildContext context) => enabled
-      ? MaterialApp(
-          home: ChangeNotifierProvider(
+  Widget build(BuildContext context) {
+    var widget = enabled
+        ? ChangeNotifierProvider(
             create: (context) => RequestsInspectorController(enabled),
             builder: (context, _) {
               final inspectorController =
@@ -40,9 +43,25 @@ class RequestsInspector extends StatelessWidget {
                 ),
               );
             },
-          ),
-        )
-      : _child;
+          )
+        : _child;
+
+    if (!hideInspectorBanner && enabled)
+      widget = Banner(
+        message: 'INSPECTOR',
+        textDirection: TextDirection.ltr,
+        location: BannerLocation.topEnd,
+        child: widget,
+      );
+
+    if (enabled)
+      widget = MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: widget,
+      );
+
+    return widget;
+  }
 }
 
 class _Inspector extends StatelessWidget {

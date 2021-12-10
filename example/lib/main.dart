@@ -10,14 +10,15 @@ import 'package:requests_inspector/requests_inspector_controller.dart';
 import 'package:requests_inspector/requests_methods.dart';
 
 Future<List<Post>> fetchPosts() async {
-  final response =
-      await Dio().get('https://jsonplaceholder.typicode.com/posts');
+  final dio = Dio(BaseOptions(validateStatus: (_) => true));
+  final response = await dio.get('https://jsonplaceholder.typicode.com/posts');
 
   final postsMap = response.data as List;
   final posts = postsMap.map((postMap) => Post.fromMap(postMap)).toList();
 
   RequestsInspectorController().addNewRequest(
     RequestDetails(
+      requestName: 'Posts',
       requestMethod: RequestMethod.GET,
       url: 'https://jsonplaceholder.typicode.com/posts',
       statusCode: response.statusCode ?? 0,
@@ -125,6 +126,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Fetch Data Example',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -159,10 +161,13 @@ class PostsListWidget extends StatelessWidget {
   final List<Post> postsList;
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: postsList.length,
-      itemBuilder: _buildPostItem,
+    return RefreshIndicator(
+      onRefresh: fetchPosts,
+      child: ListView.builder(
+        shrinkWrap: true,
+        itemCount: postsList.length,
+        itemBuilder: _buildPostItem,
+      ),
     );
   }
 
