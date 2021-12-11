@@ -31,8 +31,8 @@ RequestsInspectorController().addNewRequest(
     );
 ```
 
-### Finlay, `Shake` your phone to get your `Inspector`
+### Finlay, `Shake` your phone to get the `Inspector`
 
-<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/Screenshot_20211211-004944.jpg" width ="260" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/Screenshot_20211211-004949.jpg" width ="260" />
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/Screenshot_20211211-004944.jpg" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/Screenshot_20211211-004949.jpg" width ="280" />
 
 We are done 🎉️ 😁️
