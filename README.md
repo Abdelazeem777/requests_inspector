@@ -33,7 +33,7 @@ RequestsInspectorController().addNewRequest(
 
 ### Finlay, `Shake` your phone to get your `Inspector`
 
-<img src = "./screenshots/Screenshot_20211211-004944.jpg" width ="300" />
-<img src = "./screenshots/Screenshot_20211211-004949.jpg" width ="300" />
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/Screenshot_20211211-004944.jpg" width ="300" />
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/Screenshot_20211211-004949.jpg" width ="300" />
 
 We are done 🎉️ 😁️
