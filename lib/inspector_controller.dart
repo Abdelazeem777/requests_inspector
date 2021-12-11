@@ -4,15 +4,15 @@ import 'package:shake/shake.dart';
 import 'request_details.dart';
 
 ///Singleton
-class RequestsInspectorController extends ChangeNotifier {
-  factory RequestsInspectorController([bool enabled = false]) =>
-      _singleton ??= RequestsInspectorController._internal(enabled);
+class InspectorController extends ChangeNotifier {
+  factory InspectorController([bool enabled = false]) =>
+      _singleton ??= InspectorController._internal(enabled);
 
-  RequestsInspectorController._internal(bool enabled) : _enabled = enabled {
+  InspectorController._internal(bool enabled) : _enabled = enabled {
     if (_enabled) ShakeDetector.autoStart(onPhoneShake: _showInspector);
   }
 
-  static RequestsInspectorController? _singleton;
+  static InspectorController? _singleton;
 
   late final bool _enabled;
 

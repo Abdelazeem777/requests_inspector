@@ -3,10 +3,10 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:requests_inspector/inspector_controller.dart';
 import 'package:requests_inspector/request_details.dart';
 
 import 'package:requests_inspector/requests_inspector.dart';
-import 'package:requests_inspector/requests_inspector_controller.dart';
 import 'package:requests_inspector/requests_methods.dart';
 
 Future<List<Post>> fetchPosts() async {
@@ -16,9 +16,9 @@ Future<List<Post>> fetchPosts() async {
   final postsMap = response.data as List;
   final posts = postsMap.map((postMap) => Post.fromMap(postMap)).toList();
 
-  RequestsInspectorController().addNewRequest(
+  InspectorController().addNewRequest(
     RequestDetails(
-      requestName: 'Posts',
+      requestName: 'Posts', //Optional
       requestMethod: RequestMethod.GET,
       url: 'https://jsonplaceholder.typicode.com/posts',
       statusCode: response.statusCode ?? 0,

@@ -19,16 +19,42 @@ void main() {
 ### Then, on your API request add a new `RequestDetails` using `RequestInspectorController` filled with the API data.
 
 ```dart
-RequestsInspectorController().addNewRequest(
+InspectorController().addNewRequest(
     RequestDetails(
-        requestName: 'Posts',
+        requestName: requestName,
         requestMethod: RequestMethod.GET,
-        url: 'https://jsonplaceholder.typicode.com/posts',
-        statusCode: response.statusCode,
-        responseBody: response.data,
+        url: apiUrl,
+        statusCode: responseStatusCode,
+        responseBody: responseData,
         sentTime: DateTime.now(),
         ),
     );
+```
+
+### Real example
+
+```dart
+Future<List<Post>> fetchPosts() async {
+  final dio = Dio();
+  final response = await dio.get('https://jsonplaceholder.typicode.com/posts');
+
+  final postsMap = response.data as List;
+  final posts = postsMap.map((postMap) => Post.fromMap(postMap)).toList();
+
+  InspectorController().addNewRequest(
+    RequestDetails(
+      requestName: 'Posts',
+      requestMethod: RequestMethod.GET,
+      url: 'https://jsonplaceholder.typicode.com/posts',
+      statusCode: response.statusCode ?? 0,
+      responseBody: response.data,
+      sentTime: DateTime.now(),
+    ),
+  );
+
+  return posts;
+}
+
 ```
 
 ### Finlay, `Shake` your phone to get the `Inspector`

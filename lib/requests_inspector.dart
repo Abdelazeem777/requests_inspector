@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'request_details.dart';
-import 'requests_inspector_controller.dart';
+import 'inspector_controller.dart';
 
 ///You can show the Inspector by **Shaking** your phone.
 class RequestsInspector extends StatelessWidget {
@@ -26,10 +26,9 @@ class RequestsInspector extends StatelessWidget {
   Widget build(BuildContext context) {
     var widget = enabled
         ? ChangeNotifierProvider(
-            create: (context) => RequestsInspectorController(enabled),
+            create: (context) => InspectorController(enabled),
             builder: (context, _) {
-              final inspectorController =
-                  context.read<RequestsInspectorController>();
+              final inspectorController = context.read<InspectorController>();
               return WillPopScope(
                 onWillPop: () async =>
                     inspectorController.pageController.page == 0,
@@ -76,7 +75,7 @@ class _Inspector extends StatelessWidget {
   }
 
   AppBar _buildAppBar(BuildContext context) {
-    final inspectorController = context.read<RequestsInspectorController>();
+    final inspectorController = context.read<InspectorController>();
     return AppBar(
       backgroundColor: Colors.black,
       title: const Text('Inspector'),
@@ -89,7 +88,7 @@ class _Inspector extends StatelessWidget {
   }
 
   Widget _buildBody() {
-    return Selector<RequestsInspectorController, int>(
+    return Selector<InspectorController, int>(
       selector: (_, inspectorController) => inspectorController.selectedTab,
       builder: (context, selectedTab, _) => Column(
         children: [
@@ -101,7 +100,7 @@ class _Inspector extends StatelessWidget {
   }
 
   Widget _buildHeaderTabBar(BuildContext context, {required int selectedTab}) {
-    final inspectorController = context.read<RequestsInspectorController>();
+    final inspectorController = context.read<InspectorController>();
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -150,9 +149,9 @@ class _Inspector extends StatelessWidget {
   }
 
   Widget _buildAllRequests(BuildContext context) {
-    final inspectorController = context.read<RequestsInspectorController>();
+    final inspectorController = context.read<InspectorController>();
     return Expanded(
-      child: Selector<RequestsInspectorController, List<RequestDetails>>(
+      child: Selector<InspectorController, List<RequestDetails>>(
         selector: (_, controller) => controller.requestsList,
         shouldRebuild: (previous, next) => true,
         builder: (context, allRequests, _) => allRequests.isEmpty
@@ -206,7 +205,7 @@ class _RequestDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Selector<RequestsInspectorController, RequestDetails?>(
+      child: Selector<InspectorController, RequestDetails?>(
         selector: (_, inspectorController) =>
             inspectorController.selectedRequested,
         builder: (context, selectedRequest, _) => selectedRequest == null
