@@ -9,12 +9,14 @@ class InspectorController extends ChangeNotifier {
       _singleton ??= InspectorController._internal(enabled);
 
   InspectorController._internal(bool enabled) : _enabled = enabled {
-    if (_enabled) ShakeDetector.autoStart(onPhoneShake: _showInspector);
+    if (_enabled)
+      _shakeDetector = ShakeDetector.autoStart(onPhoneShake: _showInspector);
   }
 
   static InspectorController? _singleton;
 
   late final bool _enabled;
+  late final ShakeDetector _shakeDetector;
 
   final pageController = PageController(
     initialPage: 0,
@@ -53,5 +55,11 @@ class InspectorController extends ChangeNotifier {
     if (!_enabled) return;
     _requestsList.insert(0, request);
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _shakeDetector.stopListening();
+    super.dispose();
   }
 }
