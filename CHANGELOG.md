@@ -10,3 +10,8 @@
 
 - Rename `RequestsInspectorController` to `InspectorController` to solve naming confusion.
 - Add full example on `README.md` file.
+
+## 1.0.0+3
+
+- Make sure the shaking sensor closed on dispose.
+- Move package to stable version `v1.0.0+3`.
