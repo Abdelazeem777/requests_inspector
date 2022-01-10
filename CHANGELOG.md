@@ -15,3 +15,7 @@
 
 - Make sure the shaking sensor closed on dispose.
 - Move package to stable version `v1.0.0+3`.
+
+## 1.0.1+4
+
+- Remove `Navigator` from the `Inspector` widget tree.

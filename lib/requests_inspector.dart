@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -54,9 +55,21 @@ class RequestsInspector extends StatelessWidget {
       );
 
     if (enabled)
-      widget = MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: widget,
+      widget = Localizations(
+        locale: const Locale('en'),
+        delegates: [
+          DefaultMaterialLocalizations.delegate,
+          DefaultWidgetsLocalizations.delegate,
+          DefaultCupertinoLocalizations.delegate
+        ],
+        child: MediaQuery.fromWindow(
+          child: Directionality(
+            textDirection: TextDirection.ltr,
+            child: Material(
+              child: widget,
+            ),
+          ),
+        ),
       );
 
     return widget;
