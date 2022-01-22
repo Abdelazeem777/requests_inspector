@@ -19,3 +19,7 @@
 ## 1.0.1+4
 
 - Remove `Navigator` from the `Inspector` widget tree.
+
+## 1.0.2+5
+
+- Reset `MaterialApp` widget back because of select text feature was not working correctly.
