@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:requests_inspector/show_inspector_on_enum.dart';
 
 import 'request_details.dart';
 import 'inspector_controller.dart';
@@ -13,6 +14,7 @@ class RequestsInspector extends StatelessWidget {
     Key? key,
     this.enabled = false,
     this.hideInspectorBanner = false,
+    this.showInspectorOn = ShowInspectorOn.Shaking,
     required Widget child,
   })  : _child = child,
         super(key: key);
@@ -20,25 +22,32 @@ class RequestsInspector extends StatelessWidget {
   ///Require hot restart for showing its change
   final bool enabled;
   final bool hideInspectorBanner;
+  final ShowInspectorOn showInspectorOn;
   final Widget _child;
 
   @override
   Widget build(BuildContext context) {
     var widget = enabled
         ? ChangeNotifierProvider(
-            create: (context) => InspectorController(enabled),
+            create: (context) => InspectorController(
+              enabled: enabled,
+              showInspectorOn: showInspectorOn,
+            ),
             builder: (context, _) {
               final inspectorController = context.read<InspectorController>();
               return WillPopScope(
                 onWillPop: () async =>
                     inspectorController.pageController.page == 0,
-                child: PageView(
-                  controller: inspectorController.pageController,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    _child,
-                    const _Inspector(),
-                  ],
+                child: GestureDetector(
+                  onLongPress: inspectorController.showInspector,
+                  child: PageView(
+                    controller: inspectorController.pageController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      _child,
+                      const _Inspector(),
+                    ],
+                  ),
                 ),
               );
             },

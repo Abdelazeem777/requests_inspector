@@ -23,3 +23,17 @@
 ## 1.0.2+5
 
 - Reset `MaterialApp` widget back because of select text feature was not working correctly.
+
+## 1.0.3+6
+
+- Add an option for opening inspector by passing `showInspectorOn` to `RequestsInspector` widget.
+
+**by default it is `Shaking`.**
+
+```dart
+enum ShowInspectorOn {
+  LongPress,
+  Shaking,
+  Both,
+}
+```
