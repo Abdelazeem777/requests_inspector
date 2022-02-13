@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:requests_inspector/show_inspector_on_enum.dart';
 import 'package:shake/shake.dart';
 
-import 'request_details.dart';
+import '../requests_inspector.dart';
 
 ///Singleton
 class InspectorController extends ChangeNotifier {

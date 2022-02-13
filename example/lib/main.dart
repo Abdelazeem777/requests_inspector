@@ -3,11 +3,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:requests_inspector/inspector_controller.dart';
-import 'package:requests_inspector/request_details.dart';
-
 import 'package:requests_inspector/requests_inspector.dart';
-import 'package:requests_inspector/requests_methods.dart';
 
 Future<List<Post>> fetchPosts() async {
   final dio = Dio(BaseOptions(validateStatus: (_) => true));
@@ -26,6 +22,17 @@ Future<List<Post>> fetchPosts() async {
       sentTime: DateTime.now(),
     ),
   );
+
+  return posts;
+}
+
+Future<List<Post>> fetchPostsUsingInterceptor() async {
+  final dio = Dio(BaseOptions(validateStatus: (_) => true))
+    ..interceptors.add(RequestsInspectorInterceptor());
+  final response = await dio.get('https://jsonplaceholder.typicode.com/posts');
+
+  final postsMap = response.data as List;
+  final posts = postsMap.map((postMap) => Post.fromMap(postMap)).toList();
 
   return posts;
 }
@@ -137,7 +144,8 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child: FutureBuilder<List<Post>>(
-            future: futurePosts,
+            future:
+                futurePosts /*for Interceptor example use => fetchPostsUsingInterceptor */,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return PostsListWidget(postsList: snapshot.data!);

@@ -31,7 +31,16 @@ InspectorController().addNewRequest(
     );
 ```
 
+### OR, if you are using `Dio`, then you can pass `RequestsInspectorInterceptor()` to `Dio.interceptors`.
+
+```dart
+final dio = Dio()..interceptors.add(RequestsInspectorInterceptor());
+
+```
+
 ### Real example
+
+1. Normal `InspectorController().addNewRequest`.
 
 ```dart
 Future<List<Post>> fetchPosts() async {
@@ -51,6 +60,21 @@ Future<List<Post>> fetchPosts() async {
       sentTime: DateTime.now(),
     ),
   );
+
+  return posts;
+}
+
+```
+
+2. Using `RequestsInspectorInterceptor`.
+
+```dart
+Future<List<Post>> fetchPosts() async {
+  final dio = Dio()..interceptors.add(RequestsInspectorInterceptor());
+  final response = await dio.get('https://jsonplaceholder.typicode.com/posts');
+
+  final postsMap = response.data as List;
+  final posts = postsMap.map((postMap) => Post.fromMap(postMap)).toList();
 
   return posts;
 }

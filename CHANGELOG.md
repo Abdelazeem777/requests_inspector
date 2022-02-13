@@ -37,3 +37,7 @@ enum ShowInspectorOn {
   Both,
 }
 ```
+
+## 1.1.3+7
+
+- Add `RequestsInspectorInterceptor` that can be used with `Dio` instead of using normal `InspectorController.addRequest` method.

@@ -1,8 +1,8 @@
-import 'dart:convert';
+import 'package:requests_inspector/requests_inspector.dart';
 
 class RequestDetails {
-  final String? requestName;
-  final String requestMethod;
+  late final String? requestName;
+  final RequestMethod requestMethod;
   final String url;
   final int statusCode;
   final dynamic headers;
@@ -10,7 +10,7 @@ class RequestDetails {
   final dynamic responseBody;
   final DateTime sentTime;
   RequestDetails({
-    this.requestName,
+    String? requestName,
     required this.requestMethod,
     required this.url,
     required this.statusCode,
@@ -18,11 +18,19 @@ class RequestDetails {
     this.requestBody,
     this.responseBody,
     required this.sentTime,
-  });
+  }) {
+    this.requestName = requestName ?? _extractName(url);
+  }
+
+  String _extractName(String url) {
+    url = url.split('?').first;
+    final name = url.split('/').last;
+    return name.toUpperCase();
+  }
 
   RequestDetails copyWith({
     String? requestName,
-    String? requestMethod,
+    RequestMethod? requestMethod,
     String? url,
     int? statusCode,
     headers,
@@ -41,37 +49,6 @@ class RequestDetails {
       sentTime: sentTime ?? this.sentTime,
     );
   }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'requestName': requestName,
-      'requestMethod': requestMethod,
-      'url': url,
-      'statusCode': statusCode,
-      'headers': headers,
-      'requestBody': requestBody,
-      'responseBody': responseBody,
-      'sentTime': sentTime.millisecondsSinceEpoch,
-    };
-  }
-
-  factory RequestDetails.fromMap(Map<String, dynamic> map) {
-    return RequestDetails(
-      requestName: map['requestName'] != null ? map['requestName'] : null,
-      requestMethod: map['requestMethod'],
-      url: map['url'],
-      statusCode: map['statusCode'] != null ? map['statusCode'] : null,
-      headers: map['headers'],
-      requestBody: map['requestBody'],
-      responseBody: map['responseBody'],
-      sentTime: DateTime.fromMillisecondsSinceEpoch(map['sentTime']),
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory RequestDetails.fromJson(String source) =>
-      RequestDetails.fromMap(json.decode(source));
 
   @override
   String toString() {
