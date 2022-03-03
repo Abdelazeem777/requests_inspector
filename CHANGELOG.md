@@ -41,3 +41,18 @@ enum ShowInspectorOn {
 ## 1.1.3+7
 
 - Add `RequestsInspectorInterceptor` that can be used with `Dio` instead of using normal `InspectorController.addRequest` method.
+
+## 1.2.0
+
+- Add support for `queryParameters` if not send inside the `url`.
+
+```dart
+final params = {'userId': 1};
+
+InspectorController().addNewRequest(
+    RequestDetails(
+      ...
+      queryParameters: params,
+      ...
+
+```

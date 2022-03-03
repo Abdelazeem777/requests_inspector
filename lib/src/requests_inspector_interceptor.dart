@@ -12,6 +12,7 @@ class RequestsInspectorInterceptor extends Interceptor {
         url: response.requestOptions.path,
         statusCode: response.statusCode ?? 0,
         headers: response.requestOptions.headers,
+        queryParameters: response.requestOptions.queryParameters,
         responseBody: response.data,
         sentTime: DateTime.now(),
       ),

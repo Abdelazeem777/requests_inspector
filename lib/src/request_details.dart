@@ -6,6 +6,7 @@ class RequestDetails {
   final String url;
   final int statusCode;
   final dynamic headers;
+  final dynamic queryParameters;
   final dynamic requestBody;
   final dynamic responseBody;
   final DateTime sentTime;
@@ -15,6 +16,7 @@ class RequestDetails {
     required this.url,
     required this.statusCode,
     this.headers,
+    this.queryParameters,
     this.requestBody,
     this.responseBody,
     required this.sentTime,
@@ -34,6 +36,7 @@ class RequestDetails {
     String? url,
     int? statusCode,
     headers,
+    queryParameters,
     requestBody,
     responseBody,
     DateTime? sentTime,
@@ -44,6 +47,7 @@ class RequestDetails {
       url: url ?? this.url,
       statusCode: statusCode ?? this.statusCode,
       headers: headers ?? this.headers,
+      queryParameters: queryParameters ?? this.queryParameters,
       requestBody: requestBody ?? this.requestBody,
       responseBody: responseBody ?? this.responseBody,
       sentTime: sentTime ?? this.sentTime,
@@ -52,7 +56,7 @@ class RequestDetails {
 
   @override
   String toString() {
-    return 'RequestDetails(requestName: $requestName, requestMethod: $requestMethod, url: $url, statusCode: $statusCode, headers: $headers, requestBody: $requestBody, responseBody: $responseBody, sentTime: $sentTime)';
+    return 'RequestDetails(requestName: $requestName, requestMethod: $requestMethod, url: $url, statusCode: $statusCode, headers: $headers, queryParameters: $queryParameters, requestBody: $requestBody, responseBody: $responseBody, sentTime: $sentTime)';
   }
 
   @override
@@ -65,6 +69,7 @@ class RequestDetails {
         other.url == url &&
         other.statusCode == statusCode &&
         other.headers == headers &&
+        other.queryParameters == queryParameters &&
         other.requestBody == requestBody &&
         other.responseBody == responseBody &&
         other.sentTime == sentTime;
@@ -77,6 +82,7 @@ class RequestDetails {
         url.hashCode ^
         statusCode.hashCode ^
         headers.hashCode ^
+        queryParameters.hashCode ^
         requestBody.hashCode ^
         responseBody.hashCode ^
         sentTime.hashCode;
