@@ -195,12 +195,15 @@ class _RequestItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      tileColor:
-          _request.statusCode > 299 ? Colors.red[400] : Colors.green[400],
+      tileColor: _request.statusCode == null
+          ? Colors.red[400]
+          : _request.statusCode! > 299
+              ? Colors.red[400]
+              : Colors.green[400],
       leading: Text(_request.requestMethod.name),
       title: Text(_request.requestName ?? _request.url),
       subtitle: _request.requestName != null ? Text(_request.url) : null,
-      trailing: Text(_request.statusCode.toString()),
+      trailing: Text(_request.statusCode?.toString() ?? 'Err'),
       onTap: () => _onTap(_request),
     );
   }
@@ -252,10 +255,13 @@ class _RequestDetailsPage extends StatelessWidget {
           ),
           Container(
             padding: const EdgeInsets.all(8.0),
-            color:
-                (statusCode ?? 0) > 299 ? Colors.red[400] : Colors.green[400],
+            color: statusCode == null
+                ? Colors.red[400]
+                : statusCode > 299
+                    ? Colors.red[400]
+                    : Colors.green[400],
             child: Text(
-              statusCode.toString(),
+              statusCode?.toString() ?? 'Err',
               style: const TextStyle(fontSize: 18.0),
             ),
           ),

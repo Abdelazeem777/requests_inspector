@@ -56,3 +56,7 @@ InspectorController().addNewRequest(
       ...
 
 ```
+
+## 1.2.1
+
+- Fix bug with `RequestInspectorInterceptor` to handle request onError.
