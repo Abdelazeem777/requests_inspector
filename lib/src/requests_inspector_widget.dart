@@ -195,12 +195,15 @@ class _RequestItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      tileColor:
-          _request.statusCode > 299 ? Colors.red[400] : Colors.green[400],
+      tileColor: _request.statusCode == null
+          ? Colors.red[400]
+          : _request.statusCode! > 299
+              ? Colors.red[400]
+              : Colors.green[400],
       leading: Text(_request.requestMethod.name),
       title: Text(_request.requestName ?? _request.url),
       subtitle: _request.requestName != null ? Text(_request.url) : null,
-      trailing: Text(_request.statusCode.toString()),
+      trailing: Text(_request.statusCode?.toString() ?? 'Err'),
       onTap: () => _onTap(_request),
     );
   }
@@ -230,20 +233,10 @@ class _RequestDetailsPage extends StatelessWidget {
         _buildTitle('URL'),
         _buildSelectableText(request.url),
         const SizedBox(height: 8.0),
-        if (request.headers != null) ...[
-          _buildTitle('Headers'),
-          _buildSelectableText(request.headers),
-          const SizedBox(height: 8.0),
-        ],
-        if (request.requestBody != null) ...[
-          _buildTitle('RequestBody'),
-          _buildSelectableText(request.requestBody),
-        ],
-        const SizedBox(height: 8.0),
-        if (request.responseBody != null) ...[
-          _buildTitle('ResponseBody'),
-          _buildSelectableText(request.responseBody),
-        ],
+        ..._buildHeadersBlock(request.headers),
+        ..._buildQueryBlock(request.queryParameters),
+        ..._buildRequestBodyBlock(request.requestBody),
+        ..._buildResponseBodyBlock(request.responseBody),
       ],
     );
   }
@@ -262,10 +255,13 @@ class _RequestDetailsPage extends StatelessWidget {
           ),
           Container(
             padding: const EdgeInsets.all(8.0),
-            color:
-                (statusCode ?? 0) > 299 ? Colors.red[400] : Colors.green[400],
+            color: statusCode == null
+                ? Colors.red[400]
+                : statusCode > 299
+                    ? Colors.red[400]
+                    : Colors.green[400],
             child: Text(
-              statusCode.toString(),
+              statusCode?.toString() ?? 'Err',
               style: const TextStyle(fontSize: 18.0),
             ),
           ),
@@ -289,6 +285,58 @@ class _RequestDetailsPage extends StatelessWidget {
     final sentTimeText =
         sentTime.toIso8601String().split('T').last.substring(0, 8);
     return sentTimeText;
+  }
+
+  Iterable<Widget> _buildHeadersBlock(headers) {
+    if (headers == null) return [];
+    if ((headers is Map || headers is String || headers is List) &&
+        headers.isEmpty) return [];
+
+    return [
+      _buildTitle('Headers'),
+      _buildSelectableText(headers),
+      const SizedBox(height: 8.0),
+    ];
+  }
+
+  Iterable<Widget> _buildQueryBlock(queryParameters) {
+    if (queryParameters == null) return [];
+    if ((queryParameters is Map ||
+            queryParameters is String ||
+            queryParameters is List) &&
+        queryParameters.isEmpty) return [];
+
+    return [
+      _buildTitle('Parameters'),
+      _buildSelectableText(queryParameters),
+      const SizedBox(height: 8.0),
+    ];
+  }
+
+  Iterable<Widget> _buildRequestBodyBlock(requestBody) {
+    if (requestBody == null) return [];
+    if ((requestBody is Map || requestBody is String || requestBody is List) &&
+        requestBody.isEmpty) return [];
+
+    return [
+      _buildTitle('RequestBody'),
+      _buildSelectableText(requestBody),
+      const SizedBox(height: 8.0),
+    ];
+  }
+
+  Iterable<Widget> _buildResponseBodyBlock(responseBody) {
+    if (responseBody == null) return [];
+    if ((responseBody is Map ||
+            responseBody is String ||
+            responseBody is List) &&
+        responseBody.isEmpty) return [];
+
+    return [
+      _buildTitle('ResponseBody'),
+      _buildSelectableText(responseBody),
+      const SizedBox(height: 8.0),
+    ];
   }
 
   Widget _buildSelectableText(text) {

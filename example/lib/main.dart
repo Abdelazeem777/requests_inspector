@@ -7,7 +7,11 @@ import 'package:requests_inspector/requests_inspector.dart';
 
 Future<List<Post>> fetchPosts() async {
   final dio = Dio(BaseOptions(validateStatus: (_) => true));
-  final response = await dio.get('https://jsonplaceholder.typicode.com/posts');
+  final params = {'userId': 1};
+  final response = await dio.get(
+    'https://jsonplaceholder.typicode.com/posts',
+    queryParameters: params,
+  );
 
   final postsMap = response.data as List;
   final posts = postsMap.map((postMap) => Post.fromMap(postMap)).toList();
@@ -17,6 +21,7 @@ Future<List<Post>> fetchPosts() async {
       requestName: 'Posts', //Optional
       requestMethod: RequestMethod.GET,
       url: 'https://jsonplaceholder.typicode.com/posts',
+      queryParameters: params,
       statusCode: response.statusCode ?? 0,
       responseBody: response.data,
       sentTime: DateTime.now(),
@@ -29,7 +34,9 @@ Future<List<Post>> fetchPosts() async {
 Future<List<Post>> fetchPostsUsingInterceptor() async {
   final dio = Dio(BaseOptions(validateStatus: (_) => true))
     ..interceptors.add(RequestsInspectorInterceptor());
-  final response = await dio.get('https://jsonplaceholder.typicode.com/posts');
+  final params = {'userId': 1};
+  final response = await dio.get('https://jsonplaceholder.typicode.com/posts',
+      queryParameters: params);
 
   final postsMap = response.data as List;
   final posts = postsMap.map((postMap) => Post.fromMap(postMap)).toList();
@@ -127,7 +134,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    futurePosts = fetchPosts();
+    futurePosts =
+        fetchPostsUsingInterceptor() /*for Interceptor example use => fetchPostsUsingInterceptor() */;
   }
 
   @override
@@ -144,8 +152,7 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child: FutureBuilder<List<Post>>(
-            future:
-                futurePosts /*for Interceptor example use => fetchPostsUsingInterceptor */,
+            future: futurePosts,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return PostsListWidget(postsList: snapshot.data!);

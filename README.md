@@ -24,6 +24,7 @@ InspectorController().addNewRequest(
         requestName: requestName,
         requestMethod: RequestMethod.GET,
         url: apiUrl,
+        queryParameters: params,
         statusCode: responseStatusCode,
         responseBody: responseData,
         sentTime: DateTime.now(),
@@ -45,7 +46,12 @@ final dio = Dio()..interceptors.add(RequestsInspectorInterceptor());
 ```dart
 Future<List<Post>> fetchPosts() async {
   final dio = Dio();
-  final response = await dio.get('https://jsonplaceholder.typicode.com/posts');
+  final params = {'userId': 1};
+
+  final response = await dio.get(
+    'https://jsonplaceholder.typicode.com/posts',
+    queryParameters: params,
+  );
 
   final postsMap = response.data as List;
   final posts = postsMap.map((postMap) => Post.fromMap(postMap)).toList();
@@ -55,6 +61,7 @@ Future<List<Post>> fetchPosts() async {
       requestName: 'Posts',
       requestMethod: RequestMethod.GET,
       url: 'https://jsonplaceholder.typicode.com/posts',
+      queryParameters: params,
       statusCode: response.statusCode ?? 0,
       responseBody: response.data,
       sentTime: DateTime.now(),
