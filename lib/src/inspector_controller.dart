@@ -56,7 +56,7 @@ class InspectorController extends ChangeNotifier {
   }
 
   set selectedRequested(RequestDetails? value) {
-    if (_selectedRequested == value) return;
+    if (_selectedRequested == value && _selectedTab == 1) return;
     _selectedRequested = value;
     _selectedTab = 1;
     notifyListeners();
