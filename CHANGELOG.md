@@ -60,3 +60,8 @@ InspectorController().addNewRequest(
 ## 1.2.1
 
 - Fix bug with `RequestInspectorInterceptor` to handle request onError.
+
+## 1.2.2
+
+- Enhance time text appearance on SelectedRequest tab.
+- Fix selecting the current selected request not moving the SelectedRequest Tab bug.

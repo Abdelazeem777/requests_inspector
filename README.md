@@ -32,7 +32,7 @@ InspectorController().addNewRequest(
     );
 ```
 
-### OR, if you are using `Dio`, then you can pass `RequestsInspectorInterceptor()` to `Dio.interceptors`.
+### OR, if you are using `Dio`, then you can just pass `RequestsInspectorInterceptor()` to `Dio.interceptors` and we are good to go 🎉️🎉️.
 
 ```dart
 final dio = Dio()..interceptors.add(RequestsInspectorInterceptor());
