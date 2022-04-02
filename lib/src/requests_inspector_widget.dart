@@ -275,13 +275,20 @@ class _RequestDetailsPage extends StatelessWidget {
   }
 
   Widget _buildRequestSentTime(DateTime sentTime) {
+    final sentTimeText = _extractTimeText(sentTime);
     return Container(
       padding: const EdgeInsets.all(8.0),
       child: Text(
-        'Sent at: ${sentTime.toIso8601String().split('T').last}',
+        'Sent at: $sentTimeText',
         style: const TextStyle(fontSize: 16.0),
       ),
     );
+  }
+
+  String _extractTimeText(DateTime sentTime) {
+    final sentTimeText =
+        sentTime.toIso8601String().split('T').last.substring(0, 8);
+    return sentTimeText;
   }
 
   Widget _buildSelectableText(text) {
