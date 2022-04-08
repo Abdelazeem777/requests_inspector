@@ -85,7 +85,7 @@ Future<List<Post>> fetchPosts() async {
 
 ### Finlay, `Shake` your phone to get the `Inspector`
 
-<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/Screenshot_20211211-004944.jpg" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/Screenshot_20211211-004949.jpg" width ="280" />
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mobile_list.jpg" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mobile_request.jpg" width ="280" />
 
 ### For Web, Windows, MacOS and Linux
 
@@ -117,4 +117,6 @@ void main() {
 
 ## Some screenshots
 
-We are done 🎉️ 😁️
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/web_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/web_request.png" width ="280" />
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mac_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mac_request.png" width ="280" />
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/linux_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/linux_request.png" width ="280" />

@@ -65,3 +65,10 @@ InspectorController().addNewRequest(
 
 - Enhance time text appearance on SelectedRequest tab.
 - Fix selecting the current selected request not moving the SelectedRequest Tab bug.
+
+## 2.0.0
+
+- Add support for Web, MacOs, Windows and Linux.
+- More screenshots for the other platforms.
+- `sentTime` now is optional and the default value is `DateTime.now()`.
+- Add better explanation for usage of `ShowInspectorOn{LongPress, Shaking, Both}` enum with `RequestInspector` widget.
