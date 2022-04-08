@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shake/shake.dart';
 
 import '../requests_inspector.dart';
 
@@ -7,27 +6,18 @@ import '../requests_inspector.dart';
 class InspectorController extends ChangeNotifier {
   factory InspectorController({
     bool enabled = false,
-    ShowInspectorOn showInspectorOn = ShowInspectorOn.Shaking,
   }) =>
       _singleton ??= InspectorController._internal(
         enabled,
-        showInspectorOn,
       );
 
   InspectorController._internal(
     bool enabled,
-    ShowInspectorOn showInspectorOn,
-  )   : _enabled = enabled,
-        _showInspectorOn = showInspectorOn {
-    if (_enabled && _allowShaking)
-      _shakeDetector = ShakeDetector.autoStart(onPhoneShake: showInspector);
-  }
+  ) : _enabled = enabled;
 
   static InspectorController? _singleton;
 
   late final bool _enabled;
-  late final ShowInspectorOn _showInspectorOn;
-  late final ShakeDetector _shakeDetector;
 
   final pageController = PageController(
     initialPage: 0,
@@ -44,10 +34,6 @@ class InspectorController extends ChangeNotifier {
   int get selectedTab => _selectedTab;
   List<RequestDetails> get requestsList => _requestsList;
   RequestDetails? get selectedRequested => _selectedRequested;
-  bool get _allowShaking => [
-        ShowInspectorOn.Shaking,
-        ShowInspectorOn.Both,
-      ].contains(_showInspectorOn);
 
   set selectedTab(int value) {
     if (_selectedTab == value) return;
@@ -74,7 +60,6 @@ class InspectorController extends ChangeNotifier {
 
   @override
   void dispose() {
-    if (_allowShaking) _shakeDetector.stopListening();
     super.dispose();
   }
 }

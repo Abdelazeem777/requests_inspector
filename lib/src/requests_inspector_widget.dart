@@ -12,7 +12,6 @@ class RequestsInspector extends StatelessWidget {
     Key? key,
     this.enabled = false,
     this.hideInspectorBanner = false,
-    this.showInspectorOn = ShowInspectorOn.Shaking,
     required Widget child,
   })  : _child = child,
         super(key: key);
@@ -20,7 +19,6 @@ class RequestsInspector extends StatelessWidget {
   ///Require hot restart for showing its change
   final bool enabled;
   final bool hideInspectorBanner;
-  final ShowInspectorOn showInspectorOn;
   final Widget _child;
 
   @override
@@ -29,7 +27,6 @@ class RequestsInspector extends StatelessWidget {
         ? ChangeNotifierProvider(
             create: (context) => InspectorController(
               enabled: enabled,
-              showInspectorOn: showInspectorOn,
             ),
             builder: (context, _) {
               final inspectorController = context.read<InspectorController>();
@@ -38,6 +35,7 @@ class RequestsInspector extends StatelessWidget {
                     inspectorController.pageController.page == 0,
                 child: GestureDetector(
                   onLongPress: inspectorController.showInspector,
+                  onDoubleTap: inspectorController.showInspector,
                   child: PageView(
                     controller: inspectorController.pageController,
                     physics: const NeverScrollableScrollPhysics(),
