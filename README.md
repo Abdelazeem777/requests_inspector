@@ -11,7 +11,6 @@ void main() {
     child: MyApp(),
   ));
 }
-
 ```
 
 **Note:** Don't forget to `enable` it!
@@ -27,7 +26,6 @@ InspectorController().addNewRequest(
         queryParameters: params,
         statusCode: responseStatusCode,
         responseBody: responseData,
-        sentTime: DateTime.now(),
         ),
     );
 ```
@@ -64,13 +62,11 @@ Future<List<Post>> fetchPosts() async {
       queryParameters: params,
       statusCode: response.statusCode ?? 0,
       responseBody: response.data,
-      sentTime: DateTime.now(),
     ),
   );
 
   return posts;
 }
-
 ```
 
 2. Using `RequestsInspectorInterceptor`.
@@ -85,11 +81,40 @@ Future<List<Post>> fetchPosts() async {
 
   return posts;
 }
-
 ```
 
 ### Finlay, `Shake` your phone to get the `Inspector`
 
 <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/Screenshot_20211211-004944.jpg" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/Screenshot_20211211-004949.jpg" width ="280" />
+
+### For Web, Windows, MacOS and Linux
+
+Obviously, The shaking won't be good enough for those platforms 😅
+
+So you can specify `showInspectorOn` with `ShowInspectorOn.LongPress`.
+
+```dart
+void main() {
+  runApp(const RequestsInspector(
+    enabled: true,
+    showInspectorOn: ShowInspectorOn.LongPress
+    child: MyApp(),
+  ));
+}
+```
+
+OR, you can just pass `ShowInspectorOn.Both` to open the `Inspector` with `Shaking` or with `LongPress`.
+
+```dart
+void main() {
+  runApp(const RequestsInspector(
+    enabled: true,
+    showInspectorOn: ShowInspectorOn.Both
+    child: MyApp(),
+  ));
+}
+```
+
+## Some screenshots
 
 We are done 🎉️ 😁️

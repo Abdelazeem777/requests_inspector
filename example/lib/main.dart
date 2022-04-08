@@ -24,7 +24,6 @@ Future<List<Post>> fetchPosts() async {
       queryParameters: params,
       statusCode: response.statusCode ?? 0,
       responseBody: response.data,
-      sentTime: DateTime.now(),
     ),
   );
 
@@ -117,6 +116,7 @@ class Post {
 void main() => runApp(
       const RequestsInspector(
         enabled: true,
+        showInspectorOn: ShowInspectorOn.Both,
         child: MyApp(),
       ),
     );
@@ -149,6 +149,13 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Fetch Data Example'),
+          leading: const InkWell(
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Icon(Icons.refresh),
+            ),
+            onTap: fetchPosts,
+          ),
         ),
         body: Center(
           child: FutureBuilder<List<Post>>(
@@ -180,6 +187,7 @@ class PostsListWidget extends StatelessWidget {
       onRefresh: fetchPosts,
       child: ListView.builder(
         shrinkWrap: true,
+        physics: const AlwaysScrollableScrollPhysics(),
         itemCount: postsList.length,
         itemBuilder: _buildPostItem,
       ),

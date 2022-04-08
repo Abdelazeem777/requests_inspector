@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -29,7 +31,9 @@ class RequestsInspector extends StatelessWidget {
         ? ChangeNotifierProvider(
             create: (context) => InspectorController(
               enabled: enabled,
-              showInspectorOn: showInspectorOn,
+              showInspectorOn: _isSupportShaking()
+                  ? showInspectorOn
+                  : ShowInspectorOn.LongPress,
             ),
             builder: (context, _) {
               final inspectorController = context.read<InspectorController>();
@@ -68,6 +72,9 @@ class RequestsInspector extends StatelessWidget {
 
     return widget;
   }
+
+  bool _isSupportShaking() =>
+      kIsWeb ? false : Platform.isAndroid || Platform.isIOS;
 }
 
 class _Inspector extends StatelessWidget {
@@ -85,7 +92,7 @@ class _Inspector extends StatelessWidget {
     final inspectorController = context.read<InspectorController>();
     return AppBar(
       backgroundColor: Colors.black,
-      title: const Text('Inspector'),
+      title: const Text('Inspector 🕵'),
       leading: IconButton(
         onPressed: inspectorController.hideInspector,
         icon: const Icon(Icons.close),
@@ -201,8 +208,8 @@ class _RequestItemWidget extends StatelessWidget {
               ? Colors.red[400]
               : Colors.green[400],
       leading: Text(_request.requestMethod.name),
-      title: Text(_request.requestName ?? _request.url),
-      subtitle: _request.requestName != null ? Text(_request.url) : null,
+      title: Text(_request.requestName),
+      subtitle: Text(_request.url),
       trailing: Text(_request.statusCode?.toString() ?? 'Err'),
       onTap: () => _onTap(_request),
     );
