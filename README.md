@@ -92,4 +92,11 @@ Future<List<Post>> fetchPosts() async {
 
 <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/Screenshot_20211211-004944.jpg" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/Screenshot_20211211-004949.jpg" width ="280" />
 
+web:
+
+![image](https://user-images.githubusercontent.com/29352955/162360200-efd891e7-68a5-42b6-918b-7ec3b4f7cd87.png)
+
+![image](https://user-images.githubusercontent.com/29352955/162360222-230becd9-5ed8-469d-99ff-f236b6ef59a5.png)
+
+
 We are done 🎉️ 😁️
