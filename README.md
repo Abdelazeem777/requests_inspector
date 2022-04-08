@@ -88,7 +88,7 @@ Future<List<Post>> fetchPosts() async {
 
 ```
 
-### Finlay, `Shake` your phone to get the `Inspector`
+### Finlay, `Shake` your phone or just long press on an empty space on the screen to get the `Inspector` or if you are running web app just long press on an empty space on the screen
 
 <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/Screenshot_20211211-004944.jpg" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/Screenshot_20211211-004949.jpg" width ="280" />
 
