@@ -1,7 +1,7 @@
 import 'package:requests_inspector/requests_inspector.dart';
 
 class RequestDetails {
-  late final String? requestName;
+  late final String requestName;
   final RequestMethod requestMethod;
   final String url;
   final int? statusCode;
@@ -9,7 +9,7 @@ class RequestDetails {
   final dynamic queryParameters;
   final dynamic requestBody;
   final dynamic responseBody;
-  final DateTime sentTime;
+  late final DateTime sentTime;
   RequestDetails({
     String? requestName,
     required this.requestMethod,
@@ -19,9 +19,10 @@ class RequestDetails {
     this.queryParameters,
     this.requestBody,
     this.responseBody,
-    required this.sentTime,
+    DateTime? sentTime,
   }) {
     this.requestName = requestName ?? _extractName(url);
+    this.sentTime = sentTime ?? DateTime.now();
   }
 
   String _extractName(String url) {
