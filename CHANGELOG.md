@@ -72,3 +72,7 @@ InspectorController().addNewRequest(
 - More screenshots for the other platforms.
 - `sentTime` now is optional and the default value is `DateTime.now()`.
 - Add better explanation for usage of `ShowInspectorOn{LongPress, Shaking, Both}` enum with `RequestInspector` widget.
+
+## 2.0.1
+
+- Fix supported platforms problem.
