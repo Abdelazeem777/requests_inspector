@@ -7,13 +7,13 @@ class RequestsInspectorInterceptor extends Interceptor {
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     InspectorController().addNewRequest(
       RequestDetails(
-        requestMethod: RequestMethod.values
-            .firstWhere((e) => e.name == response.requestOptions.method),
+        requestMethod: RequestMethod.values.firstWhere((e) => e.name == response.requestOptions.method),
         url: response.requestOptions.path,
         statusCode: response.statusCode ?? 0,
         headers: response.requestOptions.headers,
         queryParameters: response.requestOptions.queryParameters,
         responseBody: response.data,
+        requestBody: response.requestOptions.data,
         sentTime: DateTime.now(),
       ),
     );
@@ -24,12 +24,12 @@ class RequestsInspectorInterceptor extends Interceptor {
   void onError(DioError err, ErrorInterceptorHandler handler) {
     InspectorController().addNewRequest(
       RequestDetails(
-        requestMethod: RequestMethod.values
-            .firstWhere((e) => e.name == err.requestOptions.method),
+        requestMethod: RequestMethod.values.firstWhere((e) => e.name == err.requestOptions.method),
         url: err.requestOptions.path,
         headers: err.requestOptions.headers,
         queryParameters: err.requestOptions.queryParameters,
         responseBody: err.message,
+        requestBody: err.requestOptions.data,
         sentTime: DateTime.now(),
       ),
     );
