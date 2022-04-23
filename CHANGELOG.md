@@ -76,3 +76,7 @@ InspectorController().addNewRequest(
 ## 2.0.1
 
 - Fix supported platforms problem.
+
+## 2.0.2
+
+- Fix `requestBody` not showing when using `RequestsInspectorInterceptor` bug.
