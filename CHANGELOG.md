@@ -1,46 +1,30 @@
-## 0.0.1
+## 2.1.0
 
-- Initial release.
+- New UI theme is implemented.
 
-## 0.0.1+1
+## 2.0.2
 
-- Fix screenshots on `README.md` file.
+- Fix `requestBody` not showing when using `RequestsInspectorInterceptor` bug.
 
-## 0.0.2+2
+## 2.0.1
 
-- Rename `RequestsInspectorController` to `InspectorController` to solve naming confusion.
-- Add full example on `README.md` file.
+- Fix supported platforms problem.
 
-## 1.0.0+3
+## 2.0.0
 
-- Make sure the shaking sensor closed on dispose.
-- Move package to stable version `v1.0.0+3`.
+- Add support for Web, MacOs, Windows and Linux.
+- More screenshots for the other platforms.
+- `sentTime` now is optional and the default value is `DateTime.now()`.
+- Add better explanation for usage of `ShowInspectorOn{LongPress, Shaking, Both}` enum with `RequestInspector` widget.
 
-## 1.0.1+4
+## 1.2.2
 
-- Remove `Navigator` from the `Inspector` widget tree.
+- Enhance time text appearance on SelectedRequest tab.
+- Fix selecting the current selected request not moving the SelectedRequest Tab bug.
 
-## 1.0.2+5
+## 1.2.1
 
-- Reset `MaterialApp` widget back because of select text feature was not working correctly.
-
-## 1.0.3+6
-
-- Add an option for opening inspector by passing `showInspectorOn` to `RequestsInspector` widget.
-
-**by default it is `Shaking`.**
-
-```dart
-enum ShowInspectorOn {
-  LongPress,
-  Shaking,
-  Both,
-}
-```
-
-## 1.1.3+7
-
-- Add `RequestsInspectorInterceptor` that can be used with `Dio` instead of using normal `InspectorController.addRequest` method.
+- Fix bug with `RequestInspectorInterceptor` to handle request onError.
 
 ## 1.2.0
 
@@ -57,26 +41,46 @@ InspectorController().addNewRequest(
 
 ```
 
-## 1.2.1
+## 1.1.3+7
 
-- Fix bug with `RequestInspectorInterceptor` to handle request onError.
+- Add `RequestsInspectorInterceptor` that can be used with `Dio` instead of using normal `InspectorController.addRequest` method.
 
-## 1.2.2
+## 1.0.3+6
 
-- Enhance time text appearance on SelectedRequest tab.
-- Fix selecting the current selected request not moving the SelectedRequest Tab bug.
+- Add an option for opening inspector by passing `showInspectorOn` to `RequestsInspector` widget.
 
-## 2.0.0
+**by default it is `Shaking`.**
 
-- Add support for Web, MacOs, Windows and Linux.
-- More screenshots for the other platforms.
-- `sentTime` now is optional and the default value is `DateTime.now()`.
-- Add better explanation for usage of `ShowInspectorOn{LongPress, Shaking, Both}` enum with `RequestInspector` widget.
+```dart
+enum ShowInspectorOn {
+  LongPress,
+  Shaking,
+  Both,
+}
+```
 
-## 2.0.1
+## 1.0.2+5
 
-- Fix supported platforms problem.
+- Reset `MaterialApp` widget back because of select text feature was not working correctly.
 
-## 2.0.2
+## 1.0.1+4
 
-- Fix `requestBody` not showing when using `RequestsInspectorInterceptor` bug.
+- Remove `Navigator` from the `Inspector` widget tree.
+
+## 1.0.0+3
+
+- Make sure the shaking sensor closed on dispose.
+- Move package to stable version `v1.0.0+3`.
+
+## 0.0.2+2
+
+- Rename `RequestsInspectorController` to `InspectorController` to solve naming confusion.
+- Add full example on `README.md` file.
+
+## 0.0.1+1
+
+- Fix screenshots on `README.md` file.
+
+## 0.0.1
+
+- Initial release.

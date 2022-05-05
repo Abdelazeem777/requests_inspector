@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:collection/collection.dart';
 import '../requests_inspector.dart';
 
 ///You can show the Inspector by **Shaking** your phone.
@@ -107,6 +107,7 @@ class _Inspector extends StatelessWidget {
       builder: (context, selectedTab, _) => Column(
         children: [
           _buildHeaderTabBar(context, selectedTab: selectedTab),
+          const Divider(height: 1),
           _buildSelectedTab(context, selectedTab: selectedTab),
         ],
       ),
@@ -235,29 +236,51 @@ class _RequestDetailsPage extends StatelessWidget {
   Widget _buildRequestDetails(BuildContext context, RequestDetails request) {
     return ListView(
       children: [
-        _buildRequestNameAndStatus(request.requestName, request.statusCode),
+        _buildRequestNameAndStatus(
+          method: request.requestMethod,
+          requestName: request.requestName,
+          statusCode: request.statusCode,
+        ),
         _buildRequestSentTime(request.sentTime),
         _buildTitle('URL'),
         _buildSelectableText(request.url),
-        const SizedBox(height: 8.0),
         ..._buildHeadersBlock(request.headers),
         ..._buildQueryBlock(request.queryParameters),
         ..._buildRequestBodyBlock(request.requestBody),
         ..._buildResponseBodyBlock(request.responseBody),
-      ],
+      ].mapIndexed(_buildBackgroundColor).toList(),
     );
   }
 
-  Widget _buildRequestNameAndStatus(String? requestName, int? statusCode) {
+  Widget _buildBackgroundColor(index, item) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: index.isOdd ? Colors.grey[100] : const Color(0xFF000000),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: item,
+      ),
+    );
+  }
+
+  Widget _buildRequestNameAndStatus({
+    RequestMethod? method,
+    String? requestName,
+    int? statusCode,
+  }) {
     return Container(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         children: [
           Expanded(
             child: Text(
-              requestName ?? 'No name',
-              style:
-                  const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              _createRequestName(method, requestName),
+              style: const TextStyle(
+                fontSize: 18.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
           ),
           Container(
@@ -275,6 +298,11 @@ class _RequestDetailsPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _createRequestName(RequestMethod? method, String? requestName) {
+    return (method?.name == null ? '' : method!.name + ': ') +
+        (requestName ?? 'No name');
   }
 
   Widget _buildRequestSentTime(DateTime sentTime) {
@@ -316,7 +344,6 @@ class _RequestDetailsPage extends StatelessWidget {
     return [
       _buildTitle('Parameters'),
       _buildSelectableText(queryParameters),
-      const SizedBox(height: 8.0),
     ];
   }
 
@@ -328,7 +355,6 @@ class _RequestDetailsPage extends StatelessWidget {
     return [
       _buildTitle('RequestBody'),
       _buildSelectableText(requestBody),
-      const SizedBox(height: 8.0),
     ];
   }
 
@@ -342,7 +368,6 @@ class _RequestDetailsPage extends StatelessWidget {
     return [
       _buildTitle('ResponseBody'),
       _buildSelectableText(responseBody),
-      const SizedBox(height: 8.0),
     ];
   }
 
@@ -378,11 +403,14 @@ class _RequestDetailsPage extends StatelessWidget {
   Widget _buildTitle(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Text(title,
-          style: const TextStyle(
-            fontSize: 18.0,
-            fontWeight: FontWeight.bold,
-          )),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 18.0,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 }
