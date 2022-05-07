@@ -1,3 +1,7 @@
+## 2.1.1
+
+- Fix `UNIDENTIFIED` error.
+
 ## 2.1.0
 
 - New UI theme is implemented.
@@ -38,7 +42,6 @@ InspectorController().addNewRequest(
       ...
       queryParameters: params,
       ...
-
 ```
 
 ## 1.1.3+7
