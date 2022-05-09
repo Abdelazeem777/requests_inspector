@@ -255,7 +255,9 @@ class _RequestDetailsPage extends StatelessWidget {
   Widget _buildBackgroundColor(index, item) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: index.isOdd ? Colors.grey[100] : const Color(0xFF000000),
+        color: index.isEven
+            ? const Color.fromARGB(255, 220, 220, 220)
+            : const Color(0xFFFFFFFF),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -279,7 +281,6 @@ class _RequestDetailsPage extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
               ),
             ),
           ),
@@ -330,7 +331,6 @@ class _RequestDetailsPage extends StatelessWidget {
     return [
       _buildTitle('Headers'),
       _buildSelectableText(headers),
-      const SizedBox(height: 8.0),
     ];
   }
 
@@ -408,7 +408,6 @@ class _RequestDetailsPage extends StatelessWidget {
         style: const TextStyle(
           fontSize: 18.0,
           fontWeight: FontWeight.bold,
-          color: Colors.white,
         ),
       ),
     );

@@ -24,6 +24,7 @@ Future<List<Post>> fetchPosts() async {
       queryParameters: params,
       statusCode: response.statusCode ?? 0,
       responseBody: response.data,
+      headers: {'language': 'en'},
     ),
   );
 

@@ -1,3 +1,7 @@
+## 2.1.2
+
+- UI enhancment.
+
 ## 2.1.1
 
 - Fix `UNIDENTIFIED` error.
