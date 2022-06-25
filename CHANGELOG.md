@@ -1,6 +1,11 @@
+## 2.2.0
+
+- Add `Run again` button to rerun the `selectedRequested` from the package itself.
+- Add `Clear all` button to remove all `RequestsDetails` from requests list.
+
 ## 2.1.2
 
-- UI enhancment.
+- UI enhancement.
 
 ## 2.1.1
 

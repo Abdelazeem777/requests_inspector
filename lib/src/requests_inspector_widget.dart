@@ -98,6 +98,26 @@ class _Inspector extends StatelessWidget {
         icon: const Icon(Icons.close),
         color: Colors.white,
       ),
+      actions: [
+        Selector<InspectorController, int>(
+          selector: (_, inspectorController) => inspectorController.selectedTab,
+          builder: (context, selectedTab, _) => selectedTab == 0
+              ? TextButton(
+                  onPressed: () => _showAreYouSureDialog(
+                    context,
+                    onYes: inspectorController.clearAllRequests,
+                  ),
+                  child: const Text(
+                    'Clear All',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )
+              : _RunAgainButton(
+                  key: ValueKey(inspectorController.selectedRequest.hashCode),
+                  onTap: inspectorController.runAgain,
+                ),
+        ),
+      ],
     );
   }
 
@@ -176,7 +196,7 @@ class _Inspector extends StatelessWidget {
                 itemBuilder: (context, index) => _RequestItemWidget(
                   request: allRequests[index],
                   onTap: (request) =>
-                      inspectorController.selectedRequested = request,
+                      inspectorController.selectedRequest = request,
                 ),
               ),
       ),
@@ -186,6 +206,68 @@ class _Inspector extends StatelessWidget {
   Widget _buildSelectedTabRequests() {
     return const _RequestDetailsPage();
   }
+
+  Future<void> _showAreYouSureDialog(
+    BuildContext context, {
+    required VoidCallback onYes,
+  }) {
+    return showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Are you sure? 🤔'),
+        content:
+            const Text('This will clear all requests added to the inspector'),
+        actions: [
+          TextButton(
+            child: const Text('Yes'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              onYes();
+            },
+          ),
+          TextButton(
+            child: const Text('No'),
+            onPressed: Navigator.of(context).pop,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RunAgainButton extends StatefulWidget {
+  const _RunAgainButton({
+    Key? key,
+    required this.onTap,
+  }) : super(key: key);
+
+  final Future<void> Function() onTap;
+
+  @override
+  _RunAgainButtonState createState() => _RunAgainButtonState();
+}
+
+class _RunAgainButtonState extends State<_RunAgainButton> {
+  bool _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return _isLoading
+        ? const Center(
+            child: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CircularProgressIndicator(color: Colors.white),
+          ))
+        : TextButton(
+            onPressed: () {
+              _setBusy();
+              widget.onTap().whenComplete(_setReady);
+            },
+            child: Text('Run again', style: TextStyle(color: Colors.white)));
+  }
+
+  void _setBusy() => setState(() => _isLoading = true);
+  void _setReady() => setState(() => _isLoading = false);
 }
 
 class _RequestItemWidget extends StatelessWidget {
@@ -225,7 +307,8 @@ class _RequestDetailsPage extends StatelessWidget {
     return Expanded(
       child: Selector<InspectorController, RequestDetails?>(
         selector: (_, inspectorController) =>
-            inspectorController.selectedRequested,
+            inspectorController.selectedRequest,
+        shouldRebuild: (previous, next) => true,
         builder: (context, selectedRequest, _) => selectedRequest == null
             ? const Center(child: Text('No request selected'))
             : _buildRequestDetails(context, selectedRequest),

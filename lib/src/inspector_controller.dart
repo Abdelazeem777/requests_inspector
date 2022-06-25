@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shake/shake.dart';
 
@@ -29,6 +30,7 @@ class InspectorController extends ChangeNotifier {
   late final ShowInspectorOn _showInspectorOn;
   late final ShakeDetector _shakeDetector;
 
+  final _dio = Dio(BaseOptions(validateStatus: (_) => true));
   final pageController = PageController(
     initialPage: 0,
     // if the viewportFraction is 1.0, the child pages will rebuild automatically
@@ -39,11 +41,11 @@ class InspectorController extends ChangeNotifier {
   int _selectedTab = 0;
 
   final _requestsList = <RequestDetails>[];
-  RequestDetails? _selectedRequested;
+  RequestDetails? _selectedRequest;
 
   int get selectedTab => _selectedTab;
   List<RequestDetails> get requestsList => _requestsList;
-  RequestDetails? get selectedRequested => _selectedRequested;
+  RequestDetails? get selectedRequest => _selectedRequest;
   bool get _allowShaking => [
         ShowInspectorOn.Shaking,
         ShowInspectorOn.Both,
@@ -55,9 +57,9 @@ class InspectorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  set selectedRequested(RequestDetails? value) {
-    if (_selectedRequested == value && _selectedTab == 1) return;
-    _selectedRequested = value;
+  set selectedRequest(RequestDetails? value) {
+    if (_selectedRequest == value && _selectedTab == 1) return;
+    _selectedRequest = value;
     _selectedTab = 1;
     notifyListeners();
   }
@@ -69,6 +71,37 @@ class InspectorController extends ChangeNotifier {
   void addNewRequest(RequestDetails request) {
     if (!_enabled) return;
     _requestsList.insert(0, request);
+    notifyListeners();
+  }
+
+  void clearAllRequests() {
+    if (_requestsList.isEmpty && _selectedRequest == null) return;
+    _requestsList.clear();
+    _selectedRequest = null;
+    notifyListeners();
+  }
+
+  Future<void> runAgain() async {
+    if (_selectedRequest == null) return;
+
+    var currentRequest = _selectedRequest!;
+    final response = await _dio.request(
+      currentRequest.url,
+      queryParameters: currentRequest.queryParameters,
+      data: currentRequest.requestBody,
+      options: Options(
+        method: currentRequest.requestMethod.name,
+        headers: currentRequest.headers,
+      ),
+    );
+    if (currentRequest != _selectedRequest) return;
+
+    _selectedRequest = currentRequest.copyWith(
+      responseBody: response.data,
+      statusCode: response.statusCode,
+      sentTime: DateTime.now(),
+    );
+
     notifyListeners();
   }
 
