@@ -57,17 +57,14 @@ class RequestsInspector extends StatelessWidget {
         : _child;
 
     if (!hideInspectorBanner && enabled)
-      widget = Banner(
-        message: 'INSPECTOR',
+      widget = Directionality(
         textDirection: TextDirection.ltr,
-        location: BannerLocation.topEnd,
-        child: widget,
-      );
-
-    if (enabled)
-      widget = MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: widget,
+        child: Banner(
+          message: 'INSPECTOR',
+          textDirection: TextDirection.ltr,
+          location: BannerLocation.topEnd,
+          child: widget,
+        ),
       );
 
     return widget;
@@ -82,9 +79,11 @@ class _Inspector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      body: _buildBody(),
+    return MaterialApp(
+      home: Scaffold(
+        appBar: _buildAppBar(context),
+        body: _buildBody(),
+      ),
     );
   }
 
@@ -258,12 +257,18 @@ class _RunAgainButtonState extends State<_RunAgainButton> {
             padding: EdgeInsets.all(8.0),
             child: CircularProgressIndicator(color: Colors.white),
           ))
-        : TextButton(
-            onPressed: () {
+        : InkWell(
+            onTap: () {
               _setBusy();
               widget.onTap().whenComplete(_setReady);
             },
-            child: Text('Run again', style: TextStyle(color: Colors.white)));
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text('Run', style: TextStyle(color: Colors.white)),
+                Icon(Icons.play_arrow, color: Colors.white),
+              ],
+            ));
   }
 
   void _setBusy() => setState(() => _isLoading = true);
@@ -290,10 +295,31 @@ class _RequestItemWidget extends StatelessWidget {
           : _request.statusCode! > 299
               ? Colors.red[400]
               : Colors.green[400],
-      leading: Text(_request.requestMethod.name),
+      leading: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Text(
+            _request.requestMethod.name,
+            style: const TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            _extractTimeText(_request.sentTime),
+            style: TextStyle(color: Colors.grey[800]),
+          ),
+        ],
+      ),
       title: Text(_request.requestName),
       subtitle: Text(_request.url),
-      trailing: Text(_request.statusCode?.toString() ?? 'Err'),
+      trailing: Text(
+        _request.statusCode?.toString() ?? 'Err',
+        style: const TextStyle(
+          fontSize: 16.0,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
       onTap: () => _onTap(_request),
     );
   }
@@ -354,7 +380,7 @@ class _RequestDetailsPage extends StatelessWidget {
     String? requestName,
     int? statusCode,
   }) {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         children: [
@@ -391,19 +417,13 @@ class _RequestDetailsPage extends StatelessWidget {
 
   Widget _buildRequestSentTime(DateTime sentTime) {
     final sentTimeText = _extractTimeText(sentTime);
-    return Container(
+    return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Text(
         'Sent at: $sentTimeText',
         style: const TextStyle(fontSize: 16.0),
       ),
     );
-  }
-
-  String _extractTimeText(DateTime sentTime) {
-    final sentTimeText =
-        sentTime.toIso8601String().split('T').last.substring(0, 8);
-    return sentTimeText;
   }
 
   Iterable<Widget> _buildHeadersBlock(headers) {
@@ -496,3 +516,12 @@ class _RequestDetailsPage extends StatelessWidget {
     );
   }
 }
+
+String _extractTimeText(DateTime sentTime) {
+  var sentTimeText = sentTime.toIso8601String().split('T').last.substring(0, 8);
+  sentTimeText = _replaceLastSeparatorWithDot(sentTimeText);
+  return sentTimeText;
+}
+
+String _replaceLastSeparatorWithDot(String sentTimeText) =>
+    sentTimeText.replaceFirst(':', '.', 5);

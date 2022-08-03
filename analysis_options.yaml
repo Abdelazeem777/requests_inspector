@@ -1,0 +1,12 @@
+include: package:flutter_lints/flutter.yaml
+linter:
+  rules:
+    curly_braces_in_flow_control_structures: false
+    constant_identifier_names: false
+    file_names: false
+    library_prefixes: false
+    prefer_function_declarations_over_variables: false
+
+analyzer:
+  errors:
+    avoid_relative_lib_imports: error

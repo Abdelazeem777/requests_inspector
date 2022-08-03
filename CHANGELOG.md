@@ -1,3 +1,8 @@
+## 2.2.1
+
+- Fix Nested `MaterialApp` bug with `Navigator` and `BuildContext`.
+- Some UI enhancement.
+
 ## 2.2.0
 
 - Add `Run again` button to rerun the `selectedRequested` from the package itself.
