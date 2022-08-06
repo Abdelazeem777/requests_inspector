@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shake/shake.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../requests_inspector.dart';
+import 'json_pretty_converter.dart';
 
 ///Singleton
 class InspectorController extends ChangeNotifier {
@@ -103,6 +105,13 @@ class InspectorController extends ChangeNotifier {
     );
 
     notifyListeners();
+  }
+
+  void shareSelectedRequest() {
+    final requestMap = _selectedRequest!.toMap();
+    final requestShareContent = JsonPrettyConverter().convert(requestMap);
+
+    Share.share(requestShareContent);
   }
 
   @override

@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
+import 'package:requests_inspector/src/json_pretty_converter.dart';
 import '../requests_inspector.dart';
 
 ///You can show the Inspector by **Shaking** your phone.
@@ -81,8 +82,10 @@ class _Inspector extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        backgroundColor: Colors.white,
         appBar: _buildAppBar(context),
         body: _buildBody(),
+        floatingActionButton: _buildShareFloatingButton(),
       ),
     );
   }
@@ -192,11 +195,15 @@ class _Inspector extends StatelessWidget {
             ? const Center(child: Text('No requests added yet'))
             : ListView.builder(
                 itemCount: allRequests.length,
-                itemBuilder: (context, index) => _RequestItemWidget(
-                  request: allRequests[index],
-                  onTap: (request) =>
-                      inspectorController.selectedRequest = request,
-                ),
+                itemBuilder: (context, index) {
+                  final request = allRequests[index];
+                  return _RequestItemWidget(
+                    isSelected: inspectorController.selectedRequest == request,
+                    request: request,
+                    onTap: (request) =>
+                        inspectorController.selectedRequest = request,
+                  );
+                },
               ),
       ),
     );
@@ -230,6 +237,23 @@ class _Inspector extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildShareFloatingButton() {
+    return Selector<InspectorController, bool>(
+      selector: (_, inspectorController) =>
+          inspectorController.selectedTab == 1 &&
+          inspectorController.selectedRequest != null,
+      builder: (context, showShareButton, _) => showShareButton
+          ? FloatingActionButton(
+              backgroundColor: Colors.black,
+              child: const Icon(Icons.share),
+              onPressed: () {
+                final controller = context.read<InspectorController>();
+                controller.shareSelectedRequest();
+              })
+          : const SizedBox(),
     );
   }
 }
@@ -278,18 +302,21 @@ class _RunAgainButtonState extends State<_RunAgainButton> {
 class _RequestItemWidget extends StatelessWidget {
   const _RequestItemWidget({
     Key? key,
+    required bool isSelected,
     required RequestDetails request,
     required ValueChanged<RequestDetails> onTap,
-  })  : _request = request,
+  })  : _isSelected = isSelected,
+        _request = request,
         _onTap = onTap,
         super(key: key);
 
+  final bool _isSelected;
   final RequestDetails _request;
   final ValueChanged<RequestDetails> _onTap;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    Widget child = ListTile(
       tileColor: _request.statusCode == null
           ? Colors.red[400]
           : _request.statusCode! > 299
@@ -322,6 +349,15 @@ class _RequestItemWidget extends StatelessWidget {
       ),
       onTap: () => _onTap(_request),
     );
+
+    if (_isSelected)
+      child = DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black, width: 2.0),
+        ),
+        child: child,
+      );
+    return child;
   }
 }
 
@@ -344,6 +380,7 @@ class _RequestDetailsPage extends StatelessWidget {
 
   Widget _buildRequestDetails(BuildContext context, RequestDetails request) {
     return ListView(
+      padding: const EdgeInsets.only(bottom: 96.0),
       children: [
         _buildRequestNameAndStatus(
           method: request.requestMethod,
@@ -475,32 +512,12 @@ class _RequestDetailsPage extends StatelessWidget {
   }
 
   Widget _buildSelectableText(text) {
-    late final String prettyprint;
-    if (text is Map || text is String || text is List)
-      prettyprint = _convertToPrettyJsonFromMapOrJson(text);
-    else if (text is FormData)
-      prettyprint = 'FormData:\n' + _convertToPrettyFromFormData(text);
-    else
-      prettyprint = text.toString();
+    final prettyprint = JsonPrettyConverter().convert(text);
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: SelectableText(prettyprint),
     );
-  }
-
-  String _convertToPrettyJsonFromMapOrJson(text) {
-    const encoder = JsonEncoder.withIndent('  ');
-    return encoder.convert(text);
-  }
-
-  String _convertToPrettyFromFormData(FormData text) {
-    final map = {
-      for (final e in text.fields) e.key: e.value,
-      for (final e in text.files) e.key: e.value.filename
-    };
-
-    return _convertToPrettyJsonFromMapOrJson(map);
   }
 
   Widget _buildTitle(String title) {

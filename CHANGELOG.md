@@ -1,3 +1,8 @@
+## 2.3.0
+
+- Add share button to share request content.
+- Add unique black border to the selected requests.
+
 ## 2.2.1
 
 - Fix Nested `MaterialApp` bug with `Navigator` and `BuildContext`.
