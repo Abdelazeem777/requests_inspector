@@ -34,6 +34,15 @@ class JsonPrettyConverter {
   }
 
   String _convertToPrettyJsonFromMapOrJson(text) {
+    if (text is! Map) return _encoder.convert(text);
+
+    text = {
+      for (final e in text.entries)
+        if (e.value is Map || e.value is List || e.value is String)
+          e.key: e.value
+        else
+          e.key: convert(e.value)
+    };
     return _encoder.convert(text);
   }
 }

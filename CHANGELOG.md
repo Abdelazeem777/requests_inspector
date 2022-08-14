@@ -1,3 +1,7 @@
+## 2.3.1
+
+- Fix json converter bug with FormData on share bug.
+
 ## 2.3.0
 
 - Add share button to share request content.
