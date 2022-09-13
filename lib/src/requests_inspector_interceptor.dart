@@ -5,11 +5,15 @@ import '../requests_inspector.dart';
 class RequestsInspectorInterceptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
+    String rightLink =
+        response.requestOptions.path.contains(response.requestOptions.baseUrl)
+            ? response.requestOptions.path
+            : (response.requestOptions.baseUrl + response.requestOptions.path);
     InspectorController().addNewRequest(
       RequestDetails(
         requestMethod: RequestMethod.values
             .firstWhere((e) => e.name == response.requestOptions.method),
-        url: response.requestOptions.path,
+        url: rightLink,
         statusCode: response.statusCode ?? 0,
         headers: response.requestOptions.headers,
         queryParameters: response.requestOptions.queryParameters,
@@ -23,11 +27,15 @@ class RequestsInspectorInterceptor extends Interceptor {
 
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
+    String rightLink =
+        err.requestOptions.path.contains(err.requestOptions.baseUrl)
+            ? err.requestOptions.path
+            : (err.requestOptions.baseUrl + err.requestOptions.path);
     InspectorController().addNewRequest(
       RequestDetails(
         requestMethod: RequestMethod.values
             .firstWhere((e) => e.name == err.requestOptions.method),
-        url: err.requestOptions.path,
+        url: rightLink,
         headers: err.requestOptions.headers,
         queryParameters: err.requestOptions.queryParameters,
         requestBody: err.requestOptions.data,
