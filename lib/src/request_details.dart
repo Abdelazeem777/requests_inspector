@@ -5,6 +5,7 @@ import 'package:requests_inspector/requests_inspector.dart';
 
 class RequestDetails {
   late final String requestName;
+  late final String _id;
   final RequestMethod requestMethod;
   final String url;
   final int? statusCode;
@@ -24,8 +25,9 @@ class RequestDetails {
     this.responseBody,
     DateTime? sentTime,
   }) {
-    this.requestName = requestName ?? _extractName(url);
+    this.requestName = requestName?.toUpperCase() ?? _extractName(url);
     this.sentTime = sentTime ?? DateTime.now();
+    _id = _generateId();
   }
 
   String _extractName(String url) {
@@ -33,6 +35,14 @@ class RequestDetails {
     final name = url.split('/').last;
     return name.toUpperCase();
   }
+
+  String _generateId() {
+    final endPoint = url.split('?').first;
+    final id = '$endPoint-${sentTime.millisecondsSinceEpoch}';
+    return id.substring(0, id.length - 2);
+  }
+
+  String get id => _id;
 
   RequestDetails copyWith({
     String? requestName,

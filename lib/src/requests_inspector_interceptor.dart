@@ -9,7 +9,7 @@ class RequestsInspectorInterceptor extends Interceptor {
       RequestDetails(
         requestMethod: RequestMethod.values
             .firstWhere((e) => e.name == response.requestOptions.method),
-        url: response.requestOptions.path,
+        url: _extractUrl(response.requestOptions),
         statusCode: response.statusCode ?? 0,
         headers: response.requestOptions.headers,
         queryParameters: response.requestOptions.queryParameters,
@@ -21,13 +21,16 @@ class RequestsInspectorInterceptor extends Interceptor {
     super.onResponse(response, handler);
   }
 
+  String _extractUrl(RequestOptions requestOptions) =>
+      requestOptions.uri.toString().split('?')[0];
+
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
     InspectorController().addNewRequest(
       RequestDetails(
         requestMethod: RequestMethod.values
             .firstWhere((e) => e.name == err.requestOptions.method),
-        url: err.requestOptions.path,
+        url: _extractUrl(err.requestOptions),
         headers: err.requestOptions.headers,
         queryParameters: err.requestOptions.queryParameters,
         requestBody: err.requestOptions.data,
