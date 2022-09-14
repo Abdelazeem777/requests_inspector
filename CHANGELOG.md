@@ -1,3 +1,7 @@
+## 2.3.2
+
+- Fix run again bug with `RequestsInspectorInterceptor` while using `baseUrl`.
+
 ## 2.3.1
 
 - Fix json converter bug with FormData on share bug.
