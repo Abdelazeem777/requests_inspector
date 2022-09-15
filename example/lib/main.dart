@@ -35,8 +35,10 @@ Future<List<Post>> fetchPostsUsingInterceptor() async {
   final dio = Dio(BaseOptions(validateStatus: (_) => true))
     ..interceptors.add(RequestsInspectorInterceptor());
   final params = {'userId': 1};
-  final response = await dio.get('https://jsonplaceholder.typicode.com/posts',
-      queryParameters: params);
+  final response = await dio.get(
+    'https://jsonplaceholder.typicode.com/posts',
+    queryParameters: params,
+  );
 
   final postsMap = response.data as List;
   final posts = postsMap.map((postMap) => Post.fromMap(postMap)).toList();

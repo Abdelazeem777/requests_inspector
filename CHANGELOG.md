@@ -1,3 +1,7 @@
+## 2.3.3
+
+- Extract built-in params from the url using `RequestsInspectorInterceptor`.
+
 ## 2.3.2
 
 - Fix run again bug with `RequestsInspectorInterceptor` while using `baseUrl`.

@@ -5,14 +5,17 @@ import '../requests_inspector.dart';
 class RequestsInspectorInterceptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
+    final urlAndQueryParMapEntry = _extractUrl(response.requestOptions);
+    final url = urlAndQueryParMapEntry.key;
+    final queryParameters = urlAndQueryParMapEntry.value;
     InspectorController().addNewRequest(
       RequestDetails(
         requestMethod: RequestMethod.values
             .firstWhere((e) => e.name == response.requestOptions.method),
-        url: _extractUrl(response.requestOptions),
+        url: url,
         statusCode: response.statusCode ?? 0,
         headers: response.requestOptions.headers,
-        queryParameters: response.requestOptions.queryParameters,
+        queryParameters: queryParameters,
         requestBody: response.requestOptions.data,
         responseBody: response.data,
         sentTime: DateTime.now(),
@@ -21,23 +24,44 @@ class RequestsInspectorInterceptor extends Interceptor {
     super.onResponse(response, handler);
   }
 
-  String _extractUrl(RequestOptions requestOptions) =>
-      requestOptions.uri.toString().split('?')[0];
-
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
+    final urlAndQueryParMapEntry = _extractUrl(err.requestOptions);
+    final url = urlAndQueryParMapEntry.key;
+    final queryParameters = urlAndQueryParMapEntry.value;
     InspectorController().addNewRequest(
       RequestDetails(
         requestMethod: RequestMethod.values
             .firstWhere((e) => e.name == err.requestOptions.method),
-        url: _extractUrl(err.requestOptions),
+        url: url,
         headers: err.requestOptions.headers,
-        queryParameters: err.requestOptions.queryParameters,
+        queryParameters: queryParameters,
         requestBody: err.requestOptions.data,
         responseBody: err.message,
         sentTime: DateTime.now(),
       ),
     );
     super.onError(err, handler);
+  }
+
+  MapEntry<String, Map<String, dynamic>> _extractUrl(
+    RequestOptions requestOptions,
+  ) {
+    final splitUri = requestOptions.uri.toString().split('?');
+    final baseUrl = splitUri.first;
+    final builtInQuery = splitUri.length > 1 ? splitUri.last : null;
+    final buildInQueryParamsList = builtInQuery?.split('&').map((e) {
+      final split = e.split('=');
+      return MapEntry(split.first, split.last);
+    }).toList();
+    final builtInQueryParams = buildInQueryParamsList == null
+        ? null
+        : Map.fromEntries(buildInQueryParamsList);
+    final queryParameters = {
+      ...?builtInQueryParams,
+      ...requestOptions.queryParameters
+    };
+
+    return MapEntry(baseUrl, queryParameters);
   }
 }
