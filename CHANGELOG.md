@@ -1,3 +1,8 @@
+## 2.3.4
+
+- Support `Flutter 3`.
+- Update `Share_plus` version.
+
 ## 2.3.3
 
 - Extract built-in params from the url using `RequestsInspectorInterceptor`.

@@ -1,10 +1,10 @@
 name: requests_inspector
 description: A Flutter package for logging API requests and accessing it by Shaking your phone to get the RequestsInspector widget on your screen.
-version: 2.3.3
+version: 2.3.4
 homepage: https://github.com/Abdelazeem777/requests_inspector
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.17.0 <3.0.0"
   flutter: ">=1.20.0"
 
 dependencies:
@@ -14,7 +14,7 @@ dependencies:
   provider: ^6.0.1
   dio: ^4.0.6
   shake: ^2.0.0
-  share_plus: ^4.0.10
+  share_plus: ^6.0.0
 
 dev_dependencies:
   flutter_test:
