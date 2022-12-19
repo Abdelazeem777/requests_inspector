@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -182,7 +180,7 @@ class _Inspector extends StatelessWidget {
   Widget _buildSelectedTab(BuildContext context, {required int selectedTab}) {
     return selectedTab == 0
         ? _buildAllRequests(context)
-        : _buildSelectedTabRequests();
+        : const _RequestDetailsPage();
   }
 
   Widget _buildAllRequests(BuildContext context) {
@@ -207,10 +205,6 @@ class _Inspector extends StatelessWidget {
               ),
       ),
     );
-  }
-
-  Widget _buildSelectedTabRequests() {
-    return const _RequestDetailsPage();
   }
 
   Future<void> _showAreYouSureDialog(

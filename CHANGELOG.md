@@ -1,3 +1,7 @@
+## 2.3.5
+
+- Reformat shared text to be more readable.
+
 ## 2.3.4
 
 - Support `Flutter 3`.

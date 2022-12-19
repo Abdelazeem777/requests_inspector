@@ -109,7 +109,7 @@ class InspectorController extends ChangeNotifier {
 
   void shareSelectedRequest() {
     final requestMap = _selectedRequest!.toMap();
-    final requestShareContent = JsonPrettyConverter().convert(requestMap);
+    final requestShareContent = _formatMap(requestMap);
 
     Share.share(requestShareContent);
   }
@@ -118,5 +118,18 @@ class InspectorController extends ChangeNotifier {
   void dispose() {
     if (_allowShaking) _shakeDetector.stopListening();
     super.dispose();
+  }
+
+  String _formatMap(Map<String, dynamic> requestMap) {
+    final converter = JsonPrettyConverter();
+    final listOfContent = [
+      for (final entry in requestMap.entries) ...[
+        '=[ ${entry.key} ]===================\n',
+        converter.convert(entry.value),
+        '\n\n',
+      ],
+    ];
+
+    return listOfContent.join();
   }
 }
