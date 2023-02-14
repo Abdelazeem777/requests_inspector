@@ -6,3 +6,4 @@ export 'src/requests_inspector_widget.dart';
 export './src/requests_methods.dart';
 export './src/show_inspector_on_enum.dart';
 export './src/requests_inspector_interceptor.dart';
+export './src/graph_ql_interceptor.dart';
