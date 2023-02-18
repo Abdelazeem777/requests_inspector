@@ -1,3 +1,7 @@
+## 2.4.0
+
+- Support `Dio` v5.
+
 ## 2.3.5
 
 - Reformat shared text to be more readable.
