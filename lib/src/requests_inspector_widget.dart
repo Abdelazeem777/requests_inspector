@@ -160,6 +160,7 @@ class _Inspector extends StatelessWidget {
   }) {
     return Expanded(
       child: InkWell(
+        onTap: onTap,
         child: Container(
           padding: const EdgeInsets.all(12.0),
           alignment: Alignment.center,
@@ -172,7 +173,6 @@ class _Inspector extends StatelessWidget {
             ),
           ),
         ),
-        onTap: onTap,
       ),
     );
   }
@@ -226,8 +226,8 @@ class _Inspector extends StatelessWidget {
             },
           ),
           TextButton(
-            child: const Text('No'),
             onPressed: Navigator.of(context).pop,
+            child: const Text('No'),
           ),
         ],
       ),
@@ -442,7 +442,7 @@ class _RequestDetailsPage extends StatelessWidget {
   }
 
   String _createRequestName(RequestMethod? method, String? requestName) {
-    return (method?.name == null ? '' : method!.name + ': ') +
+    return (method?.name == null ? '' : '${method!.name}: ') +
         (requestName ?? 'No name');
   }
 

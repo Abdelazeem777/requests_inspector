@@ -18,7 +18,7 @@ class JsonPrettyConverter {
     if (text is Map || text is String || text is List)
       prettyprint = _convertToPrettyJsonFromMapOrJson(text);
     else if (text is FormData)
-      prettyprint = 'FormData:\n' + _convertToPrettyFromFormData(text);
+      prettyprint = 'FormData:\n${_convertToPrettyFromFormData(text)}';
     else
       prettyprint = text.toString();
     return prettyprint;
