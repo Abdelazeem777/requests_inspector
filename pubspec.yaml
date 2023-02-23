@@ -15,6 +15,7 @@ dependencies:
   dio: ^5.0.0
   shake: ^2.2.0
   share_plus: ^6.3.1
+  hasura_connect: ^4.0.0+4
 
 dev_dependencies:
   flutter_test:
