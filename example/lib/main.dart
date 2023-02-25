@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -47,10 +46,10 @@ Future<List<Post>> fetchPostsUsingInterceptor() async {
   return posts;
 }
 
-Future<List<Post>> fetchPostsGraphQlUsingInterceptor() async {
+Future<List<Post>> fetchPostsGraphQlUsingHasuraInterceptor() async {
   final response = await HasuraConnect(
     'https://graphqlzero.almansi.me/api',
-    interceptors: [GraphQlInterceptor()],
+    interceptors: [HasuraGraphQLInterceptor()],
   ).query('''query {
     post(id: 1) {
       id
@@ -157,7 +156,9 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     futurePosts =
-        fetchPostsGraphQlUsingInterceptor() /*for Interceptor example use => fetchPostsUsingInterceptor() */;
+        fetchPostsUsingInterceptor() /*for restful apis Interceptor example use => fetchPostsUsingInterceptor() */;
+    // futurePosts =
+    //     fetchPostsGraphQlUsingHasuraInterceptor() /*for graph ql Interceptor example use => fetchPostsUsingInterceptor() */;
   }
 
   @override
