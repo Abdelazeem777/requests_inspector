@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:hasura_connect/hasura_connect.dart';
 import 'package:requests_inspector/requests_inspector.dart';
 
 Future<List<Post>> fetchPosts() async {
@@ -32,8 +33,7 @@ Future<List<Post>> fetchPosts() async {
 }
 
 Future<List<Post>> fetchPostsUsingInterceptor() async {
-  final dio = Dio(BaseOptions(validateStatus: (_) => true))
-    ..interceptors.add(RequestsInspectorInterceptor());
+  final dio = Dio(BaseOptions(validateStatus: (_) => true))..interceptors.add(RequestsInspectorInterceptor());
   final params = {'userId': 1};
   final response = await dio.get(
     'https://jsonplaceholder.typicode.com/posts',
@@ -44,6 +44,24 @@ Future<List<Post>> fetchPostsUsingInterceptor() async {
   final posts = postsMap.map((postMap) => Post.fromMap(postMap)).toList();
 
   return posts;
+}
+
+Future<List<Post>> fetchPostsGraphQlUsingHasuraInterceptor() async {
+  final response = await HasuraConnect(
+    'https://graphqlzero.almansi.me/api',
+    interceptors: [HasuraGraphQLInterceptor()],
+  ).query('''query {
+    post(id: 1) {
+      id
+      title
+      body
+    }
+    }''');
+  print(response);
+  var post = Post.fromMap(response['data']['post']);
+  print(post.toMap());
+
+  return [post];
 }
 
 class Post {
@@ -84,7 +102,7 @@ class Post {
   factory Post.fromMap(Map<String, dynamic> map) {
     return Post(
       userId: map['userId']?.toInt() ?? 0,
-      id: map['id']?.toInt() ?? 0,
+      id: int.parse(map['id']),
       title: map['title'] ?? '',
       body: map['body'] ?? '',
     );
@@ -138,7 +156,9 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     futurePosts =
-        fetchPostsUsingInterceptor() /*for Interceptor example use => fetchPostsUsingInterceptor() */;
+        fetchPostsUsingInterceptor() /*for restful apis Interceptor example use => fetchPostsUsingInterceptor() */;
+    // futurePosts =
+    //     fetchPostsGraphQlUsingHasuraInterceptor() /*for graph ql Interceptor example use => fetchPostsUsingInterceptor() */;
   }
 
   @override
