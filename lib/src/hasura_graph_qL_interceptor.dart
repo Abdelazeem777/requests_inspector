@@ -1,9 +1,7 @@
-import 'dart:convert';
-
 import 'package:hasura_connect/hasura_connect.dart';
 import 'package:requests_inspector/requests_inspector.dart';
 
-class GraphQlInterceptor extends Interceptor {
+class HasuraGraphQLInterceptor extends Interceptor {
   Request? request;
   @override
   Future<void> onConnected(HasuraConnect connect) async {}
