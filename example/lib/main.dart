@@ -33,7 +33,8 @@ Future<List<Post>> fetchPosts() async {
 }
 
 Future<List<Post>> fetchPostsUsingInterceptor() async {
-  final dio = Dio(BaseOptions(validateStatus: (_) => true))..interceptors.add(RequestsInspectorInterceptor());
+  final dio = Dio(BaseOptions(validateStatus: (_) => true))
+    ..interceptors.add(RequestsInspectorInterceptor());
   final params = {'userId': 1};
   final response = await dio.get(
     'https://jsonplaceholder.typicode.com/posts',
@@ -102,7 +103,7 @@ class Post {
   factory Post.fromMap(Map<String, dynamic> map) {
     return Post(
       userId: map['userId']?.toInt() ?? 0,
-      id: int.parse(map['id']),
+      id: int.tryParse(map['id'].toString()) ?? 0,
       title: map['title'] ?? '',
       body: map['body'] ?? '',
     );
@@ -156,9 +157,9 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     futurePosts =
-        fetchPostsUsingInterceptor() /*for restful apis Interceptor example use => fetchPostsUsingInterceptor() */;
-    // futurePosts =
-    //     fetchPostsGraphQlUsingHasuraInterceptor() /*for graph ql Interceptor example use => fetchPostsUsingInterceptor() */;
+//  fetchPostsUsingInterceptor() /*for restful apis Interceptor example use => fetchPostsUsingInterceptor() */;
+
+        fetchPostsGraphQlUsingHasuraInterceptor() /*for graph ql Interceptor example use => fetchPostsUsingInterceptor() */;
   }
 
   @override

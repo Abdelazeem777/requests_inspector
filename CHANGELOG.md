@@ -1,3 +1,7 @@
+## 2.5.0
+
+- Support `HasuraGraphQL`.
+
 ## 2.4.0
 
 - Support `Dio` v5.
