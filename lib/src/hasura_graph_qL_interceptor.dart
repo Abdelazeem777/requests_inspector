@@ -7,18 +7,18 @@ class HasuraGraphQLInterceptor extends Interceptor {
   Future<void> onConnected(HasuraConnect connect) async {}
 
   @override
-  Future onError(HasuraError error, HasuraConnect connect) async {
+  Future onError(HasuraError request, HasuraConnect connect) async {
     InspectorController().addNewRequest(
       RequestDetails(
-        requestName: error.request.query.variables?.entries.first.value,
+        requestName: request.request.query.variables?.entries.first.value,
         requestMethod: RequestMethod.POST,
-        requestBody: error.request.query.toString(),
-        headers: error.request.headers,
+        requestBody: request.request.query.toString(),
+        headers: request.request.headers,
         url: connect.url,
-        responseBody: error.message,
+        responseBody: request.message,
       ),
     );
-    return error;
+    return request;
   }
 
   @override
@@ -28,19 +28,19 @@ class HasuraGraphQLInterceptor extends Interceptor {
   }
 
   @override
-  Future onResponse(Response response, HasuraConnect connect) async {
+  Future onResponse(Response data, HasuraConnect connect) async {
     InspectorController().addNewRequest(
       RequestDetails(
-        requestName: response.request.query.variables?.entries.first.value,
+        requestName: data.request.query.variables?.entries.first.value,
         requestMethod: RequestMethod.POST,
-        requestBody: response.request.query.toString(),
-        headers: response.request.headers,
-        statusCode: response.statusCode,
+        requestBody: data.request.query.toString(),
+        headers: data.request.headers,
+        statusCode: data.statusCode,
         url: connect.url,
-        responseBody: response.data,
+        responseBody: data.data,
       ),
     );
-    return response;
+    return data;
   }
 
   @override
