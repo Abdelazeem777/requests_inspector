@@ -7,3 +7,4 @@ export './src/requests_methods.dart';
 export './src/show_inspector_on_enum.dart';
 export './src/requests_inspector_interceptor.dart';
 export 'src/hasura_graph_qL_interceptor.dart';
+export 'src/graphql_flutter_interceptor.dart';
