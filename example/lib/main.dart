@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-
+import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:hasura_connect/hasura_connect.dart';
 import 'package:requests_inspector/requests_inspector.dart';
+import 'package:graphql/client.dart';
 
 Future<List<Post>> fetchPosts() async {
   final dio = Dio(BaseOptions(validateStatus: (_) => true));
@@ -33,8 +34,7 @@ Future<List<Post>> fetchPosts() async {
 }
 
 Future<List<Post>> fetchPostsUsingInterceptor() async {
-  final dio = Dio(BaseOptions(validateStatus: (_) => true))
-    ..interceptors.add(RequestsInspectorInterceptor());
+  final dio = Dio(BaseOptions(validateStatus: (_) => true))..interceptors.add(RequestsInspectorInterceptor());
   final params = {'userId': 1};
   final response = await dio.get(
     'https://jsonplaceholder.typicode.com/posts',
@@ -62,6 +62,30 @@ Future<List<Post>> fetchPostsGraphQlUsingHasuraInterceptor() async {
   var post = Post.fromMap(response['data']['post']);
   print(post.toMap());
 
+  return [post];
+}
+
+Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
+  final client = GraphQLClient(
+    cache: GraphQLCache(),
+    link: GraphQLFlutterInterceptor('https://graphqlzero.almansi.me/api'),
+  );
+  const query = r'''query {
+    post(id: 1) {
+      id
+      title
+      body
+    }
+    }''';
+
+  final options = QueryOptions(document: gql(query));
+  final result = await client.query(options);
+  if (result.hasException) {
+    log(result.exception.toString());
+  } else {
+    log(result.data.toString());
+  }
+  var post = Post.fromMap(result.data?['post']);
   return [post];
 }
 
@@ -159,7 +183,7 @@ class _MyAppState extends State<MyApp> {
     futurePosts =
 //  fetchPostsUsingInterceptor() /*for restful apis Interceptor example use => fetchPostsUsingInterceptor() */;
 
-        fetchPostsGraphQlUsingHasuraInterceptor() /*for graph ql Interceptor example use => fetchPostsUsingInterceptor() */;
+        fetchPostsGraphQlUsingGraphQLFlutterInterceptor() /*for graph ql Interceptor example use => fetchPostsUsingInterceptor() */;
   }
 
   @override

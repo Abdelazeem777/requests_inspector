@@ -1,6 +1,6 @@
 # requests_inspector 🕵
 
-A Flutter package for logging API requests and accessing it by **Shaking** your phone to get the `RequestsInspector` widget on your screen.
+A Flutter package for logging restful & graph ql APIS requests and accessing it by **Shaking** your phone to get the `RequestsInspector` widget on your screen.
 
 ### First, add it at the top of your `MaterialApp` with `enabled: true`.
 
@@ -12,6 +12,7 @@ void main() {
   ));
 }
 ```
+### 1. Restful: 
 
 **Note:** Don't forget to `enable` it!
 
@@ -37,9 +38,9 @@ final dio = Dio()..interceptors.add(RequestsInspectorInterceptor());
 
 ```
 
-### Real example
+### Real Restful example
 
-1. Normal `InspectorController().addNewRequest`.
+a. Normal `InspectorController().addNewRequest`.
 
 ```dart
 Future<List<Post>> fetchPosts() async {
@@ -69,7 +70,7 @@ Future<List<Post>> fetchPosts() async {
 }
 ```
 
-2. Using `RequestsInspectorInterceptor`.
+b. Using `RequestsInspectorInterceptor`.
 
 ```dart
 Future<List<Post>> fetchPosts() async {
@@ -82,10 +83,37 @@ Future<List<Post>> fetchPosts() async {
   return posts;
 }
 ```
-
 ### Finlay, `Shake` your phone to get the `Inspector`
 
 <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mobile_list.jpg" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mobile_request.jpg" width ="280" />
+
+### 2. Graph Ql:
+### You can use `HassuraConnect` library to use the graph ql requests, then you can just pass `HasuraGraphQLInterceptor()` to `HassuraConnect.interceptors` and we are good to go 🎉️🎉️.
+
+```dart
+ Future<List<Post>> fetchPostsGraphQlUsingHasuraInterceptor() async {
+  final response = await HasuraConnect(
+    'https://graphqlzero.almansi.me/api',
+    interceptors: [HasuraGraphQLInterceptor()],
+  ).query('''query {
+    post(id: 1) {
+      id
+      title
+      body
+    }
+    }''');
+  print(response);
+  var post = Post.fromMap(response['data']['post']);
+  print(post.toMap());
+
+  return [post];
+}
+```
+### Finlay, `Shake` your phone to get the `Inspector`
+
+<img src = "https://user-images.githubusercontent.com/13955306/221519994-ebe40514-60d0-4aec-a14e-7684d6d2d832.png" width ="280" /> <img src = "https://user-images.githubusercontent.com/13955306/221518947-9b8fada5-7648-45af-a52d-f09e95b91e51.png" width ="280" /> 
+
+
 
 ### For Web, Windows, MacOS and Linux
 
