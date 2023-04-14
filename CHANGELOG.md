@@ -1,3 +1,10 @@
+## 3.0.0
+
+- Presenting `GraphQLInspectorLink` for supporting `GraphQL` clients. 🎉️
+  (Thanks to [Abdelrahman Tareq](https://github.com/AbdoTareq) PR ).
+
+- Some Refactoring for `HasuraGraphQL` support.
+
 ## 2.5.0
 
 - Support `HasuraGraphQL`.

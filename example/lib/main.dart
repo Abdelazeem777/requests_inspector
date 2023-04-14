@@ -34,7 +34,8 @@ Future<List<Post>> fetchPosts() async {
 }
 
 Future<List<Post>> fetchPostsUsingInterceptor() async {
-  final dio = Dio(BaseOptions(validateStatus: (_) => true))..interceptors.add(RequestsInspectorInterceptor());
+  final dio = Dio(BaseOptions(validateStatus: (_) => true))
+    ..interceptors.add(RequestsInspectorInterceptor());
   final params = {'userId': 1};
   final response = await dio.get(
     'https://jsonplaceholder.typicode.com/posts',
@@ -50,7 +51,7 @@ Future<List<Post>> fetchPostsUsingInterceptor() async {
 Future<List<Post>> fetchPostsGraphQlUsingHasuraInterceptor() async {
   final response = await HasuraConnect(
     'https://graphqlzero.almansi.me/api',
-    interceptors: [HasuraGraphQLInterceptor()],
+    interceptors: [HasuraInspectorInterceptor()],
   ).query('''query {
     post(id: 1) {
       id
@@ -68,7 +69,7 @@ Future<List<Post>> fetchPostsGraphQlUsingHasuraInterceptor() async {
 Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
   final client = GraphQLClient(
     cache: GraphQLCache(),
-    link: GraphQLFlutterInterceptor('https://graphqlzero.almansi.me/api'),
+    link: GraphQLInspectorLink(HttpLink('https://graphqlzero.almansi.me/api')),
   );
   const query = r'''query {
     post(id: 1) {
@@ -181,9 +182,9 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     futurePosts =
-//  fetchPostsUsingInterceptor() /*for restful apis Interceptor example use => fetchPostsUsingInterceptor() */;
-
-        fetchPostsGraphQlUsingGraphQLFlutterInterceptor() /*for graph ql Interceptor example use => fetchPostsUsingInterceptor() */;
+        fetchPostsUsingInterceptor() /*for restful apis Interceptor example use => fetchPostsUsingInterceptor() */;
+    //  fetchPostsGraphQlUsingHasuraInterceptor() /*for graph ql(Hasura) Interceptor example */;
+    //  fetchPostsGraphQlUsingGraphQLFlutterInterceptor() /*for graph ql Interceptor example */;
   }
 
   @override

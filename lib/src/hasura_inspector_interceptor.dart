@@ -1,40 +1,38 @@
 import 'package:hasura_connect/hasura_connect.dart';
 import 'package:requests_inspector/requests_inspector.dart';
 
-class HasuraGraphQLInterceptor extends Interceptor {
-  Request? request;
+class HasuraInspectorInterceptor extends Interceptor {
   @override
   Future<void> onConnected(HasuraConnect connect) async {}
 
   @override
-  Future onError(HasuraError request, HasuraConnect connect) async {
+  Future onError(HasuraError error, HasuraConnect connect) async {
+    final request = error.request;
     InspectorController().addNewRequest(
       RequestDetails(
-        requestName: request.request.query.variables?.entries.first.value,
+        requestName: request.query.variables?.entries.first.value,
         requestMethod: RequestMethod.POST,
-        requestBody: request.request.query.toString(),
-        headers: request.request.headers,
+        requestBody: request.query.toString(),
+        headers: request.headers,
         url: connect.url,
-        responseBody: request.message,
+        responseBody: error.message,
       ),
     );
     return request;
   }
 
   @override
-  Future<Request> onRequest(Request request, HasuraConnect connect) async {
-    request = request;
-    return request;
-  }
+  Future<Request> onRequest(Request request, _) async => request;
 
   @override
   Future onResponse(Response data, HasuraConnect connect) async {
+    final request = data.request;
     InspectorController().addNewRequest(
       RequestDetails(
-        requestName: data.request.query.variables?.entries.first.value,
+        requestName: request.query.variables?.entries.first.value,
         requestMethod: RequestMethod.POST,
-        requestBody: data.request.query.toString(),
-        headers: data.request.headers,
+        requestBody: request.query.toString(),
+        headers: request.headers,
         statusCode: data.statusCode,
         url: connect.url,
         responseBody: data.data,
@@ -50,7 +48,5 @@ class HasuraGraphQLInterceptor extends Interceptor {
   Future<void> onTryAgain(HasuraConnect connect) async {}
 
   @override
-  Future<void>? onDisconnected() {
-    throw UnimplementedError();
-  }
+  Future<void>? onDisconnected() {}
 }
