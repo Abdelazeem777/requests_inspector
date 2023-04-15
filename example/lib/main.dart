@@ -59,9 +59,9 @@ Future<List<Post>> fetchPostsGraphQlUsingHasuraInterceptor() async {
       body
     }
     }''');
-  print(response);
+  log(response);
   var post = Post.fromMap(response['data']['post']);
-  print(post.toMap());
+  log(post.toMap().toString());
 
   return [post];
 }
