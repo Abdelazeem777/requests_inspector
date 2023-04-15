@@ -48,5 +48,5 @@ class HasuraInspectorInterceptor extends Interceptor {
   Future<void> onTryAgain(HasuraConnect connect) async {}
 
   @override
-  Future<void>? onDisconnected() {}
+  Future<void>? onDisconnected() async {}
 }
