@@ -107,11 +107,14 @@ class InspectorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void shareSelectedRequest() {
+  void shareSelectedRequest([Rect? sharePositionOrigin]) {
     final requestMap = _selectedRequest!.toMap();
     final requestShareContent = _formatMap(requestMap);
 
-    Share.share(requestShareContent);
+    Share.share(
+      requestShareContent,
+      sharePositionOrigin: sharePositionOrigin,
+    );
   }
 
   @override

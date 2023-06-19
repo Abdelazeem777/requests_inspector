@@ -1,3 +1,7 @@
+## 3.0.1
+
+- Fix share request bug with the iPad.
+
 ## 3.0.0
 
 - Presenting `GraphQLInspectorLink` for supporting `GraphQL` clients. 🎉️

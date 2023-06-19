@@ -244,8 +244,13 @@ class _Inspector extends StatelessWidget {
               backgroundColor: Colors.black,
               child: const Icon(Icons.share),
               onPressed: () {
+                final box = context.findRenderObject() as RenderBox?;
                 final controller = context.read<InspectorController>();
-                controller.shareSelectedRequest();
+                controller.shareSelectedRequest(
+                  box == null
+                      ? null
+                      : box.localToGlobal(Offset.zero) & box.size,
+                );
               })
           : const SizedBox(),
     );
