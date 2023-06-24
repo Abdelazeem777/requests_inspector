@@ -4,4 +4,5 @@ enum RequestMethod {
   PATCH,
   PUT,
   DELETE,
+  WS,
 }
