@@ -401,7 +401,7 @@ class _RequestDetailsPage extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: index.isEven
-            ? const Color.fromARGB(255, 220, 220, 220)
+            ? const Color.fromARGB(255, 208, 208, 208)
             : const Color(0xFFFFFFFF),
       ),
       child: Padding(
