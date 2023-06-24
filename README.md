@@ -98,9 +98,14 @@ you jus need to wrap your normal `HttpLink` with our `GraphQLInspectorLink` and 
 
 ```dart
  Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
+ Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
   final client = GraphQLClient(
     cache: GraphQLCache(),
-    link: GraphQLInspectorLink(HttpLink('https://graphqlzero.almansi.me/api')),
+    link: Link.split(
+      (request) => request.isSubscription,
+      GraphQLInspectorLink(WebSocketLink('ws://graphqlzero.almansi.me/api')),
+      GraphQLInspectorLink(HttpLink('https://graphqlzero.almansi.me/api')),
+    ),
   );
   const query = r'''query {
     post(id: 1) {
@@ -180,3 +185,14 @@ void main() {
 <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/web_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/web_request.png" width ="280" />
 <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mac_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mac_request.png" width ="280" />
 <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/linux_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/linux_request.png" width ="280" />
+
+## Future plans
+
+- [x] Add support for `GraphQL`.
+- [ ] Enhance the `GraphQL` request and response displaying structure.
+- [ ] Improve the request tab UI and add expand/collapse for each data block.
+- [ ] Add search inside the request details page.
+
+## 📃 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

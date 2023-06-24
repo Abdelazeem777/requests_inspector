@@ -1,3 +1,7 @@
+## 3.1.0
+
+- `WebSocketLink` is supported using the normal `GraphQLInspectorLink`.
+
 ## 3.0.1
 
 - Fix share request bug with the iPad.
