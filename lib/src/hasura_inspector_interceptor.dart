@@ -6,19 +6,19 @@ class HasuraInspectorInterceptor extends Interceptor {
   Future<void> onConnected(HasuraConnect connect) async {}
 
   @override
-  Future onError(HasuraError error, HasuraConnect connect) async {
-    final request = error.request;
+  Future onError(HasuraError request, HasuraConnect connect) async {
+    final myRequest = request.request;
     InspectorController().addNewRequest(
       RequestDetails(
-        requestName: request.query.variables?.entries.first.value,
+        requestName: myRequest.query.variables?.entries.first.value,
         requestMethod: RequestMethod.POST,
-        requestBody: request.query.toString(),
-        headers: request.headers,
+        requestBody: myRequest.query.toString(),
+        headers: myRequest.headers,
         url: connect.url,
-        responseBody: error.message,
+        responseBody: request.message,
       ),
     );
-    return request;
+    return myRequest;
   }
 
   @override

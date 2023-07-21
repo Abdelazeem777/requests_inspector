@@ -285,9 +285,9 @@ class _RunAgainButtonState extends State<_RunAgainButton> {
               _setBusy();
               widget.onTap().whenComplete(_setReady);
             },
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children: [
                 Text('Run', style: TextStyle(color: Colors.white)),
                 Icon(Icons.play_arrow, color: Colors.white),
               ],
