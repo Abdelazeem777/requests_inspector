@@ -1,3 +1,7 @@
+## 3.1.2
+
+- Upgrade `share_plus` v7.0.2.
+
 ## 3.1.1
 
 - Refactoring the `example` project for better understanding thanks to [Moaz El-sawaf](https://github.com/moazelsawaf).
