@@ -1,6 +1,6 @@
 ## 3.1.1
 
-- Refactoring the `example` project for better understanding.
+- Refactoring the `example` project for better understanding thanks to [Moaz El-sawaf](https://github.com/moazelsawaf).
 - Support flutter latest version v3.10.6.
 
 ## 3.1.0
