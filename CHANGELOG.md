@@ -1,3 +1,8 @@
+## 3.1.1
+
+- Refactoring the `example` project for better understanding.
+- Support flutter latest version v3.10.6.
+
 ## 3.1.0
 
 - `WebSocketLink` is supported using the normal `GraphQLInspectorLink`.
