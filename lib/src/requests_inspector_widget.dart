@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
 import 'package:requests_inspector/src/json_pretty_converter.dart';
+import 'package:velocity_x/velocity_x.dart';
 import '../requests_inspector.dart';
 
 ///You can show the Inspector by **Shaking** your phone.
@@ -503,10 +504,11 @@ class _RequestDetailsPage extends StatelessWidget {
             responseBody is String ||
             responseBody is List) &&
         responseBody.isEmpty) return [];
-
     return [
       _buildTitle('ResponseBody'),
-      _buildSelectableText(responseBody),
+      responseBody is Map ? VxJson(responseBody) : Container(),
+      responseBody is List ? VxJson({'data': responseBody}) : Container(),
+      responseBody is String ? _buildSelectableText(responseBody) : Container(),
     ];
   }
 
