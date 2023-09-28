@@ -489,6 +489,7 @@ class _RequestDetailsPage extends StatelessWidget {
         (requestName ?? 'No name');
   }
 
+  ///TODO: It's better to add the request duration as well!
   Widget _buildRequestSentTime(DateTime sentTime) {
     final sentTimeText = _extractTimeText(sentTime);
     return Padding(
