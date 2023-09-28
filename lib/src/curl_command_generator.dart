@@ -62,6 +62,7 @@ class CurlCommandGenerator {
   void _addHeaders(StringBuffer curlCommand) {
     if (details.headers != null) {
       details.headers.forEach((key, value) {
+        if (key == 'content-length') return;
         curlCommand.write('-H "$key: $value" ');
       });
     }
