@@ -243,16 +243,54 @@ class _Inspector extends StatelessWidget {
           ? FloatingActionButton(
               backgroundColor: Colors.black,
               child: const Icon(Icons.share),
-              onPressed: () {
-                final box = context.findRenderObject() as RenderBox?;
+              onPressed: () async {
                 final controller = context.read<InspectorController>();
+                final selectedRequest = controller.selectedRequest!;
+                final isHttp = _isHttp(selectedRequest);
+
+                final isCurl =
+                    isHttp ? await _showDialogShareType(context) : false;
+
+                if (isCurl == null) return;
+
+                final box = context.findRenderObject() as RenderBox?;
                 controller.shareSelectedRequest(
                   box == null
                       ? null
                       : box.localToGlobal(Offset.zero) & box.size,
+                  isCurl,
                 );
               })
           : const SizedBox(),
+    );
+  }
+
+  bool _isHttp(RequestDetails selectedRequest) {
+    return selectedRequest.requestMethod == RequestMethod.GET ||
+        selectedRequest.requestMethod == RequestMethod.POST ||
+        selectedRequest.requestMethod == RequestMethod.PUT ||
+        selectedRequest.requestMethod == RequestMethod.PATCH ||
+        selectedRequest.requestMethod == RequestMethod.DELETE;
+  }
+
+  Future<bool?> _showDialogShareType(BuildContext context) {
+    return showDialog<bool?>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Normal Log or CURL command? 🤔'),
+        content: const Text(
+            'The CURL command is more useful for exporting to Postman or run it again from terminal'),
+        actions: [
+          TextButton(
+            child: const Text('CURL Command'),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Normal Log'),
+          ),
+        ],
+      ),
     );
   }
 }

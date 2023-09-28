@@ -4,6 +4,7 @@ import 'package:shake/shake.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../requests_inspector.dart';
+import 'curl_command_generator.dart';
 import 'json_pretty_converter.dart';
 
 ///Singleton
@@ -107,10 +108,15 @@ class InspectorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void shareSelectedRequest([Rect? sharePositionOrigin]) {
-    final requestMap = _selectedRequest!.toMap();
-    final requestShareContent = _formatMap(requestMap);
-
+  void shareSelectedRequest([Rect? sharePositionOrigin, bool isCurl = false]) {
+    String? requestShareContent;
+    if (isCurl) {
+      final curlCommandGenerator = CurlCommandGenerator(_selectedRequest!);
+      requestShareContent = curlCommandGenerator.generate();
+    } else {
+      final requestMap = _selectedRequest!.toMap();
+      requestShareContent = _formatMap(requestMap);
+    }
     Share.share(
       requestShareContent,
       sharePositionOrigin: sharePositionOrigin,
