@@ -1,3 +1,13 @@
+## 3.2.0
+
+- Now you can share your request as a `cURL` command. 🥳
+  <br>
+
+  **Note:**
+  You can use `cURL` command to send the request again from your terminal.
+  _OR_
+  You can import the command to [Postman](https://www.postman.com/) to send the request again for more flexibility and control on the debugging process. 💪💪
+
 ## 3.1.2
 
 - Upgrade `share_plus` v7.0.2.

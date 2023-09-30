@@ -2,6 +2,11 @@
 
 A Flutter package for **logging** API requests (**RESTful API** & **GraphQL**) requests and accessing it by **Shaking** your phone to get the `RequestsInspector` widget on your screen.
 
+Also you can share the request details as (**Log** or **cURL** command) with your team to help them debug the API requests.
+
+**Note:**
+You can use `cURL` command to send the request again from your terminal or [Postman](https://www.postman.com/) 💪💪
+
 ### First, add it at the top of your `MaterialApp` with `enabled: true`.
 
 ```dart
