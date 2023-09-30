@@ -1,5 +1,4 @@
 import 'dart:convert'; // for jsonEncode and Uri.encodeQueryComponent
-import 'dart:io';
 
 import 'package:dio/dio.dart';
 
