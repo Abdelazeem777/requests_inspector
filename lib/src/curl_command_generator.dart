@@ -1,6 +1,8 @@
 import 'dart:convert'; // for jsonEncode and Uri.encodeQueryComponent
 import 'dart:io';
 
+import 'package:dio/dio.dart';
+
 import 'request_details.dart';
 import 'requests_methods.dart'; // for File
 
@@ -100,13 +102,19 @@ class CurlCommandGenerator {
             bodyString.substring(0, bodyString.length - 1); // Remove last &
         curlCommand.write("-d '$bodyString' ");
       } else if (contentType.contains('multipart/form-data')) {
-        (details.requestBody as Map).forEach((key, value) {
-          if (value is File) {
-            curlCommand.write("-F '$key=@${value.path}' ");
-          } else {
-            curlCommand.write("-F '$key=${value.toString()}' ");
+        if (details.requestBody is FormData) {
+          FormData formData = details.requestBody as FormData;
+          for (var mapEntry in formData.fields) {
+            curlCommand.write("-F '${mapEntry.key}=${mapEntry.value}' ");
           }
-        });
+
+          formData.files.forEach((file) {
+            // Ideally, you would have the actual file path, but since FormData does not expose this information
+            // You might use filename, but note that this won't work as a real curl command without the correct file path.
+            String fileName = file.value.filename ?? 'file';
+            curlCommand.write("-F '${file.key}=@$fileName' ");
+          });
+        }
       } else {
         curlCommand.write("-d '${jsonEncode(details.requestBody)}' ");
       }
