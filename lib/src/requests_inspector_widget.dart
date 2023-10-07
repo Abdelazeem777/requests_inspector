@@ -56,17 +56,17 @@ class RequestsInspector extends StatelessWidget {
         : _child;
 
     if (!hideInspectorBanner && enabled)
-      widget = Directionality(
+      widget = Banner(
+        message: 'INSPECTOR',
         textDirection: TextDirection.ltr,
-        child: Banner(
-          message: 'INSPECTOR',
-          textDirection: TextDirection.ltr,
-          location: BannerLocation.topEnd,
-          child: widget,
-        ),
+        location: BannerLocation.topEnd,
+        child: widget,
       );
 
-    return widget;
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: widget,
+    );
   }
 
   bool _isSupportShaking() =>
