@@ -40,7 +40,9 @@ class RequestsInspector extends StatelessWidget {
                 onWillPop: () async =>
                     inspectorController.pageController.page == 0,
                 child: GestureDetector(
-                  onLongPress: inspectorController.showInspector,
+                  onLongPress: showInspectorOn != ShowInspectorOn.Shaking
+                    ? inspectorController.showInspector
+                    : null,
                   child: PageView(
                     controller: inspectorController.pageController,
                     physics: const NeverScrollableScrollPhysics(),
