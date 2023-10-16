@@ -1,3 +1,11 @@
+## 3.2.1
+
+- Fix `hideInspectorBanner: true` no longer crashes the app, thanks to [vlytvyne](https://github.com/vlytvyne).
+
+- Fix `ShowInspectorOn.LongPress` not working if `ShowInspectorOn.Shaking` is set, thanks to [vlytvyne](https://github.com/vlytvyne).
+
+- Update README.md file.
+
 ## 3.2.0
 
 - Now you can share your request as a `cURL` command. 🥳
