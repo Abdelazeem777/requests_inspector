@@ -7,6 +7,8 @@ Also you can share the request details as (**Log** or **cURL** command) with you
 **Note:**
 You can use `cURL` command to send the request again from your terminal or [Postman](https://www.postman.com/) 💪💪
 
+<img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/curl_share_request.gif" width="600"/>
+
 ### First, add it at the top of your `MaterialApp` with `enabled: true`.
 
 ```dart
