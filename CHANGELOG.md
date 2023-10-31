@@ -1,6 +1,7 @@
 ## 3.3.0
 
 - Increase the shaking count to 3 times to open the inspector.
+- Remove HasuraGraphQL support for now because of the packages conflicts.
 
 ## 3.2.1
 
