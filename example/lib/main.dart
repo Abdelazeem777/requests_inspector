@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:hasura_connect/hasura_connect.dart';
 import 'package:requests_inspector/requests_inspector.dart';
 import 'package:graphql/client.dart';
 
@@ -46,24 +45,6 @@ Future<List<Post>> fetchPostsUsingInterceptor() async {
   final posts = postsMap.map((postMap) => Post.fromMap(postMap)).toList();
 
   return posts;
-}
-
-Future<List<Post>> fetchPostsGraphQlUsingHasuraInterceptor() async {
-  final response = await HasuraConnect(
-    'https://graphqlzero.almansi.me/api',
-    interceptors: [HasuraInspectorInterceptor()],
-  ).query('''query {
-    post(id: 1) {
-      id
-      title
-      body
-    }
-    }''');
-  log(response);
-  var post = Post.fromMap(response['data']['post']);
-  log(post.toMap().toString());
-
-  return [post];
 }
 
 Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
@@ -183,7 +164,6 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     futurePosts =
         fetchPostsUsingInterceptor() /*for restful apis Interceptor example use => fetchPostsUsingInterceptor() */;
-    //  fetchPostsGraphQlUsingHasuraInterceptor() /*for graph ql(Hasura) Interceptor example */;
     //  fetchPostsGraphQlUsingGraphQLFlutterInterceptor() /*for graph ql Interceptor example */;
   }
 

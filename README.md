@@ -135,30 +135,6 @@ you jus need to wrap your normal `HttpLink` with our `GraphQLInspectorLink` and 
 
 ```
 
-### 3. GraphQl(Hassura):
-
-You can use [hasura_connect]('https://pub.dev/packages/hasura_connect') library to use the graph ql requests, then you can just pass `HasuraInspectorInterceptor()` to `HassuraConnect.interceptors` and we are good to go 🎉️🎉️.
-
-```dart
- Future<List<Post>> fetchPostsGraphQlUsingHasuraInterceptor() async {
-  final response = await HasuraConnect(
-    'https://graphqlzero.almansi.me/api',
-    interceptors: [HasuraInspectorInterceptor()],
-  ).query('''query {
-    post(id: 1) {
-      id
-      title
-      body
-    }
-    }''');
-  print(response);
-  var post = Post.fromMap(response['data']['post']);
-  print(post.toMap());
-
-  return [post];
-}
-```
-
 ### For Web, Windows, MacOS and Linux
 
 Obviously, The shaking won't be good enough for those platforms 😅
