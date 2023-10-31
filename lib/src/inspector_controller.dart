@@ -24,7 +24,10 @@ class InspectorController extends ChangeNotifier {
   )   : _enabled = enabled,
         _showInspectorOn = showInspectorOn {
     if (_enabled && _allowShaking)
-      _shakeDetector = ShakeDetector.autoStart(onPhoneShake: showInspector);
+      _shakeDetector = ShakeDetector.autoStart(
+        onPhoneShake: showInspector,
+        minimumShakeCount: 3,
+      );
   }
 
   static InspectorController? _singleton;

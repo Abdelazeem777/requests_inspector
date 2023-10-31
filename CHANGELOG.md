@@ -1,3 +1,7 @@
+## 3.3.0
+
+- Increase the shaking count to 3 times to open the inspector.
+
 ## 3.2.1
 
 - Fix `hideInspectorBanner: true` no longer crashes the app, thanks to [vlytvyne](https://github.com/vlytvyne).
