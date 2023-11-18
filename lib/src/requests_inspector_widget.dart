@@ -41,8 +41,8 @@ class RequestsInspector extends StatelessWidget {
                     inspectorController.pageController.page == 0,
                 child: GestureDetector(
                   onLongPress: showInspectorOn != ShowInspectorOn.Shaking
-                    ? inspectorController.showInspector
-                    : null,
+                      ? inspectorController.showInspector
+                      : null,
                   child: PageView(
                     controller: inspectorController.pageController,
                     physics: const NeverScrollableScrollPhysics(),
@@ -81,6 +81,7 @@ class _Inspector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: Theme.of(context).copyWith(useMaterial3: false),
       home: Scaffold(
         backgroundColor: Colors.white,
         appBar: _buildAppBar(context),

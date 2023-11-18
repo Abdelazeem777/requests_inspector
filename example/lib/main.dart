@@ -174,6 +174,7 @@ class _MyAppState extends State<MyApp> {
       title: 'Fetch Data Example',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        useMaterial3: false,
       ),
       home: Scaffold(
         appBar: AppBar(
