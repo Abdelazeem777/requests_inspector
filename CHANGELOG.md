@@ -1,3 +1,8 @@
+## 3.3.1
+
+- Add support for Flutter v3.16.\*, thanks to [the-best-is-best](https://github.com/the-best-is-best).
+- Upgrade `gql` package to v1.0.0+1.
+
 ## 3.3.0
 
 - Increase the shaking count to 3 times to open the inspector.
