@@ -1,3 +1,5 @@
+[![Stand With Palestine](https://raw.githubusercontent.com/TheBSD/StandWithPalestine/main/banner-no-action.svg)](https://thebsd.github.io/StandWithPalestine)
+
 # requests_inspector 🕵
 
 A Flutter package for **logging** API requests (**RESTful API** & **GraphQL**) requests and accessing it by **Shaking** your phone to get the `RequestsInspector` widget on your screen.
