@@ -1,3 +1,7 @@
+## 3.3.2
+
+- Add request Duration to the request details for HTTP and GraphQL.
+
 ## 3.3.1
 
 - Add support for Flutter v3.16.\*, thanks to [the-best-is-best](https://github.com/the-best-is-best).

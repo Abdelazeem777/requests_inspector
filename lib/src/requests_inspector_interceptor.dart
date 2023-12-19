@@ -4,6 +4,13 @@ import '../requests_inspector.dart';
 
 class RequestsInspectorInterceptor extends Interceptor {
   @override
+  Future<void> onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
+    options.extra['startTime'] = DateTime.now();
+    return super.onRequest(options, handler);
+  }
+
+  @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     final urlAndQueryParMapEntry = _extractUrl(response.requestOptions);
     final url = urlAndQueryParMapEntry.key;
@@ -18,7 +25,8 @@ class RequestsInspectorInterceptor extends Interceptor {
         queryParameters: queryParameters,
         requestBody: response.requestOptions.data,
         responseBody: response.data,
-        sentTime: DateTime.now(),
+        sentTime: response.requestOptions.extra['startTime'],
+        receivedTime: DateTime.now(),
       ),
     );
     super.onResponse(response, handler);
@@ -38,7 +46,8 @@ class RequestsInspectorInterceptor extends Interceptor {
         queryParameters: queryParameters,
         requestBody: err.requestOptions.data,
         responseBody: err.message,
-        sentTime: DateTime.now(),
+        sentTime: err.requestOptions.extra['startTime'],
+        receivedTime: DateTime.now(),
       ),
     );
     super.onError(err, handler);

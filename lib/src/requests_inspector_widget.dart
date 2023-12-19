@@ -373,7 +373,9 @@ class _RequestItemWidget extends StatelessWidget {
             ),
           ),
           Text(
-            _extractTimeText(_request.sentTime),
+            _request.receivedTime != null
+                ? _calculateDuration(_request.sentTime, _request.receivedTime!)
+                : _extractTimeText(_request.sentTime),
             style: TextStyle(color: Colors.grey[800]),
           ),
         ],
@@ -427,7 +429,10 @@ class _RequestDetailsPage extends StatelessWidget {
           requestName: request.requestName,
           statusCode: request.statusCode,
         ),
-        _buildRequestSentTime(request.sentTime),
+        _buildRequestSentTimeAndDuration(
+          request.sentTime,
+          request.receivedTime,
+        ),
         _buildTitle('URL'),
         _buildSelectableText(request.url),
         ..._buildHeadersBlock(request.headers),
@@ -492,13 +497,23 @@ class _RequestDetailsPage extends StatelessWidget {
         (requestName ?? 'No name');
   }
 
-  ///TODO: It's better to add the request duration as well!
-  Widget _buildRequestSentTime(DateTime sentTime) {
+  Widget _buildRequestSentTimeAndDuration(
+    DateTime sentTime,
+    DateTime? receivedTime,
+  ) {
     final sentTimeText = _extractTimeText(sentTime);
+    var text = 'Sent at: $sentTimeText';
+
+    if (receivedTime != null) {
+      final durationText = _calculateDuration(sentTime, receivedTime);
+      final receivedTimeText = _extractTimeText(receivedTime);
+      text += '\nReceived at: $receivedTimeText\nDuration: $durationText';
+    }
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Text(
-        'Sent at: $sentTimeText',
+        text,
         style: const TextStyle(fontSize: 16.0),
       ),
     );
@@ -579,6 +594,16 @@ String _extractTimeText(DateTime sentTime) {
   var sentTimeText = sentTime.toIso8601String().split('T').last.substring(0, 8);
   sentTimeText = _replaceLastSeparatorWithDot(sentTimeText);
   return sentTimeText;
+}
+
+String _calculateDuration(DateTime sentTime, DateTime receivedTime) {
+  final duration = receivedTime.difference(sentTime);
+
+  if (duration.inMilliseconds < 1000) return '${duration.inMilliseconds} ms';
+  if (duration.inSeconds < 60) return '${duration.inSeconds} s';
+  if (duration.inMinutes < 60) return '${duration.inMinutes} m';
+  if (duration.inHours < 24) return '${duration.inHours} h';
+  return '${duration.inDays} d';
 }
 
 String _replaceLastSeparatorWithDot(String sentTimeText) =>
