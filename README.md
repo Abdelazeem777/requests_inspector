@@ -2,12 +2,16 @@
 
 # requests_inspector 🕵
 
+[![pub package](https://img.shields.io/pub/v/requests_inspector.svg)](https://pub.dev/packages/requests_inspector)
+
 A Flutter package for **logging** API requests (**RESTful API** & **GraphQL**) requests and accessing it by **Shaking** your phone to get the `RequestsInspector` widget on your screen.
+
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mobile_list.jpg" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mobile_request.jpg" width ="280" />
 
 Also you can share the request details as (**Log** or **cURL** command) with your team to help them debug the API requests.
 
-**Note:**
-You can use `cURL` command to send the request again from your terminal or [Postman](https://www.postman.com/) 💪💪
+**From Inspector to PostMan 🧡**
+Now you can use `cURL` command to send the request again from your terminal or [Postman](https://www.postman.com/) 💪💪
 
 <img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/curl_share_request.gif" width="600"/>
 
