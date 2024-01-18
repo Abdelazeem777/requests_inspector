@@ -1,3 +1,7 @@
+## 3.4.0
+
+- Add the ability to intercept the request before sending it to the server and modify it.
+
 ## 3.3.2
 
 - Add request Duration to the request details for HTTP and GraphQL.

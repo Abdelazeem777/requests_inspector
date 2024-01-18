@@ -7,7 +7,18 @@ class RequestsInspectorInterceptor extends Interceptor {
   Future<void> onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
     options.extra['startTime'] = DateTime.now();
-    return super.onRequest(options, handler);
+
+    if (!InspectorController().userInterceptorEnabled)
+      return super.onRequest(options, handler);
+
+    final requestDetails = _convertToRequestDetails(options);
+    final newRequestDetails =
+        await InspectorController().editRequest(requestDetails);
+
+    if (newRequestDetails == null) return super.onRequest(options, handler);
+
+    final newOptions = _copyRequestToNewOptions(options, newRequestDetails);
+    return super.onRequest(newOptions, handler);
   }
 
   @override
@@ -73,4 +84,26 @@ class RequestsInspectorInterceptor extends Interceptor {
 
     return MapEntry(baseUrl, queryParameters);
   }
+
+  RequestDetails _convertToRequestDetails(RequestOptions options) =>
+      RequestDetails(
+        requestMethod:
+            RequestMethod.values.firstWhere((e) => e.name == options.method),
+        url: options.uri.toString(),
+        headers: options.headers,
+        queryParameters: options.queryParameters,
+        requestBody: options.data,
+        sentTime: DateTime.now(),
+      );
+
+  RequestOptions _copyRequestToNewOptions(
+          RequestOptions options, RequestDetails requestDetails) =>
+      options.copyWith(
+        method: requestDetails.requestMethod.name,
+        headers: requestDetails.headers,
+        queryParameters: requestDetails.queryParameters,
+        data: requestDetails.requestBody,
+        path: requestDetails.url,
+        extra: {...options.extra, 'startTime': DateTime.now()},
+      );
 }

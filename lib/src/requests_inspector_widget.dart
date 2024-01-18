@@ -5,34 +5,45 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
 import 'package:requests_inspector/src/json_pretty_converter.dart';
+import 'package:requests_inspector/src/request_editor_dialog.dart';
 import '../requests_inspector.dart';
 
 ///You can show the Inspector by **Shaking** your phone.
 class RequestsInspector extends StatelessWidget {
   const RequestsInspector({
     Key? key,
-    this.enabled = false,
-    this.hideInspectorBanner = false,
-    this.showInspectorOn = ShowInspectorOn.Shaking,
+    bool enabled = false,
+    bool hideInspectorBanner = false,
+    ShowInspectorOn showInspectorOn = ShowInspectorOn.Shaking,
     required Widget child,
-  })  : _child = child,
+    GlobalKey<NavigatorState>? navigatorKey,
+  })  : _enabled = enabled,
+        _hideInspectorBanner = hideInspectorBanner,
+        _showInspectorOn = showInspectorOn,
+        _child = child,
+        _navigatorKey = navigatorKey,
         super(key: key);
 
   ///Require hot restart for showing its change
-  final bool enabled;
-  final bool hideInspectorBanner;
-  final ShowInspectorOn showInspectorOn;
+  final bool _enabled;
+  final bool _hideInspectorBanner;
+  final ShowInspectorOn _showInspectorOn;
   final Widget _child;
+  final GlobalKey<NavigatorState>? _navigatorKey;
 
   @override
   Widget build(BuildContext context) {
-    var widget = enabled
+    var widget = _enabled
         ? ChangeNotifierProvider(
             create: (context) => InspectorController(
-              enabled: enabled,
+              enabled: _enabled,
               showInspectorOn: _isSupportShaking()
-                  ? showInspectorOn
+                  ? _showInspectorOn
                   : ShowInspectorOn.LongPress,
+              onInterceptRequest: (requestDetails) => _showRequestEditorDialog(
+                context,
+                requestDetails: requestDetails,
+              ),
             ),
             builder: (context, _) {
               final inspectorController = context.read<InspectorController>();
@@ -40,7 +51,7 @@ class RequestsInspector extends StatelessWidget {
                 onWillPop: () async =>
                     inspectorController.pageController.page == 0,
                 child: GestureDetector(
-                  onLongPress: showInspectorOn != ShowInspectorOn.Shaking
+                  onLongPress: _showInspectorOn != ShowInspectorOn.Shaking
                       ? inspectorController.showInspector
                       : null,
                   child: PageView(
@@ -57,7 +68,7 @@ class RequestsInspector extends StatelessWidget {
           )
         : _child;
 
-    if (!hideInspectorBanner && enabled)
+    if (!_hideInspectorBanner && _enabled)
       widget = Banner(
         message: 'INSPECTOR',
         textDirection: TextDirection.ltr,
@@ -73,6 +84,17 @@ class RequestsInspector extends StatelessWidget {
 
   bool _isSupportShaking() =>
       kIsWeb ? false : Platform.isAndroid || Platform.isIOS;
+
+  Future<RequestDetails?> _showRequestEditorDialog(
+    BuildContext context, {
+    required RequestDetails requestDetails,
+  }) {
+    if (_navigatorKey?.currentContext == null) return Future.value(null);
+    return showDialog<RequestDetails?>(
+      context: _navigatorKey!.currentContext!,
+      builder: (context) => RequestEditorDialog(requestDetails: requestDetails),
+    );
+  }
 }
 
 class _Inspector extends StatelessWidget {
@@ -102,6 +124,19 @@ class _Inspector extends StatelessWidget {
         color: Colors.white,
       ),
       actions: [
+        Selector<InspectorController, bool>(
+          selector: (_, inspectorController) =>
+              inspectorController.userInterceptorEnabled,
+          builder: (context, userInterceptorEnabled, _) => Switch(
+            value: userInterceptorEnabled,
+            activeColor: Colors.green,
+            activeTrackColor: Colors.grey[700],
+            inactiveThumbColor: Colors.white,
+            inactiveTrackColor: Colors.grey[700],
+            onChanged: (value) =>
+                inspectorController.userInterceptorEnabled = value,
+          ),
+        ),
         Selector<InspectorController, int>(
           selector: (_, inspectorController) => inspectorController.selectedTab,
           builder: (context, selectedTab, _) => selectedTab == 0

@@ -19,6 +19,8 @@ class JsonPrettyConverter {
       prettyprint = _convertToPrettyJsonFromMapOrJson(text);
     else if (text is FormData)
       prettyprint = 'FormData:\n${_convertToPrettyFromFormData(text)}';
+    else if (text == null)
+      prettyprint = '';
     else
       prettyprint = text.toString();
     return prettyprint;
@@ -44,5 +46,13 @@ class JsonPrettyConverter {
           e.key: convert(e.value)
     };
     return _encoder.convert(text);
+  }
+
+  Map<String, dynamic> mapFromString(String text) {
+    try {
+      return jsonDecode(text);
+    } catch (e) {
+      return {};
+    }
   }
 }

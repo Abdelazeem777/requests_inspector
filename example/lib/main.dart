@@ -141,11 +141,14 @@ class Post {
   }
 }
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 void main() => runApp(
-      const RequestsInspector(
+      RequestsInspector(
         enabled: true,
         showInspectorOn: ShowInspectorOn.Both,
-        child: MyApp(),
+        child: const MyApp(),
+        navigatorKey: navigatorKey,
       ),
     );
 
@@ -170,6 +173,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'Fetch Data Example',
       theme: ThemeData(
@@ -184,7 +188,7 @@ class _MyAppState extends State<MyApp> {
               padding: EdgeInsets.all(8.0),
               child: Icon(Icons.refresh),
             ),
-            onTap: fetchPosts,
+            onTap: fetchPostsUsingInterceptor,
           ),
         ),
         body: Center(
