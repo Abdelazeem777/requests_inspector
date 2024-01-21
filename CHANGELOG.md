@@ -1,3 +1,7 @@
+## 3.4.1
+
+- Update showInspectorOn enum value from Shaking to Both.
+
 ## 3.4.0
 
 - Add the ability to intercept the request before sending it to the server and modify it.
