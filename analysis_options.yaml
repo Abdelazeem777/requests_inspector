@@ -6,7 +6,15 @@ linter:
     file_names: false
     library_prefixes: false
     prefer_function_declarations_over_variables: false
+    sort_child_properties_last: false
+    always_declare_return_types: true
+    avoid_unnecessary_containers: true
 
 analyzer:
   errors:
     avoid_relative_lib_imports: error
+    always_declare_return_types: error
+    file_names: error
+    avoid_unnecessary_containers: error
+    unused_import: error
+    unused_local_variable: error

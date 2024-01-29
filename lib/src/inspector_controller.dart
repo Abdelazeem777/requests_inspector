@@ -7,7 +7,7 @@ import '../requests_inspector.dart';
 import 'curl_command_generator.dart';
 import 'json_pretty_converter.dart';
 
-typedef InterceptRequestCallback = Future<RequestDetails?> Function(
+typedef StoppingRequestCallback = Future<RequestDetails?> Function(
     RequestDetails requestDetails);
 
 ///Singleton
@@ -15,21 +15,21 @@ class InspectorController extends ChangeNotifier {
   factory InspectorController({
     bool enabled = false,
     ShowInspectorOn showInspectorOn = ShowInspectorOn.Shaking,
-    InterceptRequestCallback? onInterceptRequest,
+    StoppingRequestCallback? onStoppingRequest,
   }) =>
       _singleton ??= InspectorController._internal(
         enabled,
         showInspectorOn,
-        onInterceptRequest,
+        onStoppingRequest,
       );
 
   InspectorController._internal(
     bool enabled,
     ShowInspectorOn showInspectorOn,
-    InterceptRequestCallback? onInterceptRequest,
+    StoppingRequestCallback? onStoppingRequest,
   )   : _enabled = enabled,
         _showInspectorOn = showInspectorOn,
-        _onInterceptRequest = onInterceptRequest {
+        _onStoppingRequest = onStoppingRequest {
     if (_enabled && _allowShaking)
       _shakeDetector = ShakeDetector.autoStart(
         onPhoneShake: showInspector,
@@ -42,7 +42,7 @@ class InspectorController extends ChangeNotifier {
   late final bool _enabled;
   late final ShowInspectorOn _showInspectorOn;
   late final ShakeDetector _shakeDetector;
-  InterceptRequestCallback? _onInterceptRequest;
+  StoppingRequestCallback? _onStoppingRequest;
 
   final _dio = Dio(BaseOptions(validateStatus: (_) => true));
   final pageController = PageController(
@@ -53,13 +53,15 @@ class InspectorController extends ChangeNotifier {
   );
 
   int _selectedTab = 0;
-  bool _userInterceptorEnabled = false;
+  bool _userRequestStopperEnabled = false;
+  bool _userResponseStopperEnabled = false;
 
   final _requestsList = <RequestDetails>[];
   RequestDetails? _selectedRequest;
 
   int get selectedTab => _selectedTab;
-  bool get userInterceptorEnabled => _userInterceptorEnabled;
+  bool get userRequestStopperEnabled => _userRequestStopperEnabled;
+  bool get userResponseStopperEnabled => _userResponseStopperEnabled;
   List<RequestDetails> get requestsList => _requestsList;
   RequestDetails? get selectedRequest => _selectedRequest;
   bool get _allowShaking => [
@@ -73,9 +75,15 @@ class InspectorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  set userInterceptorEnabled(bool value) {
-    if (_userInterceptorEnabled == value) return;
-    _userInterceptorEnabled = value;
+  set userRequestStopperEnabled(bool value) {
+    if (_userRequestStopperEnabled == value) return;
+    _userRequestStopperEnabled = value;
+    notifyListeners();
+  }
+
+  set userResponseStopperEnabled(bool value) {
+    if (_userResponseStopperEnabled == value) return;
+    _userResponseStopperEnabled = value;
     notifyListeners();
   }
 
@@ -164,7 +172,7 @@ class InspectorController extends ChangeNotifier {
   }
 
   Future<RequestDetails?> editRequest(RequestDetails requestDetails) {
-    if (!_enabled || _onInterceptRequest == null) return Future.value(null);
-    return _onInterceptRequest!(requestDetails);
+    if (!_enabled || _onStoppingRequest == null) return Future.value(null);
+    return _onStoppingRequest!(requestDetails);
   }
 }

@@ -3,17 +3,19 @@ import 'package:requests_inspector/src/json_pretty_converter.dart';
 
 import '../requests_inspector.dart';
 
-class RequestEditorDialog extends StatefulWidget {
-  const RequestEditorDialog({super.key, RequestDetails? requestDetails})
+class RequestStopperEditorDialog extends StatefulWidget {
+  const RequestStopperEditorDialog({super.key, RequestDetails? requestDetails})
       : _requestDetails = requestDetails;
 
   final RequestDetails? _requestDetails;
 
   @override
-  State<RequestEditorDialog> createState() => _RequestEditorDialogState();
+  State<RequestStopperEditorDialog> createState() =>
+      _RequestStopperEditorDialogState();
 }
 
-class _RequestEditorDialogState extends State<RequestEditorDialog> {
+class _RequestStopperEditorDialogState
+    extends State<RequestStopperEditorDialog> {
   RequestDetails? _newRequestDetails;
 
   @override

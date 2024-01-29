@@ -107,12 +107,10 @@ class CurlCommandGenerator {
             curlCommand.write("-F '${mapEntry.key}=${mapEntry.value}' ");
           }
 
-          formData.files.forEach((file) {
-            // Ideally, you would have the actual file path, but since FormData does not expose this information
-            // You might use filename, but note that this won't work as a real curl command without the correct file path.
+          for (var file in formData.files) {
             String fileName = file.value.filename ?? 'file';
             curlCommand.write("-F '${file.key}=@$fileName' ");
-          });
+          }
         }
       } else {
         curlCommand.write("-d '${jsonEncode(details.requestBody)}' ");

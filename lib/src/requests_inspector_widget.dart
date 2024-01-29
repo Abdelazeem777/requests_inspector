@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
 import 'package:requests_inspector/src/json_pretty_converter.dart';
-import 'package:requests_inspector/src/request_editor_dialog.dart';
+import 'package:requests_inspector/src/request_stopper_editor_dialog.dart';
 import '../requests_inspector.dart';
 
 ///You can show the Inspector by **Shaking** your phone.
@@ -40,7 +40,7 @@ class RequestsInspector extends StatelessWidget {
               showInspectorOn: _isSupportShaking()
                   ? _showInspectorOn
                   : ShowInspectorOn.LongPress,
-              onInterceptRequest: (requestDetails) => _showRequestEditorDialog(
+              onStoppingRequest: (requestDetails) => _showRequestEditorDialog(
                 context,
                 requestDetails: requestDetails,
               ),
@@ -92,7 +92,8 @@ class RequestsInspector extends StatelessWidget {
     if (_navigatorKey?.currentContext == null) return Future.value(null);
     return showDialog<RequestDetails?>(
       context: _navigatorKey!.currentContext!,
-      builder: (context) => RequestEditorDialog(requestDetails: requestDetails),
+      builder: (context) =>
+          RequestStopperEditorDialog(requestDetails: requestDetails),
     );
   }
 }
@@ -126,15 +127,15 @@ class _Inspector extends StatelessWidget {
       actions: [
         Selector<InspectorController, bool>(
           selector: (_, inspectorController) =>
-              inspectorController.userInterceptorEnabled,
-          builder: (context, userInterceptorEnabled, _) => Switch(
-            value: userInterceptorEnabled,
+              inspectorController.userRequestStopperEnabled,
+          builder: (context, userRequestStopperEnabled, _) => Switch(
+            value: userRequestStopperEnabled,
             activeColor: Colors.green,
             activeTrackColor: Colors.grey[700],
             inactiveThumbColor: Colors.white,
             inactiveTrackColor: Colors.grey[700],
             onChanged: (value) =>
-                inspectorController.userInterceptorEnabled = value,
+                inspectorController.userRequestStopperEnabled = value,
           ),
         ),
         Selector<InspectorController, int>(
@@ -282,6 +283,8 @@ class _Inspector extends StatelessWidget {
               backgroundColor: Colors.black,
               child: const Icon(Icons.share),
               onPressed: () async {
+                final box = context.findRenderObject() as RenderBox?;
+
                 final controller = context.read<InspectorController>();
                 final selectedRequest = controller.selectedRequest!;
                 final isHttp = _isHttp(selectedRequest);
@@ -291,7 +294,6 @@ class _Inspector extends StatelessWidget {
 
                 if (isCurl == null) return;
 
-                final box = context.findRenderObject() as RenderBox?;
                 controller.shareSelectedRequest(
                   box == null
                       ? null

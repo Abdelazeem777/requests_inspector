@@ -8,7 +8,7 @@ class RequestsInspectorInterceptor extends Interceptor {
       RequestOptions options, RequestInterceptorHandler handler) async {
     options.extra['startTime'] = DateTime.now();
 
-    if (!InspectorController().userInterceptorEnabled)
+    if (!InspectorController().userRequestStopperEnabled)
       return super.onRequest(options, handler);
 
     final requestDetails = _convertToRequestDetails(options);
@@ -44,7 +44,7 @@ class RequestsInspectorInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioError err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     final urlAndQueryParMapEntry = _extractUrl(err.requestOptions);
     final url = urlAndQueryParMapEntry.key;
     final queryParameters = urlAndQueryParMapEntry.value;
