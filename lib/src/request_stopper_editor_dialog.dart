@@ -4,8 +4,9 @@ import 'package:requests_inspector/src/json_pretty_converter.dart';
 import '../requests_inspector.dart';
 
 class RequestStopperEditorDialog extends StatefulWidget {
-  const RequestStopperEditorDialog({super.key, RequestDetails? requestDetails})
-      : _requestDetails = requestDetails;
+  const RequestStopperEditorDialog({Key? key, RequestDetails? requestDetails})
+      : _requestDetails = requestDetails,
+        super(key: key);
 
   final RequestDetails? _requestDetails;
 

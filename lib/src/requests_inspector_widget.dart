@@ -1,7 +1,9 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_json_view/flutter_json_view.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
 import 'package:requests_inspector/src/json_pretty_converter.dart';
@@ -600,11 +602,61 @@ class _RequestDetailsPage extends StatelessWidget {
 
     return [
       _buildTitle('ResponseBody'),
-      _buildSelectableText(responseBody),
+      responseBody.runtimeType != String
+          ? _buildJsonViewer(responseBody)
+          : _buildSelectableText(responseBody),
     ];
   }
 
+  Widget _buildJsonViewer(text) {
+    final prettyprint = JsonPrettyConverter().convert(text);
+    log(prettyprint);
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: JsonView.string(
+        prettyprint,
+        keyName: '{...}',
+        listKeyName: '[...]',
+        theme: const JsonViewTheme(
+          backgroundColor: Colors.transparent,
+          keyStyle: TextStyle(
+            color: Colors.black54,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+          doubleStyle: TextStyle(
+            color: Colors.green,
+            fontSize: 16,
+          ),
+          intStyle: TextStyle(
+            color: Colors.green,
+            fontSize: 16,
+          ),
+          stringStyle: TextStyle(
+            color: Colors.green,
+            fontSize: 16,
+          ),
+          boolStyle: TextStyle(
+            color: Colors.green,
+            fontSize: 16,
+          ),
+          closeIcon: Icon(
+            Icons.arrow_drop_down,
+            color: Colors.green,
+            size: 20,
+          ),
+          openIcon: Icon(
+            Icons.arrow_drop_up,
+            color: Colors.green,
+            size: 20,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSelectableText(text) {
+    log(text.runtimeType.toString());
     final prettyprint = JsonPrettyConverter().convert(text);
 
     return Padding(

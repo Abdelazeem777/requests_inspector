@@ -6,7 +6,7 @@ version: 3.4.1
 homepage: https://github.com/Abdelazeem777/requests_inspector
 
 environment:
-  sdk: ">=2.17.0 <4.0.0"
+  sdk: ">=2.15.0 <4.0.0"
   flutter: ">=1.20.0"
 
 dependencies:
@@ -20,9 +20,12 @@ dependencies:
   provider: ^6.0.5
   shake: ^2.2.0
   share_plus: ^7.0.2
+  flutter_json_view:
+    git:
+      url: https://github.com/Abdullah-Mohammed-Ali/flutter_json_view
 
 dev_dependencies:
-  flutter_lints: ^2.0.1
+  flutter_lints: ^3.0.1
   flutter_test:
     sdk: flutter
 
