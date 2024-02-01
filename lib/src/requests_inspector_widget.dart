@@ -589,7 +589,9 @@ class _RequestDetailsPage extends StatelessWidget {
 
     return [
       _buildTitle('RequestBody'),
-      _buildSelectableText(requestBody),
+      requestBody.runtimeType != String
+          ? _buildJsonViewer(requestBody)
+          : _buildSelectableText(requestBody),
     ];
   }
 
@@ -612,7 +614,7 @@ class _RequestDetailsPage extends StatelessWidget {
     final prettyprint = JsonPrettyConverter().convert(text);
     log(prettyprint);
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
       child: JsonView.string(
         prettyprint,
         keyName: '{...}',
@@ -623,6 +625,10 @@ class _RequestDetailsPage extends StatelessWidget {
             color: Colors.black54,
             fontSize: 16,
             fontWeight: FontWeight.w600,
+          ),
+          separator: Text(
+            ' : ',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
           doubleStyle: TextStyle(
             color: Colors.green,

@@ -167,7 +167,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     futurePosts =
         fetchPostsUsingInterceptor() /*for restful apis Interceptor example use => fetchPostsUsingInterceptor() */;
-    //  fetchPostsGraphQlUsingGraphQLFlutterInterceptor() /*for graph ql Interceptor example */;
+    // fetchPostsGraphQlUsingGraphQLFlutterInterceptor() /*for graph ql Interceptor example */;
   }
 
   @override
