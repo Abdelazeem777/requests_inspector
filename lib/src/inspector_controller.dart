@@ -10,26 +10,32 @@ import 'json_pretty_converter.dart';
 typedef StoppingRequestCallback = Future<RequestDetails?> Function(
     RequestDetails requestDetails);
 
+typedef StoppingResponseCallback = Future Function(dynamic responseData);
+
 ///Singleton
 class InspectorController extends ChangeNotifier {
   factory InspectorController({
     bool enabled = false,
     ShowInspectorOn showInspectorOn = ShowInspectorOn.Shaking,
     StoppingRequestCallback? onStoppingRequest,
+    StoppingResponseCallback? onStoppingResponse,
   }) =>
       _singleton ??= InspectorController._internal(
         enabled,
         showInspectorOn,
         onStoppingRequest,
+        onStoppingResponse,
       );
 
   InspectorController._internal(
     bool enabled,
     ShowInspectorOn showInspectorOn,
     StoppingRequestCallback? onStoppingRequest,
+    StoppingResponseCallback? onStoppingResponse,
   )   : _enabled = enabled,
         _showInspectorOn = showInspectorOn,
-        _onStoppingRequest = onStoppingRequest {
+        _onStoppingRequest = onStoppingRequest,
+        _onStoppingResponse = onStoppingResponse {
     if (_enabled && _allowShaking)
       _shakeDetector = ShakeDetector.autoStart(
         onPhoneShake: showInspector,
@@ -43,6 +49,7 @@ class InspectorController extends ChangeNotifier {
   late final ShowInspectorOn _showInspectorOn;
   late final ShakeDetector _shakeDetector;
   StoppingRequestCallback? _onStoppingRequest;
+  StoppingResponseCallback? _onStoppingResponse;
 
   final _dio = Dio(BaseOptions(validateStatus: (_) => true));
   final pageController = PageController(
@@ -174,5 +181,16 @@ class InspectorController extends ChangeNotifier {
   Future<RequestDetails?> editRequest(RequestDetails requestDetails) {
     if (!_enabled || _onStoppingRequest == null) return Future.value(null);
     return _onStoppingRequest!(requestDetails);
+  }
+
+  Future editResponse(responseData) {
+    if (!_enabled || _onStoppingResponse == null) return Future.value(null);
+
+    if (!['Map', 'String', 'List'].any((e) => responseData.runtimeType
+        .toString()
+        .replaceFirst('_', '')
+        .startsWith(e))) return Future.value(null);
+
+    return _onStoppingResponse!(responseData);
   }
 }

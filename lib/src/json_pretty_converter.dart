@@ -48,11 +48,21 @@ class JsonPrettyConverter {
     return _encoder.convert(text);
   }
 
-  Map<String, dynamic> mapFromString(String text) {
+  dynamic deconvertFrom(String text, String? oldDataType) {
+    if (oldDataType == null) return null;
+
+    oldDataType = _removeUnderScoreIfExists(oldDataType);
     try {
-      return jsonDecode(text);
+      if (oldDataType.startsWith('Map')) return jsonDecode(text);
+      if (oldDataType.startsWith('String')) return text;
+      if (oldDataType.startsWith('List')) return jsonDecode(text);
+
+      return null;
     } catch (e) {
-      return {};
+      return null;
     }
   }
+
+  String _removeUnderScoreIfExists(String dataTypeName) =>
+      dataTypeName.replaceFirst('_', '');
 }

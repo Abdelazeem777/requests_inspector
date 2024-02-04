@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:requests_inspector/src/json_pretty_converter.dart';
 
 import '../requests_inspector.dart';
+import 'shared_widgets/inspector_dialog_text_field.dart';
 
 class RequestStopperEditorDialog extends StatefulWidget {
   const RequestStopperEditorDialog({Key? key, RequestDetails? requestDetails})
@@ -105,7 +106,7 @@ class _RequestStopperEditorDialogState
           ),
           const Text('URL: '),
           const SizedBox(height: 4.0),
-          _InspectorDialogTextField(
+          InspectorDialogTextField(
             text: _newRequestDetails?.url ?? '',
             onChanged: (value) =>
                 _newRequestDetails = _newRequestDetails?.copyWith(url: value),
@@ -113,64 +114,47 @@ class _RequestStopperEditorDialogState
           const SizedBox(height: 16.0),
           const Text('Headers: '),
           const SizedBox(height: 4.0),
-          _InspectorDialogTextField(
+          InspectorDialogTextField(
             text: JsonPrettyConverter().convert(_newRequestDetails?.headers),
-            onChanged: (value) => _newRequestDetails = _newRequestDetails
-                ?.copyWith(headers: JsonPrettyConverter().mapFromString(value)),
+            onChanged: (value) =>
+                _newRequestDetails = _newRequestDetails?.copyWith(
+              headers: JsonPrettyConverter().deconvertFrom(
+                value,
+                _newRequestDetails?.headers.runtimeType.toString(),
+              ),
+            ),
           ),
           const SizedBox(height: 16.0),
           const Text('Query Parameters: '),
           const SizedBox(height: 4.0),
-          _InspectorDialogTextField(
+          InspectorDialogTextField(
             text: JsonPrettyConverter()
                 .convert(_newRequestDetails?.queryParameters),
-            onChanged: (value) => _newRequestDetails =
-                _newRequestDetails?.copyWith(
-                    queryParameters:
-                        JsonPrettyConverter().mapFromString(value)),
+            onChanged: (value) =>
+                _newRequestDetails = _newRequestDetails?.copyWith(
+              queryParameters: JsonPrettyConverter().deconvertFrom(
+                value,
+                _newRequestDetails?.queryParameters.runtimeType.toString(),
+              ),
+            ),
           ),
           const SizedBox(height: 16.0),
           const Text('Request Body: '),
           const SizedBox(height: 4.0),
-          _InspectorDialogTextField(
+          InspectorDialogTextField(
             text:
                 JsonPrettyConverter().convert(_newRequestDetails?.requestBody),
-            onChanged: (value) => _newRequestDetails =
-                _newRequestDetails?.copyWith(
-                    requestBody: JsonPrettyConverter().mapFromString(value)),
+            onChanged: (value) =>
+                _newRequestDetails = _newRequestDetails?.copyWith(
+              requestBody: JsonPrettyConverter().deconvertFrom(
+                value,
+                _newRequestDetails?.requestBody.runtimeType.toString(),
+              ),
+            ),
           ),
           const SizedBox(height: 8.0),
         ],
       ),
-    );
-  }
-}
-
-class _InspectorDialogTextField extends StatelessWidget {
-  const _InspectorDialogTextField({
-    Key? key,
-    required this.text,
-    required this.onChanged,
-  }) : super(key: key);
-
-  final String text;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      decoration: const InputDecoration(
-        filled: true,
-        fillColor: Color.fromARGB(255, 19, 19, 19),
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-        ),
-      ),
-      maxLines: null,
-      minLines: 2,
-      scrollPhysics: const NeverScrollableScrollPhysics(),
-      controller: TextEditingController(text: text),
-      onChanged: onChanged,
     );
   }
 }

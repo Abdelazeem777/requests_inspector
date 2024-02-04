@@ -8,9 +8,12 @@ import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
 import 'package:requests_inspector/src/json_pretty_converter.dart';
 import 'package:requests_inspector/src/request_stopper_editor_dialog.dart';
+import 'package:requests_inspector/src/response_stopper_editor_dialog.dart';
 import '../requests_inspector.dart';
 
 ///You can show the Inspector by **Shaking** your phone.
+///
+/// Pass your `navigatorKey` of your MaterialApp to enable Request & Response `Stopper` Dialogs.
 class RequestsInspector extends StatelessWidget {
   const RequestsInspector({
     Key? key,
@@ -18,7 +21,7 @@ class RequestsInspector extends StatelessWidget {
     bool hideInspectorBanner = false,
     ShowInspectorOn showInspectorOn = ShowInspectorOn.Both,
     required Widget child,
-    GlobalKey<NavigatorState>? navigatorKey,
+    required GlobalKey<NavigatorState>? navigatorKey,
   })  : _enabled = enabled,
         _hideInspectorBanner = hideInspectorBanner,
         _showInspectorOn = showInspectorOn,
@@ -31,6 +34,8 @@ class RequestsInspector extends StatelessWidget {
   final bool _hideInspectorBanner;
   final ShowInspectorOn _showInspectorOn;
   final Widget _child;
+
+  /// Pass it to enable Request & Response `Stopper` Dialogs
   final GlobalKey<NavigatorState>? _navigatorKey;
 
   @override
@@ -45,6 +50,10 @@ class RequestsInspector extends StatelessWidget {
               onStoppingRequest: (requestDetails) => _showRequestEditorDialog(
                 context,
                 requestDetails: requestDetails,
+              ),
+              onStoppingResponse: (responseData) => _showResponseEditorDialog(
+                context,
+                responseData: responseData,
               ),
             ),
             builder: (context, _) {
@@ -61,7 +70,7 @@ class RequestsInspector extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
                       _child,
-                      const _Inspector(),
+                      _Inspector(navigatorKey: _navigatorKey),
                     ],
                   ),
                 ),
@@ -98,10 +107,29 @@ class RequestsInspector extends StatelessWidget {
           RequestStopperEditorDialog(requestDetails: requestDetails),
     );
   }
+
+  Future _showResponseEditorDialog(
+    BuildContext context, {
+    required responseData,
+  }) {
+    if (_navigatorKey?.currentContext == null) return Future.value(null);
+
+    return showDialog(
+      context: _navigatorKey!.currentContext!,
+      builder: (context) =>
+          ResponseStopperEditorDialog(responseData: responseData),
+    );
+  }
 }
 
 class _Inspector extends StatelessWidget {
-  const _Inspector({Key? key}) : super(key: key);
+  const _Inspector({
+    Key? key,
+    GlobalKey<NavigatorState>? navigatorKey,
+  })  : _navigatorKey = navigatorKey,
+        super(key: key);
+
+  final GlobalKey<NavigatorState>? _navigatorKey;
 
   @override
   Widget build(BuildContext context) {
@@ -118,6 +146,8 @@ class _Inspector extends StatelessWidget {
 
   AppBar _buildAppBar(BuildContext context) {
     final inspectorController = context.read<InspectorController>();
+    final showStopperDialogsAllowed = _navigatorKey?.currentContext != null;
+
     return AppBar(
       backgroundColor: Colors.black,
       title: const Text('Inspector 🕵'),
@@ -127,19 +157,6 @@ class _Inspector extends StatelessWidget {
         color: Colors.white,
       ),
       actions: [
-        Selector<InspectorController, bool>(
-          selector: (_, inspectorController) =>
-              inspectorController.userRequestStopperEnabled,
-          builder: (context, userRequestStopperEnabled, _) => Switch(
-            value: userRequestStopperEnabled,
-            activeColor: Colors.green,
-            activeTrackColor: Colors.grey[700],
-            inactiveThumbColor: Colors.white,
-            inactiveTrackColor: Colors.grey[700],
-            onChanged: (value) =>
-                inspectorController.userRequestStopperEnabled = value,
-          ),
-        ),
         Selector<InspectorController, int>(
           selector: (_, inspectorController) => inspectorController.selectedTab,
           builder: (context, selectedTab, _) => selectedTab == 0
@@ -157,6 +174,65 @@ class _Inspector extends StatelessWidget {
                   key: ValueKey(inspectorController.selectedRequest.hashCode),
                   onTap: inspectorController.runAgain,
                 ),
+        ),
+        if (showStopperDialogsAllowed) _buildPopUpMenu(inspectorController),
+      ],
+    );
+  }
+
+  Widget _buildPopUpMenu(InspectorController inspectorController) {
+    return PopupMenuButton(
+      icon: const Icon(Icons.more_vert, color: Colors.white),
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          child: InkWell(
+            onTap: () => inspectorController.userRequestStopperEnabled =
+                !inspectorController.userRequestStopperEnabled,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Stop Requests'),
+                Selector<InspectorController, bool>(
+                  selector: (_, inspectorController) =>
+                      inspectorController.userRequestStopperEnabled,
+                  builder: (context, userRequestStopperEnabled, _) => Switch(
+                    value: userRequestStopperEnabled,
+                    activeColor: Colors.green,
+                    activeTrackColor: Colors.grey[700],
+                    inactiveThumbColor: Colors.white,
+                    inactiveTrackColor: Colors.grey[700],
+                    onChanged: (value) =>
+                        inspectorController.userRequestStopperEnabled = value,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        PopupMenuItem(
+          child: InkWell(
+            onTap: () => inspectorController.userResponseStopperEnabled =
+                !inspectorController.userResponseStopperEnabled,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Stop Responses'),
+                Selector<InspectorController, bool>(
+                  selector: (_, inspectorController) =>
+                      inspectorController.userResponseStopperEnabled,
+                  builder: (context, userResponseStopperEnabled, _) => Switch(
+                    value: userResponseStopperEnabled,
+                    activeColor: Colors.green,
+                    activeTrackColor: Colors.grey[700],
+                    inactiveThumbColor: Colors.white,
+                    inactiveTrackColor: Colors.grey[700],
+                    onChanged: (value) =>
+                        inspectorController.userResponseStopperEnabled = value,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );

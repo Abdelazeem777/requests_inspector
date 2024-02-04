@@ -22,7 +22,19 @@ class RequestsInspectorInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
+  Future<void> onResponse(
+      Response response, ResponseInterceptorHandler handler) async {
+    final dateTime = DateTime.now();
+
+    if (InspectorController().userResponseStopperEnabled) {
+      final oldResponseData = response.data;
+
+      final newResponseData =
+          await InspectorController().editResponse(oldResponseData);
+
+      response.data = newResponseData ?? oldResponseData;
+    }
+
     final urlAndQueryParMapEntry = _extractUrl(response.requestOptions);
     final url = urlAndQueryParMapEntry.key;
     final queryParameters = urlAndQueryParMapEntry.value;
@@ -37,7 +49,7 @@ class RequestsInspectorInterceptor extends Interceptor {
         requestBody: response.requestOptions.data,
         responseBody: response.data,
         sentTime: response.requestOptions.extra['startTime'],
-        receivedTime: DateTime.now(),
+        receivedTime: dateTime,
       ),
     );
     super.onResponse(response, handler);
