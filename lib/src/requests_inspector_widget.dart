@@ -654,7 +654,9 @@ class _RequestDetailsPage extends StatelessWidget {
 
     return [
       _buildTitle('Parameters'),
-      _buildSelectableText(queryParameters),
+      queryParameters.runtimeType != String
+          ? _buildJsonViewer(queryParameters)
+          : _buildSelectableText(queryParameters),
     ];
   }
 
