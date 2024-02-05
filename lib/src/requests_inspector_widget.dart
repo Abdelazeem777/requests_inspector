@@ -17,7 +17,7 @@ class RequestsInspector extends StatelessWidget {
     super.key,
     bool enabled = false,
     bool hideInspectorBanner = false,
-    bool showExpandableJsonView = true,
+    bool enableExpandableJsonView = true,
     ShowInspectorOn showInspectorOn = ShowInspectorOn.Both,
     required Widget child,
     required GlobalKey<NavigatorState>? navigatorKey,
@@ -26,14 +26,14 @@ class RequestsInspector extends StatelessWidget {
         _showInspectorOn = showInspectorOn,
         _child = child,
         _navigatorKey = navigatorKey,
-        _showExpandableJsonView = showExpandableJsonView;
+        _enableExpandableJsonView = enableExpandableJsonView;
 
   ///Require hot restart for showing its change
   final bool _enabled;
   final bool _hideInspectorBanner;
   final ShowInspectorOn _showInspectorOn;
   final Widget _child;
-  final bool _showExpandableJsonView;
+  final bool _enableExpandableJsonView;
 
   /// Pass it to enable Request & Response `Stopper` Dialogs
   final GlobalKey<NavigatorState>? _navigatorKey;
@@ -43,7 +43,7 @@ class RequestsInspector extends StatelessWidget {
     var widget = _enabled
         ? ChangeNotifierProvider(
             create: (context) => InspectorController(
-              showExpandableJsonView: _showExpandableJsonView,
+              enableExpandableJsonView: _enableExpandableJsonView,
               enabled: _enabled,
               showInspectorOn: _isSupportShaking()
                   ? _showInspectorOn
@@ -58,7 +58,7 @@ class RequestsInspector extends StatelessWidget {
               ),
             ),
             builder: (context, _) {
-              final inspectorController = context.read<InspectorController>();
+              final inspectorController = InspectorController();
               return WillPopScope(
                 onWillPop: () async =>
                     inspectorController.pageController.page == 0,
@@ -175,14 +175,12 @@ class _Inspector extends StatelessWidget {
                   onTap: inspectorController.runAgain,
                 ),
         ),
-        if (showStopperDialogsAllowed) _buildPopUpMenu(context),
+        if (showStopperDialogsAllowed) _buildPopUpMenu(inspectorController),
       ],
     );
   }
 
-  Widget _buildPopUpMenu(BuildContext context) {
-    final inspectorController = context.read<InspectorController>();
-
+  Widget _buildPopUpMenu(InspectorController inspectorController) {
     return PopupMenuButton(
       icon: const Icon(Icons.more_vert, color: Colors.white),
       itemBuilder: (context) => [
@@ -238,15 +236,15 @@ class _Inspector extends StatelessWidget {
         ),
         PopupMenuItem(
           child: InkWell(
-            onTap: () => inspectorController.showExpandableJsonView =
-                !inspectorController.showExpandableJsonView,
+            onTap: () => inspectorController.enableExpandableJsonView =
+                !inspectorController.enableExpandableJsonView,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Expandable Json view'),
                 Selector<InspectorController, bool>(
                   selector: (_, inspectorController) =>
-                      inspectorController.showExpandableJsonView,
+                      inspectorController.enableExpandableJsonView,
                   builder: (context, showExpandableJsonView, _) => Switch(
                     value: showExpandableJsonView,
                     activeColor: Colors.green,
@@ -254,7 +252,7 @@ class _Inspector extends StatelessWidget {
                     inactiveThumbColor: Colors.white,
                     inactiveTrackColor: Colors.grey[700],
                     onChanged: (value) =>
-                        inspectorController.showExpandableJsonView = value,
+                        inspectorController.enableExpandableJsonView = value,
                   ),
                 ),
               ],
@@ -582,11 +580,11 @@ class _RequestDetailsPage extends StatelessWidget {
         _buildSelectableText(request.url),
         ..._buildHeadersBlock(request.headers),
         ..._buildQueryBlock(request.queryParameters,
-            _inspectorController.showExpandableJsonView),
+            _inspectorController.enableExpandableJsonView),
         ..._buildRequestBodyBlock(
-            request.requestBody, _inspectorController.showExpandableJsonView),
-        ..._buildResponseBodyBlock(
-            request.responseBody, _inspectorController.showExpandableJsonView),
+            request.requestBody, _inspectorController.enableExpandableJsonView),
+        ..._buildResponseBodyBlock(request.responseBody,
+            _inspectorController.enableExpandableJsonView),
       ].mapIndexed(_buildBackgroundColor).toList(),
     );
   }
