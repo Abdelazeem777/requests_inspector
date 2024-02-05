@@ -6,8 +6,7 @@ import 'shared_widgets/inspector_dialog_text_field.dart';
 
 class RequestStopperEditorDialog extends StatefulWidget {
   const RequestStopperEditorDialog({super.key, RequestDetails? requestDetails})
-      : _requestDetails = requestDetails
-      ;
+      : _requestDetails = requestDetails;
 
   final RequestDetails? _requestDetails;
 
