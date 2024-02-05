@@ -58,7 +58,7 @@ class RequestsInspector extends StatelessWidget {
               ),
             ),
             builder: (context, _) {
-              final inspectorController = InspectorController();
+              final inspectorController = context.read<InspectorController>();
               return WillPopScope(
                 onWillPop: () async =>
                     inspectorController.pageController.page == 0,
@@ -322,7 +322,7 @@ class _Inspector extends StatelessWidget {
   Widget _buildSelectedTab(BuildContext context, {required int selectedTab}) {
     return selectedTab == 0
         ? _buildAllRequests(context)
-        : _RequestDetailsPage();
+        : const _RequestDetailsPage();
   }
 
   Widget _buildAllRequests(BuildContext context) {
