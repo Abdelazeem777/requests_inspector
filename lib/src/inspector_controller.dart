@@ -21,16 +21,20 @@ class InspectorController extends ChangeNotifier {
     StoppingResponseCallback? onStoppingResponse,
     bool showExpandableJsonView = true,
   }) =>
-      _singleton ??= InspectorController._internal(enabled, showInspectorOn,
-          onStoppingRequest, onStoppingResponse, showExpandableJsonView);
+      _singleton ??= InspectorController._internal(
+          enabled: enabled,
+          showInspectorOn: showInspectorOn,
+          onStoppingRequest: onStoppingRequest,
+          onStoppingResponse: onStoppingResponse,
+          showExpandableJsonView: showExpandableJsonView);
 
-  InspectorController._internal(
-    bool enabled,
-    ShowInspectorOn showInspectorOn,
+  InspectorController._internal({
+    required bool enabled,
+    required ShowInspectorOn showInspectorOn,
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
-    bool showExpandableJsonView,
-  )   : _enabled = enabled,
+    required bool showExpandableJsonView,
+  })  : _enabled = enabled,
         _showInspectorOn = showInspectorOn,
         _onStoppingRequest = onStoppingRequest,
         _onStoppingResponse = onStoppingResponse,

@@ -4,9 +4,8 @@ import 'package:requests_inspector/src/json_pretty_converter.dart';
 import 'shared_widgets/inspector_dialog_text_field.dart';
 
 class ResponseStopperEditorDialog extends StatefulWidget {
-  const ResponseStopperEditorDialog({Key? key, required responseData})
-      : _responseData = responseData,
-        super(key: key);
+  const ResponseStopperEditorDialog({super.key, required responseData})
+      : _responseData = responseData;
 
   final _responseData;
 
