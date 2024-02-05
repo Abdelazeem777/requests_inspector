@@ -139,7 +139,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "8c85936e0022a38fb44fcc503d185d2061baa02f"
+      resolved-ref: "4644834e27cfd52b91fe0e147e7aea58dcad0bcf"
       url: "https://github.com/Abdullah-Mohammed-Ali/flutter_json_view"
     source: git
     version: "1.1.4"

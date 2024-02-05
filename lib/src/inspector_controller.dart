@@ -19,23 +19,22 @@ class InspectorController extends ChangeNotifier {
     ShowInspectorOn showInspectorOn = ShowInspectorOn.Shaking,
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
+    bool showExpandableJsonView = true,
   }) =>
-      _singleton ??= InspectorController._internal(
-        enabled,
-        showInspectorOn,
-        onStoppingRequest,
-        onStoppingResponse,
-      );
+      _singleton ??= InspectorController._internal(enabled, showInspectorOn,
+          onStoppingRequest, onStoppingResponse, showExpandableJsonView);
 
   InspectorController._internal(
     bool enabled,
     ShowInspectorOn showInspectorOn,
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
+    bool showExpandableJsonView,
   )   : _enabled = enabled,
         _showInspectorOn = showInspectorOn,
         _onStoppingRequest = onStoppingRequest,
-        _onStoppingResponse = onStoppingResponse {
+        _onStoppingResponse = onStoppingResponse,
+        _showExpandableJsonView = showExpandableJsonView {
     if (_enabled && _allowShaking)
       _shakeDetector = ShakeDetector.autoStart(
         onPhoneShake: showInspector,
@@ -62,6 +61,7 @@ class InspectorController extends ChangeNotifier {
   int _selectedTab = 0;
   bool _userRequestStopperEnabled = false;
   bool _userResponseStopperEnabled = false;
+  bool _showExpandableJsonView = true;
 
   final _requestsList = <RequestDetails>[];
   RequestDetails? _selectedRequest;
@@ -69,6 +69,7 @@ class InspectorController extends ChangeNotifier {
   int get selectedTab => _selectedTab;
   bool get userRequestStopperEnabled => _userRequestStopperEnabled;
   bool get userResponseStopperEnabled => _userResponseStopperEnabled;
+  bool get showExpandableJsonView => _showExpandableJsonView;
   List<RequestDetails> get requestsList => _requestsList;
   RequestDetails? get selectedRequest => _selectedRequest;
   bool get _allowShaking => [
@@ -91,6 +92,12 @@ class InspectorController extends ChangeNotifier {
   set userResponseStopperEnabled(bool value) {
     if (_userResponseStopperEnabled == value) return;
     _userResponseStopperEnabled = value;
+    notifyListeners();
+  }
+
+  set showExpandableJsonView(bool value) {
+    if (_showExpandableJsonView == value) return;
+    _showExpandableJsonView = value;
     notifyListeners();
   }
 

@@ -19,6 +19,7 @@ class RequestsInspector extends StatelessWidget {
     Key? key,
     bool enabled = false,
     bool hideInspectorBanner = false,
+    bool showExpandableJsonView = true,
     ShowInspectorOn showInspectorOn = ShowInspectorOn.Both,
     required Widget child,
     required GlobalKey<NavigatorState>? navigatorKey,
@@ -27,6 +28,7 @@ class RequestsInspector extends StatelessWidget {
         _showInspectorOn = showInspectorOn,
         _child = child,
         _navigatorKey = navigatorKey,
+        _showExpandableJsonView = showExpandableJsonView,
         super(key: key);
 
   ///Require hot restart for showing its change
@@ -34,6 +36,7 @@ class RequestsInspector extends StatelessWidget {
   final bool _hideInspectorBanner;
   final ShowInspectorOn _showInspectorOn;
   final Widget _child;
+  final bool _showExpandableJsonView;
 
   /// Pass it to enable Request & Response `Stopper` Dialogs
   final GlobalKey<NavigatorState>? _navigatorKey;
@@ -43,6 +46,7 @@ class RequestsInspector extends StatelessWidget {
     var widget = _enabled
         ? ChangeNotifierProvider(
             create: (context) => InspectorController(
+              showExpandableJsonView: _showExpandableJsonView,
               enabled: _enabled,
               showInspectorOn: _isSupportShaking()
                   ? _showInspectorOn
@@ -70,7 +74,9 @@ class RequestsInspector extends StatelessWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
                       _child,
-                      _Inspector(navigatorKey: _navigatorKey),
+                      _Inspector(
+                          navigatorKey: _navigatorKey,
+                          showExpandableJsonView: _showExpandableJsonView),
                     ],
                   ),
                 ),
@@ -123,9 +129,10 @@ class RequestsInspector extends StatelessWidget {
 }
 
 class _Inspector extends StatelessWidget {
-  const _Inspector({
+  _Inspector({
     Key? key,
     GlobalKey<NavigatorState>? navigatorKey,
+    required bool showExpandableJsonView,
   })  : _navigatorKey = navigatorKey,
         super(key: key);
 
@@ -234,6 +241,31 @@ class _Inspector extends StatelessWidget {
             ),
           ),
         ),
+        PopupMenuItem(
+          child: InkWell(
+            onTap: () => inspectorController.showExpandableJsonView =
+                !inspectorController.showExpandableJsonView,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Expandable Json view'),
+                Selector<InspectorController, bool>(
+                  selector: (_, inspectorController) =>
+                      inspectorController.showExpandableJsonView,
+                  builder: (context, showExpandableJsonView, _) => Switch(
+                    value: showExpandableJsonView,
+                    activeColor: Colors.green,
+                    activeTrackColor: Colors.grey[700],
+                    inactiveThumbColor: Colors.white,
+                    inactiveTrackColor: Colors.grey[700],
+                    onChanged: (value) =>
+                        inspectorController.showExpandableJsonView = value,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -295,9 +327,11 @@ class _Inspector extends StatelessWidget {
   }
 
   Widget _buildSelectedTab(BuildContext context, {required int selectedTab}) {
+    final inspectorController = context.read<InspectorController>();
+
     return selectedTab == 0
         ? _buildAllRequests(context)
-        : const _RequestDetailsPage();
+        : _RequestDetailsPage(inspectorController: inspectorController);
   }
 
   Widget _buildAllRequests(BuildContext context) {
@@ -519,7 +553,11 @@ class _RequestItemWidget extends StatelessWidget {
 }
 
 class _RequestDetailsPage extends StatelessWidget {
-  const _RequestDetailsPage({Key? key}) : super(key: key);
+  const _RequestDetailsPage(
+      {Key? key, required InspectorController inspectorController})
+      : _inspectorController = inspectorController,
+        super(key: key);
+  final InspectorController _inspectorController;
 
   @override
   Widget build(BuildContext context) {
@@ -551,9 +589,12 @@ class _RequestDetailsPage extends StatelessWidget {
         _buildTitle('URL'),
         _buildSelectableText(request.url),
         ..._buildHeadersBlock(request.headers),
-        ..._buildQueryBlock(request.queryParameters),
-        ..._buildRequestBodyBlock(request.requestBody),
-        ..._buildResponseBodyBlock(request.responseBody),
+        ..._buildQueryBlock(request.queryParameters,
+            _inspectorController.showExpandableJsonView),
+        ..._buildRequestBodyBlock(
+            request.requestBody, _inspectorController.showExpandableJsonView),
+        ..._buildResponseBodyBlock(
+            request.responseBody, _inspectorController.showExpandableJsonView),
       ].mapIndexed(_buildBackgroundColor).toList(),
     );
   }
@@ -645,7 +686,16 @@ class _RequestDetailsPage extends StatelessWidget {
     ];
   }
 
-  Iterable<Widget> _buildQueryBlock(queryParameters) {
+  Widget _buildJsonBlock(bool showExpandableJsonView, body) {
+    return showExpandableJsonView
+        ? body.runtimeType != String
+            ? _buildJsonViewer(body)
+            : _buildSelectableText(body)
+        : _buildSelectableText(body);
+  }
+
+  Iterable<Widget> _buildQueryBlock(
+      queryParameters, bool showExpandableJsonView) {
     if (queryParameters == null) return [];
     if ((queryParameters is Map ||
             queryParameters is String ||
@@ -654,26 +704,24 @@ class _RequestDetailsPage extends StatelessWidget {
 
     return [
       _buildTitle('Parameters'),
-      queryParameters.runtimeType != String
-          ? _buildJsonViewer(queryParameters)
-          : _buildSelectableText(queryParameters),
+      _buildJsonBlock(showExpandableJsonView, queryParameters)
     ];
   }
 
-  Iterable<Widget> _buildRequestBodyBlock(requestBody) {
+  Iterable<Widget> _buildRequestBodyBlock(
+      requestBody, bool showExpandableJsonView) {
     if (requestBody == null) return [];
     if ((requestBody is Map || requestBody is String || requestBody is List) &&
         requestBody.isEmpty) return [];
 
     return [
       _buildTitle('RequestBody'),
-      requestBody.runtimeType != String
-          ? _buildJsonViewer(requestBody)
-          : _buildSelectableText(requestBody),
+      _buildJsonBlock(showExpandableJsonView, requestBody)
     ];
   }
 
-  Iterable<Widget> _buildResponseBodyBlock(responseBody) {
+  Iterable<Widget> _buildResponseBodyBlock(
+      responseBody, bool showExpandableJsonView) {
     if (responseBody == null) return [];
     if ((responseBody is Map ||
             responseBody is String ||
@@ -682,9 +730,7 @@ class _RequestDetailsPage extends StatelessWidget {
 
     return [
       _buildTitle('ResponseBody'),
-      responseBody.runtimeType != String
-          ? _buildJsonViewer(responseBody)
-          : _buildSelectableText(responseBody),
+      _buildJsonBlock(showExpandableJsonView, responseBody)
     ];
   }
 
@@ -727,12 +773,12 @@ class _RequestDetailsPage extends StatelessWidget {
           closeIcon: Icon(
             Icons.arrow_drop_down,
             color: Colors.green,
-            size: 20,
+            size: 24,
           ),
           openIcon: Icon(
             Icons.arrow_drop_up,
             color: Colors.green,
-            size: 20,
+            size: 24,
           ),
         ),
       ),
