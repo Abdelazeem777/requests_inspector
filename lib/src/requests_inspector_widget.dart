@@ -10,9 +10,9 @@ import 'package:requests_inspector/src/response_stopper_editor_dialog.dart';
 import '../requests_inspector.dart';
 
 ///You can show the Inspector by **Shaking** your phone.
-///
-/// Pass your `navigatorKey` of your MaterialApp to enable Request & Response `Stopper` Dialogs.
 class RequestsInspector extends StatelessWidget {
+  /// Pass your `navigatorKey` of your MaterialApp to enable Request & Response `Stopper` Dialogs.
+  /// And if you don't want to use it, you can pass it as `null`.
   const RequestsInspector({
     super.key,
     bool enabled = false,
@@ -35,7 +35,6 @@ class RequestsInspector extends StatelessWidget {
   final Widget _child;
   final bool _enableExpandableJsonView;
 
-  /// Pass it to enable Request & Response `Stopper` Dialogs
   final GlobalKey<NavigatorState>? _navigatorKey;
 
   @override
