@@ -1,7 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_json_view/flutter_json_view.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
 import 'package:requests_inspector/src/json_pretty_converter.dart';
@@ -14,9 +14,10 @@ import '../requests_inspector.dart';
 /// Pass your `navigatorKey` of your MaterialApp to enable Request & Response `Stopper` Dialogs.
 class RequestsInspector extends StatelessWidget {
   const RequestsInspector({
-    Key? key,
+    super.key,
     bool enabled = false,
     bool hideInspectorBanner = false,
+    bool enableExpandableJsonView = true,
     ShowInspectorOn showInspectorOn = ShowInspectorOn.Both,
     required Widget child,
     required GlobalKey<NavigatorState>? navigatorKey,
@@ -25,13 +26,14 @@ class RequestsInspector extends StatelessWidget {
         _showInspectorOn = showInspectorOn,
         _child = child,
         _navigatorKey = navigatorKey,
-        super(key: key);
+        _enableExpandableJsonView = enableExpandableJsonView;
 
   ///Require hot restart for showing its change
   final bool _enabled;
   final bool _hideInspectorBanner;
   final ShowInspectorOn _showInspectorOn;
   final Widget _child;
+  final bool _enableExpandableJsonView;
 
   /// Pass it to enable Request & Response `Stopper` Dialogs
   final GlobalKey<NavigatorState>? _navigatorKey;
@@ -41,6 +43,7 @@ class RequestsInspector extends StatelessWidget {
     var widget = _enabled
         ? ChangeNotifierProvider(
             create: (context) => InspectorController(
+              enableExpandableJsonView: _enableExpandableJsonView,
               enabled: _enabled,
               showInspectorOn: _isSupportShaking()
                   ? _showInspectorOn
@@ -122,10 +125,9 @@ class RequestsInspector extends StatelessWidget {
 
 class _Inspector extends StatelessWidget {
   const _Inspector({
-    Key? key,
+    super.key,
     GlobalKey<NavigatorState>? navigatorKey,
-  })  : _navigatorKey = navigatorKey,
-        super(key: key);
+  }) : _navigatorKey = navigatorKey;
 
   final GlobalKey<NavigatorState>? _navigatorKey;
 
@@ -226,6 +228,31 @@ class _Inspector extends StatelessWidget {
                     inactiveTrackColor: Colors.grey[700],
                     onChanged: (value) =>
                         inspectorController.userResponseStopperEnabled = value,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        PopupMenuItem(
+          child: InkWell(
+            onTap: () => inspectorController.enableExpandableJsonView =
+                !inspectorController.enableExpandableJsonView,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Expandable Json view'),
+                Selector<InspectorController, bool>(
+                  selector: (_, inspectorController) =>
+                      inspectorController.enableExpandableJsonView,
+                  builder: (context, showExpandableJsonView, _) => Switch(
+                    value: showExpandableJsonView,
+                    activeColor: Colors.green,
+                    activeTrackColor: Colors.grey[700],
+                    inactiveThumbColor: Colors.white,
+                    inactiveTrackColor: Colors.grey[700],
+                    onChanged: (value) =>
+                        inspectorController.enableExpandableJsonView = value,
                   ),
                 ),
               ],
@@ -454,14 +481,13 @@ class _RunAgainButtonState extends State<_RunAgainButton> {
 
 class _RequestItemWidget extends StatelessWidget {
   const _RequestItemWidget({
-    Key? key,
+    super.key,
     required bool isSelected,
     required RequestDetails request,
     required ValueChanged<RequestDetails> onTap,
   })  : _isSelected = isSelected,
         _request = request,
-        _onTap = onTap,
-        super(key: key);
+        _onTap = onTap;
 
   final bool _isSelected;
   final RequestDetails _request;
@@ -517,7 +543,7 @@ class _RequestItemWidget extends StatelessWidget {
 }
 
 class _RequestDetailsPage extends StatelessWidget {
-  const _RequestDetailsPage({Key? key}) : super(key: key);
+  const _RequestDetailsPage();
 
   @override
   Widget build(BuildContext context) {
@@ -534,6 +560,7 @@ class _RequestDetailsPage extends StatelessWidget {
   }
 
   Widget _buildRequestDetails(BuildContext context, RequestDetails request) {
+    final _inspectorController = context.read<InspectorController>();
     return ListView(
       padding: const EdgeInsets.only(bottom: 96.0),
       children: [
@@ -549,9 +576,12 @@ class _RequestDetailsPage extends StatelessWidget {
         _buildTitle('URL'),
         _buildSelectableText(request.url),
         ..._buildHeadersBlock(request.headers),
-        ..._buildQueryBlock(request.queryParameters),
-        ..._buildRequestBodyBlock(request.requestBody),
-        ..._buildResponseBodyBlock(request.responseBody),
+        ..._buildQueryBlock(request.queryParameters,
+            _inspectorController.enableExpandableJsonView),
+        ..._buildRequestBodyBlock(
+            request.requestBody, _inspectorController.enableExpandableJsonView),
+        ..._buildResponseBodyBlock(request.responseBody,
+            _inspectorController.enableExpandableJsonView),
       ].mapIndexed(_buildBackgroundColor).toList(),
     );
   }
@@ -643,7 +673,16 @@ class _RequestDetailsPage extends StatelessWidget {
     ];
   }
 
-  Iterable<Widget> _buildQueryBlock(queryParameters) {
+  Widget _buildJsonBlock(bool showExpandableJsonView, body) {
+    return showExpandableJsonView
+        ? body.runtimeType != String
+            ? _buildJsonViewer(body)
+            : _buildSelectableText(body)
+        : _buildSelectableText(body);
+  }
+
+  Iterable<Widget> _buildQueryBlock(
+      queryParameters, bool showExpandableJsonView) {
     if (queryParameters == null) return [];
     if ((queryParameters is Map ||
             queryParameters is String ||
@@ -652,32 +691,87 @@ class _RequestDetailsPage extends StatelessWidget {
 
     return [
       _buildTitle('Parameters'),
-      _buildSelectableText(queryParameters),
+      _buildJsonBlock(showExpandableJsonView, queryParameters)
     ];
   }
 
-  Iterable<Widget> _buildRequestBodyBlock(requestBody) {
+  Iterable<Widget> _buildRequestBodyBlock(
+      requestBody, bool showExpandableJsonView) {
     if (requestBody == null) return [];
     if ((requestBody is Map || requestBody is String || requestBody is List) &&
         requestBody.isEmpty) return [];
 
     return [
       _buildTitle('RequestBody'),
-      _buildSelectableText(requestBody),
+      _buildJsonBlock(showExpandableJsonView, requestBody)
     ];
   }
 
-  Iterable<Widget> _buildResponseBodyBlock(responseBody) {
+  Iterable<Widget> _buildResponseBodyBlock(
+      responseBody, bool showExpandableJsonView) {
     if (responseBody == null) return [];
     if ((responseBody is Map ||
             responseBody is String ||
             responseBody is List) &&
         responseBody.isEmpty) return [];
-
     return [
       _buildTitle('ResponseBody'),
-      _buildSelectableText(responseBody),
+      _buildJsonBlock(showExpandableJsonView, responseBody)
     ];
+  }
+
+  Widget _buildJsonViewer(text) {
+    final prettyprint = JsonPrettyConverter().convert(text);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      child: JsonView.string(
+        prettyprint,
+        keyName: '{...}',
+        listKeyName: '[...]',
+        theme: _buildJsonViewTheme(),
+      ),
+    );
+  }
+
+  JsonViewTheme _buildJsonViewTheme() {
+    return const JsonViewTheme(
+      backgroundColor: Colors.transparent,
+      keyStyle: TextStyle(
+        color: Colors.black54,
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+      ),
+      separator: Text(
+        ' : ',
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+      ),
+      doubleStyle: TextStyle(
+        color: Colors.green,
+        fontSize: 16,
+      ),
+      intStyle: TextStyle(
+        color: Colors.green,
+        fontSize: 16,
+      ),
+      stringStyle: TextStyle(
+        color: Colors.green,
+        fontSize: 16,
+      ),
+      boolStyle: TextStyle(
+        color: Colors.green,
+        fontSize: 16,
+      ),
+      closeIcon: Icon(
+        Icons.arrow_drop_down,
+        color: Colors.green,
+        size: 24,
+      ),
+      openIcon: Icon(
+        Icons.arrow_drop_up,
+        color: Colors.green,
+        size: 24,
+      ),
+    );
   }
 
   Widget _buildSelectableText(text) {

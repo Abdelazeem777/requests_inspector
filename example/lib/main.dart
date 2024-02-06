@@ -146,6 +146,7 @@ final navigatorKey = GlobalKey<NavigatorState>();
 void main() => runApp(
       RequestsInspector(
         enabled: true,
+        enableExpandableJsonView: false,
         showInspectorOn: ShowInspectorOn.Both,
         child: const MyApp(),
         navigatorKey: navigatorKey,
@@ -167,7 +168,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     futurePosts =
         fetchPostsUsingInterceptor() /*for restful apis Interceptor example use => fetchPostsUsingInterceptor() */;
-    //  fetchPostsGraphQlUsingGraphQLFlutterInterceptor() /*for graph ql Interceptor example */;
+    // fetchPostsGraphQlUsingGraphQLFlutterInterceptor() /*for graph ql Interceptor example */;
   }
 
   @override
