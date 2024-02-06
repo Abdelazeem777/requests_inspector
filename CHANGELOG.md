@@ -1,3 +1,9 @@
+## 3.5.0
+
+- Add the ability to intercept the response before sending it to the client and modify it. 🥳
+- Renamed the Request intercept and Response intercept to `Stopper` so now both come under `Request Stopper` and `Response Stopper` respectively .
+- Add a new Viewer option for Json [`ExpandableJsonView`] to view the response in a more readable format, big thanks to [a.aboelkhair](https://github.com/Abdullah-Mohammed-Ali). 😊🙏
+
 ## 3.4.1
 
 - Update showInspectorOn enum value from Shaking to Both.

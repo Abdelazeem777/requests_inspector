@@ -146,7 +146,6 @@ class _Inspector extends StatelessWidget {
 
   AppBar _buildAppBar(BuildContext context) {
     final inspectorController = context.read<InspectorController>();
-    final showStopperDialogsAllowed = _navigatorKey?.currentContext != null;
 
     return AppBar(
       backgroundColor: Colors.black,
@@ -175,65 +174,69 @@ class _Inspector extends StatelessWidget {
                   onTap: inspectorController.runAgain,
                 ),
         ),
-        if (showStopperDialogsAllowed) _buildPopUpMenu(inspectorController),
+        _buildPopUpMenu(inspectorController),
       ],
     );
   }
 
   Widget _buildPopUpMenu(InspectorController inspectorController) {
+    final showStopperDialogsAllowed = _navigatorKey?.currentContext != null;
+
     return PopupMenuButton(
       icon: const Icon(Icons.more_vert, color: Colors.white),
       itemBuilder: (context) => [
-        PopupMenuItem(
-          child: InkWell(
-            onTap: () => inspectorController.userRequestStopperEnabled =
-                !inspectorController.userRequestStopperEnabled,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Stop Requests'),
-                Selector<InspectorController, bool>(
-                  selector: (_, inspectorController) =>
-                      inspectorController.userRequestStopperEnabled,
-                  builder: (context, userRequestStopperEnabled, _) => Switch(
-                    value: userRequestStopperEnabled,
-                    activeColor: Colors.green,
-                    activeTrackColor: Colors.grey[700],
-                    inactiveThumbColor: Colors.white,
-                    inactiveTrackColor: Colors.grey[700],
-                    onChanged: (value) =>
-                        inspectorController.userRequestStopperEnabled = value,
+        if (showStopperDialogsAllowed)
+          PopupMenuItem(
+            child: InkWell(
+              onTap: () => inspectorController.userRequestStopperEnabled =
+                  !inspectorController.userRequestStopperEnabled,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Stop Requests'),
+                  Selector<InspectorController, bool>(
+                    selector: (_, inspectorController) =>
+                        inspectorController.userRequestStopperEnabled,
+                    builder: (context, userRequestStopperEnabled, _) => Switch(
+                      value: userRequestStopperEnabled,
+                      activeColor: Colors.green,
+                      activeTrackColor: Colors.grey[700],
+                      inactiveThumbColor: Colors.white,
+                      inactiveTrackColor: Colors.grey[700],
+                      onChanged: (value) =>
+                          inspectorController.userRequestStopperEnabled = value,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
-        PopupMenuItem(
-          child: InkWell(
-            onTap: () => inspectorController.userResponseStopperEnabled =
-                !inspectorController.userResponseStopperEnabled,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Stop Responses'),
-                Selector<InspectorController, bool>(
-                  selector: (_, inspectorController) =>
-                      inspectorController.userResponseStopperEnabled,
-                  builder: (context, userResponseStopperEnabled, _) => Switch(
-                    value: userResponseStopperEnabled,
-                    activeColor: Colors.green,
-                    activeTrackColor: Colors.grey[700],
-                    inactiveThumbColor: Colors.white,
-                    inactiveTrackColor: Colors.grey[700],
-                    onChanged: (value) =>
-                        inspectorController.userResponseStopperEnabled = value,
+        if (showStopperDialogsAllowed)
+          PopupMenuItem(
+            child: InkWell(
+              onTap: () => inspectorController.userResponseStopperEnabled =
+                  !inspectorController.userResponseStopperEnabled,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Stop Responses'),
+                  Selector<InspectorController, bool>(
+                    selector: (_, inspectorController) =>
+                        inspectorController.userResponseStopperEnabled,
+                    builder: (context, userResponseStopperEnabled, _) => Switch(
+                      value: userResponseStopperEnabled,
+                      activeColor: Colors.green,
+                      activeTrackColor: Colors.grey[700],
+                      inactiveThumbColor: Colors.white,
+                      inactiveTrackColor: Colors.grey[700],
+                      onChanged: (value) => inspectorController
+                          .userResponseStopperEnabled = value,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
         PopupMenuItem(
           child: InkWell(
             onTap: () => inspectorController.enableExpandableJsonView =
