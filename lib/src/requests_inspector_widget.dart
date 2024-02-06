@@ -547,12 +547,10 @@ class _RequestDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _inspectorController = context.read<InspectorController>();
-
     return Expanded(
       child: Selector<InspectorController, RequestDetails?>(
         selector: (_, inspectorController) =>
-            _inspectorController.selectedRequest,
+            inspectorController.selectedRequest,
         shouldRebuild: (previous, next) => true,
         builder: (context, selectedRequest, _) => selectedRequest == null
             ? const Center(child: Text('No request selected'))
@@ -563,7 +561,6 @@ class _RequestDetailsPage extends StatelessWidget {
 
   Widget _buildRequestDetails(BuildContext context, RequestDetails request) {
     final _inspectorController = context.read<InspectorController>();
-
     return ListView(
       padding: const EdgeInsets.only(bottom: 96.0),
       children: [
