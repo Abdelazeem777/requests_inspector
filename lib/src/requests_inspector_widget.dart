@@ -130,6 +130,8 @@ class _Inspector extends StatelessWidget {
 
   final GlobalKey<NavigatorState>? _navigatorKey;
 
+  bool get showStopperDialogsAllowed => _navigatorKey?.currentContext != null;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -179,8 +181,6 @@ class _Inspector extends StatelessWidget {
   }
 
   Widget _buildPopUpMenu(InspectorController inspectorController) {
-    final showStopperDialogsAllowed = _navigatorKey?.currentContext != null;
-
     return PopupMenuButton(
       icon: const Icon(Icons.more_vert, color: Colors.white),
       itemBuilder: (context) => [
