@@ -1,3 +1,8 @@
+## 3.5.1
+
+- Fix some bugs with `Stopper` switch button.
+- Add `ExpandableJsonView` to the header block.
+
 ## 3.5.0
 
 - Add the ability to intercept the response before sending it to the client and modify it. 🥳
