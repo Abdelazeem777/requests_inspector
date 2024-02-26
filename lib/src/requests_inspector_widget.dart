@@ -278,6 +278,7 @@ class _Inspector extends StatelessWidget {
     );
   }
 
+//TODO: HERE!
   Widget _buildHeaderTabBar(BuildContext context, {required int selectedTab}) {
     final inspectorController = context.read<InspectorController>();
     return Row(
@@ -577,7 +578,8 @@ class _RequestDetailsPage extends StatelessWidget {
         ),
         _buildTitle('URL'),
         _buildSelectableText(request.url),
-        ..._buildHeadersBlock(request.headers),
+        ..._buildHeadersBlock(
+            request.headers, _inspectorController.enableExpandableJsonView),
         ..._buildQueryBlock(request.queryParameters,
             _inspectorController.enableExpandableJsonView),
         ..._buildRequestBodyBlock(
@@ -664,14 +666,14 @@ class _RequestDetailsPage extends StatelessWidget {
     );
   }
 
-  Iterable<Widget> _buildHeadersBlock(headers) {
+  Iterable<Widget> _buildHeadersBlock(headers, bool showExpandableJsonView) {
     if (headers == null) return [];
     if ((headers is Map || headers is String || headers is List) &&
         headers.isEmpty) return [];
 
     return [
       _buildTitle('Headers'),
-      _buildSelectableText(headers),
+      _buildJsonBlock(showExpandableJsonView, headers)
     ];
   }
 
@@ -684,7 +686,9 @@ class _RequestDetailsPage extends StatelessWidget {
   }
 
   Iterable<Widget> _buildQueryBlock(
-      queryParameters, bool showExpandableJsonView) {
+    queryParameters,
+    bool showExpandableJsonView,
+  ) {
     if (queryParameters == null) return [];
     if ((queryParameters is Map ||
             queryParameters is String ||
@@ -710,7 +714,9 @@ class _RequestDetailsPage extends StatelessWidget {
   }
 
   Iterable<Widget> _buildResponseBodyBlock(
-      responseBody, bool showExpandableJsonView) {
+    responseBody,
+    bool showExpandableJsonView,
+  ) {
     if (responseBody == null) return [];
     if ((responseBody is Map ||
             responseBody is String ||
