@@ -1,3 +1,7 @@
+## 3.5.2
+
+- Fix bug in `header` `stopper` editor.
+
 ## 3.5.1
 
 - Fix some bugs with `Stopper` switch button.

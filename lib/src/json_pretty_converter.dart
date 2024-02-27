@@ -53,7 +53,7 @@ class JsonPrettyConverter {
 
     oldDataType = _removeUnderScoreIfExists(oldDataType);
     try {
-      if (oldDataType.startsWith('Map')) return jsonDecode(text);
+      if (oldDataType.contains('Map')) return jsonDecode(text);
       if (oldDataType.startsWith('String')) return text;
       if (oldDataType.startsWith('List')) return jsonDecode(text);
 
