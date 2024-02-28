@@ -130,7 +130,7 @@ class _Inspector extends StatelessWidget {
 
   final GlobalKey<NavigatorState>? _navigatorKey;
 
-  bool get showStopperDialogsAllowed => _navigatorKey?.currentContext != null;
+  bool showStopperDialogsAllowed() => _navigatorKey?.currentContext != null;
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +184,7 @@ class _Inspector extends StatelessWidget {
     return PopupMenuButton(
       icon: const Icon(Icons.more_vert, color: Colors.white),
       itemBuilder: (context) => [
-        if (showStopperDialogsAllowed)
+        if (showStopperDialogsAllowed())
           PopupMenuItem(
             child: InkWell(
               onTap: () => inspectorController.userRequestStopperEnabled =
@@ -210,7 +210,7 @@ class _Inspector extends StatelessWidget {
               ),
             ),
           ),
-        if (showStopperDialogsAllowed)
+        if (showStopperDialogsAllowed())
           PopupMenuItem(
             child: InkWell(
               onTap: () => inspectorController.userResponseStopperEnabled =
