@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:dio/dio.dart';
 
 class JsonPrettyConverter {
@@ -16,7 +15,7 @@ class JsonPrettyConverter {
   String convert(text) {
     late final String prettyprint;
     if (text is Map || text is String || text is List)
-      prettyprint = _convertToPrettyJsonFromMapOrJson(text);
+      prettyprint = _encoder.convert(text);
     else if (text is FormData)
       prettyprint = 'FormData:\n${_convertToPrettyFromFormData(text)}';
     else if (text == null)
@@ -31,21 +30,7 @@ class JsonPrettyConverter {
       for (final e in text.fields) e.key: e.value,
       for (final e in text.files) e.key: e.value.filename
     };
-
-    return _convertToPrettyJsonFromMapOrJson(map);
-  }
-
-  String _convertToPrettyJsonFromMapOrJson(text) {
-    if (text is! Map) return _encoder.convert(text);
-
-    text = {
-      for (final e in text.entries)
-        if (e.value is Map || e.value is List || e.value is String)
-          e.key: e.value
-        else
-          e.key: convert(e.value)
-    };
-    return _encoder.convert(text);
+    return _encoder.convert(map);
   }
 
   dynamic deconvertFrom(String text, String? oldDataType) {
