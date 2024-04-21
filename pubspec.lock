@@ -134,15 +134,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.20.5"
-  flutter_json_view:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "4644834e27cfd52b91fe0e147e7aea58dcad0bcf"
-      url: "https://github.com/Abdullah-Mohammed-Ali/flutter_json_view"
-    source: git
-    version: "1.1.4"
   flutter_lints:
     dependency: "direct dev"
     description:

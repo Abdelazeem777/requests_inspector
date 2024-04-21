@@ -146,10 +146,9 @@ final navigatorKey = GlobalKey<NavigatorState>();
 void main() => runApp(
       RequestsInspector(
         enabled: true,
-        enableExpandableJsonView: false,
         showInspectorOn: ShowInspectorOn.Both,
-        child: const MyApp(),
         navigatorKey: navigatorKey,
+        child: const MyApp(),
       ),
     );
 

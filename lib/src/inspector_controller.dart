@@ -19,26 +19,23 @@ class InspectorController extends ChangeNotifier {
     ShowInspectorOn showInspectorOn = ShowInspectorOn.Shaking,
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
-    bool enableExpandableJsonView = true,
   }) =>
       _singleton ??= InspectorController._internal(
-          enabled: enabled,
-          showInspectorOn: showInspectorOn,
-          onStoppingRequest: onStoppingRequest,
-          onStoppingResponse: onStoppingResponse,
-          enableExpandableJsonView: enableExpandableJsonView);
+        enabled: enabled,
+        showInspectorOn: showInspectorOn,
+        onStoppingRequest: onStoppingRequest,
+        onStoppingResponse: onStoppingResponse,
+      );
 
   InspectorController._internal({
     required bool enabled,
     required ShowInspectorOn showInspectorOn,
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
-    required bool enableExpandableJsonView,
   })  : _enabled = enabled,
         _showInspectorOn = showInspectorOn,
         _onStoppingRequest = onStoppingRequest,
-        _onStoppingResponse = onStoppingResponse,
-        _enableExpandableJsonView = enableExpandableJsonView {
+        _onStoppingResponse = onStoppingResponse {
     if (_enabled && _allowShaking)
       _shakeDetector = ShakeDetector.autoStart(
         onPhoneShake: showInspector,
@@ -65,7 +62,6 @@ class InspectorController extends ChangeNotifier {
   int _selectedTab = 0;
   bool _userRequestStopperEnabled = false;
   bool _userResponseStopperEnabled = false;
-  bool _enableExpandableJsonView = true;
 
   final _requestsList = <RequestDetails>[];
   RequestDetails? _selectedRequest;
@@ -73,7 +69,6 @@ class InspectorController extends ChangeNotifier {
   int get selectedTab => _selectedTab;
   bool get userRequestStopperEnabled => _userRequestStopperEnabled;
   bool get userResponseStopperEnabled => _userResponseStopperEnabled;
-  bool get enableExpandableJsonView => _enableExpandableJsonView;
   List<RequestDetails> get requestsList => _requestsList;
   RequestDetails? get selectedRequest => _selectedRequest;
   bool get _allowShaking => [
@@ -96,12 +91,6 @@ class InspectorController extends ChangeNotifier {
   set userResponseStopperEnabled(bool value) {
     if (_userResponseStopperEnabled == value) return;
     _userResponseStopperEnabled = value;
-    notifyListeners();
-  }
-
-  set enableExpandableJsonView(bool value) {
-    if (_enableExpandableJsonView == value) return;
-    _enableExpandableJsonView = value;
     notifyListeners();
   }
 
