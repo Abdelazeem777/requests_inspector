@@ -256,11 +256,13 @@ class _Inspector extends StatelessWidget {
         _buildTabItem(
           title: 'All',
           isSelected: selectedTab == 0,
+          isLeft: true,
           onTap: () => inspectorController.selectedTab = 0,
         ),
         _buildTabItem(
           title: 'Request Details',
           isSelected: selectedTab == 1,
+          isLeft: false,
           onTap: () => inspectorController.selectedTab = 1,
         ),
       ],
@@ -270,6 +272,7 @@ class _Inspector extends StatelessWidget {
   Widget _buildTabItem({
     required String title,
     required bool isSelected,
+    required bool isLeft,
     required VoidCallback onTap,
   }) {
     return Expanded(
@@ -278,7 +281,19 @@ class _Inspector extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(12.0),
           alignment: Alignment.center,
-          color: isSelected ? const Color(0xFF1C1B1F) : Colors.white,
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFF1C1B1F) : Colors.white,
+            borderRadius: isSelected
+                ? null
+                : BorderRadius.only(
+                    bottomRight: isLeft
+                        ? const Radius.circular(12.0)
+                        : const Radius.circular(0.0),
+                    bottomLeft: isLeft
+                        ? const Radius.circular(0.0)
+                        : const Radius.circular(12.0),
+                  ),
+          ),
           child: Text(
             title,
             style: TextStyle(
