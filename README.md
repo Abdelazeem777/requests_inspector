@@ -10,8 +10,8 @@ A Flutter package for **logging** API requests (**RESTful API** & **GraphQL**) r
 
 Also you can share the request details as (**Log** or **cURL** command) with your team to help them debug the API requests.
 
-**From Inspector to PostMan 🧡**
-Now you can use `cURL` command to send the request again from your terminal or [Postman](https://www.postman.com/) 💪💪
+**From Inspector to Postman 🧡 🎉️**
+Now you can extract `cURL` command from the **inspector** to send the request again from your terminal or [Postman](https://www.postman.com/) 💪💪
 
 <img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/curl_share_request.gif" width="600"/>
 

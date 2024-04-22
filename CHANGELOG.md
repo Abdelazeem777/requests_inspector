@@ -1,3 +1,8 @@
+## 4.0.0
+
+- Completely new UI theme for the inspector. 🎉️🎉️
+- Enhance user experience and texts readability. 😃
+
 ## 3.5.0
 
 - Add the ability to intercept the response before sending it to the client and modify it. 🥳

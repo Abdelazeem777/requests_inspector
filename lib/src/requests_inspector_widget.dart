@@ -130,9 +130,10 @@ class _Inspector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: Theme.of(context).copyWith(useMaterial3: false),
+      theme: ThemeData.dark().copyWith(
+        colorScheme: ColorScheme.dark(primary: Colors.grey[800]!),
+      ),
       home: Scaffold(
-        backgroundColor: Colors.white,
         appBar: _buildAppBar(context),
         body: _buildBody(),
         floatingActionButton: _buildShareFloatingButton(),
@@ -241,26 +242,24 @@ class _Inspector extends StatelessWidget {
       builder: (context, selectedTab, _) => Column(
         children: [
           _buildHeaderTabBar(context, selectedTab: selectedTab),
-          const Divider(height: 1),
           _buildSelectedTab(context, selectedTab: selectedTab),
         ],
       ),
     );
   }
 
-//TODO: HERE!
   Widget _buildHeaderTabBar(BuildContext context, {required int selectedTab}) {
     final inspectorController = context.read<InspectorController>();
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildTabItem(
-          title: 'All requests',
+          title: 'All',
           isSelected: selectedTab == 0,
           onTap: () => inspectorController.selectedTab = 0,
         ),
         _buildTabItem(
-          title: 'SelectedTab requests',
+          title: 'Request Details',
           isSelected: selectedTab == 1,
           onTap: () => inspectorController.selectedTab = 1,
         ),
@@ -279,12 +278,12 @@ class _Inspector extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(12.0),
           alignment: Alignment.center,
-          color: isSelected ? Colors.black : Colors.grey[700],
+          color: isSelected ? const Color(0xFF1C1B1F) : Colors.white,
           child: Text(
             title,
             style: TextStyle(
               color: isSelected ? Colors.white : Colors.black,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w300,
+              fontWeight: isSelected ? FontWeight.w800 : FontWeight.w300,
             ),
           ),
         ),
@@ -306,7 +305,10 @@ class _Inspector extends StatelessWidget {
         shouldRebuild: (previous, next) => true,
         builder: (context, allRequests, _) => allRequests.isEmpty
             ? const Center(child: Text('No requests added yet'))
-            : ListView.builder(
+            : ListView.separated(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 6.0, horizontal: 6.0),
+                separatorBuilder: (_, __) => const SizedBox(height: 6.0),
                 itemCount: allRequests.length,
                 itemBuilder: (context, index) {
                   final request = allRequests[index];
@@ -334,7 +336,10 @@ class _Inspector extends StatelessWidget {
             const Text('This will clear all requests added to the inspector'),
         actions: [
           TextButton(
-            child: const Text('Yes'),
+            child: const Text(
+              'Yes',
+              style: TextStyle(color: Colors.red),
+            ),
             onPressed: () {
               Navigator.of(context).pop();
               onYes();
@@ -342,7 +347,7 @@ class _Inspector extends StatelessWidget {
           ),
           TextButton(
             onPressed: Navigator.of(context).pop,
-            child: const Text('No'),
+            child: const Text('No', style: TextStyle(color: Colors.green)),
           ),
         ],
       ),
@@ -357,6 +362,7 @@ class _Inspector extends StatelessWidget {
       builder: (context, showShareButton, _) => showShareButton
           ? FloatingActionButton(
               backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
               child: const Icon(Icons.share),
               onPressed: () async {
                 final box = context.findRenderObject() as RenderBox?;
@@ -393,17 +399,23 @@ class _Inspector extends StatelessWidget {
     return showDialog<bool?>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Normal Log or CURL command? 🤔'),
+        title: const Text('Normal Log or cURL command? 🤔'),
         content: const Text(
-            'The CURL command is more useful for exporting to Postman or run it again from terminal'),
+            'The cURL command is more useful for exporting to Postman or run it again from terminal'),
         actions: [
           TextButton(
-            child: const Text('CURL Command'),
+            child: const Text(
+              'cURL Command',
+              style: TextStyle(color: Colors.green),
+            ),
             onPressed: () => Navigator.of(context).pop(true),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Normal Log'),
+            child: const Text(
+              'Normal Log',
+              style: TextStyle(color: Colors.yellow),
+            ),
           ),
         ],
       ),
@@ -469,11 +481,8 @@ class _RequestItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget child = ListTile(
-      tileColor: _request.statusCode == null
-          ? Colors.red[400]
-          : _request.statusCode! > 299
-              ? Colors.red[400]
-              : Colors.green[400],
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+      tileColor: _specifyStatusCodeColor(_request.statusCode),
       leading: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -507,12 +516,23 @@ class _RequestItemWidget extends StatelessWidget {
     if (_isSelected)
       child = DecoratedBox(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, width: 2.0),
+          border: Border.all(color: Colors.white, width: 2.0),
+          borderRadius: BorderRadius.circular(4.0),
         ),
         child: child,
       );
-    return child;
+    return Theme(
+      data: Theme.of(context).copyWith(colorScheme: const ColorScheme.light()),
+      child: child,
+    );
   }
+}
+
+Color? _specifyStatusCodeColor(int? statusCode) {
+  if (statusCode == null) return Colors.red[400];
+  if (statusCode > 399) return Colors.red[400];
+  if (statusCode > 299) return Colors.yellow[400];
+  return Colors.green[400];
 }
 
 class _RequestDetailsPage extends StatelessWidget {
@@ -526,7 +546,8 @@ class _RequestDetailsPage extends StatelessWidget {
             inspectorController.selectedRequest,
         shouldRebuild: (previous, next) => true,
         builder: (context, selectedRequest, _) => selectedRequest == null
-            ? const Center(child: Text('No request selected'))
+            ? const Center(
+                child: Text('Please select a request first to view details'))
             : _buildRequestDetails(context, selectedRequest),
       ),
     );
@@ -545,7 +566,7 @@ class _RequestDetailsPage extends StatelessWidget {
           request.sentTime,
           request.receivedTime,
         ),
-        _buildTitle('URL'),
+        _buildTitle('URL:'),
         _buildSelectableText(request.url),
         ..._buildHeadersBlock(request.headers),
         ..._buildQueryBlock(request.queryParameters),
@@ -556,17 +577,22 @@ class _RequestDetailsPage extends StatelessWidget {
   }
 
   Widget _buildBackgroundColor(index, item) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: index.isEven
-            ? const Color.fromARGB(255, 208, 208, 208)
-            : const Color(0xFFFFFFFF),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: item,
-      ),
+    Widget child = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: item,
     );
+    return index.isEven
+        ? child
+        : Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6.0),
+            child: DecoratedBox(
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 19, 19, 19),
+                borderRadius: BorderRadius.all(Radius.circular(4.0)),
+              ),
+              child: child,
+            ),
+          );
   }
 
   Widget _buildRequestNameAndStatus({
@@ -575,28 +601,28 @@ class _RequestDetailsPage extends StatelessWidget {
     int? statusCode,
   }) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(6.0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
             child: Text(
               _createRequestName(method, requestName),
               style: const TextStyle(
-                fontSize: 18.0,
+                fontSize: 16.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
           Container(
-            padding: const EdgeInsets.all(8.0),
-            color: statusCode == null
-                ? Colors.red[400]
-                : statusCode > 299
-                    ? Colors.red[400]
-                    : Colors.green[400],
+            padding: const EdgeInsets.all(6.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8.0),
+              color: _specifyStatusCodeColor(statusCode),
+            ),
             child: Text(
               statusCode?.toString() ?? 'Err',
-              style: const TextStyle(fontSize: 18.0),
+              style: const TextStyle(fontSize: 16.0),
             ),
           ),
         ],
@@ -623,7 +649,7 @@ class _RequestDetailsPage extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(6.0),
       child: Text(
         text,
         style: const TextStyle(fontSize: 16.0),
@@ -636,7 +662,10 @@ class _RequestDetailsPage extends StatelessWidget {
     if ((headers is Map || headers is String || headers is List) &&
         headers.isEmpty) return [];
 
-    return [_buildTitle('Headers'), _buildSelectableText(headers)];
+    return [
+      _buildTitle('Headers:'),
+      _buildSelectableText(headers),
+    ];
   }
 
   Iterable<Widget> _buildQueryBlock(queryParameters) {
@@ -646,7 +675,10 @@ class _RequestDetailsPage extends StatelessWidget {
             queryParameters is List) &&
         queryParameters.isEmpty) return [];
 
-    return [_buildTitle('Parameters'), _buildSelectableText(queryParameters)];
+    return [
+      _buildTitle('Parameters:'),
+      _buildSelectableText(queryParameters),
+    ];
   }
 
   Iterable<Widget> _buildRequestBodyBlock(requestBody) {
@@ -654,7 +686,10 @@ class _RequestDetailsPage extends StatelessWidget {
     if ((requestBody is Map || requestBody is String || requestBody is List) &&
         requestBody.isEmpty) return [];
 
-    return [_buildTitle('RequestBody'), _buildSelectableText(requestBody)];
+    return [
+      _buildTitle('RequestBody:'),
+      _buildSelectableText(requestBody),
+    ];
   }
 
   Iterable<Widget> _buildResponseBodyBlock(responseBody) {
@@ -663,25 +698,28 @@ class _RequestDetailsPage extends StatelessWidget {
             responseBody is String ||
             responseBody is List) &&
         responseBody.isEmpty) return [];
-    return [_buildTitle('ResponseBody'), _buildSelectableText(responseBody)];
+    return [
+      _buildTitle('ResponseBody:'),
+      _buildSelectableText(responseBody),
+    ];
   }
 
   Widget _buildSelectableText(text) {
     final prettyprint = JsonPrettyConverter().convert(text);
 
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(6.0),
       child: SelectableText(prettyprint),
     );
   }
 
   Widget _buildTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: const EdgeInsets.fromLTRB(6.0, 8.0, 6.0, 0.0),
       child: Text(
         title,
         style: const TextStyle(
-          fontSize: 18.0,
+          fontSize: 16.0,
           fontWeight: FontWeight.bold,
         ),
       ),
