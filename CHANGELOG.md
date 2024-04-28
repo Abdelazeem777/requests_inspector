@@ -1,3 +1,8 @@
+## 4.0.1
+
+- Update README.md file.
+- Reverse between the `child` widget and the `Inspector` widget on the internal PageView to start with `Inspector` first.
+
 ## 4.0.0
 
 - Completely new UI theme for the inspector. 🎉️🎉️
