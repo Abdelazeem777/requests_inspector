@@ -4,7 +4,13 @@
 
 [![pub package](https://img.shields.io/pub/v/requests_inspector.svg)](https://pub.dev/packages/requests_inspector)
 
-A Flutter package for **logging** API requests (**RESTful API** & **GraphQL**) requests and accessing it by **Shaking** your phone to get the `RequestsInspector` widget on your screen or by **Long-Press** on any free space on the screen.
+A Flutter package for **logging** API requests (**RESTful API** & **GraphQL**) requests and accessing it by
+
+##### To get the `RequestsInspector` widget on your screen:
+
+- **Shaking** your phone
+  OR
+- **Long-Press** on any free space on the screen.
 
 <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mobile_list.jpg" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mobile_request.jpg" width ="280" />
 
