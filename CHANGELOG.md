@@ -1,3 +1,7 @@
+## 4.0.2
+
+- Revert the latest solution provided on v4.0.1 because of related issue with `flutter_zoom_drawer` package.
+
 ## 4.0.1
 
 - Update README.md file.

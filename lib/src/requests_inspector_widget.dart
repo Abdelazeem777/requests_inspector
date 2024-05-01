@@ -55,7 +55,7 @@ class RequestsInspector extends StatelessWidget {
               final inspectorController = context.read<InspectorController>();
               return WillPopScope(
                 onWillPop: () async =>
-                    inspectorController.pageController.page == 1,
+                    inspectorController.pageController.page == 0,
                 child: GestureDetector(
                   onLongPress: _showInspectorOn != ShowInspectorOn.Shaking
                       ? inspectorController.showInspector
@@ -64,8 +64,8 @@ class RequestsInspector extends StatelessWidget {
                     controller: inspectorController.pageController,
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
-                      _Inspector(navigatorKey: _navigatorKey),
                       _child,
+                      _Inspector(navigatorKey: _navigatorKey),
                     ],
                   ),
                 ),

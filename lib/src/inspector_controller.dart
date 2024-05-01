@@ -53,7 +53,7 @@ class InspectorController extends ChangeNotifier {
 
   final _dio = Dio(BaseOptions(validateStatus: (_) => true));
   final pageController = PageController(
-    initialPage: 1,
+    initialPage: 0,
     // if the viewportFraction is 1.0, the child pages will rebuild automatically
     // but if it less than 1.0, the pages will stay alive
     viewportFraction: 0.9999999,
@@ -101,9 +101,9 @@ class InspectorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void showInspector() => pageController.jumpToPage(0);
+  void showInspector() => pageController.jumpToPage(1);
 
-  void hideInspector() => pageController.jumpToPage(1);
+  void hideInspector() => pageController.jumpToPage(0);
 
   void addNewRequest(RequestDetails request) {
     if (!_enabled) return;
