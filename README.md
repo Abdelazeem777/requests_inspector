@@ -185,7 +185,7 @@ Widget build(BuildContext context) {
 
 - Second, just enable it from Inspector and it will stop all your requests and responses.
 
-<img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/stopper_feature.gif" width="600"/>
+<img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/stopper_feature.gif" width="280"/>
 
 ### For Web, Windows, MacOS and Linux
 
