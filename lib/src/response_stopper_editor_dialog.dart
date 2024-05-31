@@ -52,7 +52,7 @@ class _ResponseStopperEditorDialogState
                   child: ElevatedButton(
                     style:
                         ElevatedButton.styleFrom(foregroundColor: Colors.white),
-                    child: const Text('Send'),
+                    child: const Text('Receive'),
                     onPressed: () =>
                         Navigator.of(context).pop(_newResponseData),
                   ),

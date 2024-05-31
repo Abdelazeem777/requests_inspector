@@ -188,7 +188,7 @@ class _Inspector extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Stop Requests'),
+                  const Text('Requests Stopper'),
                   Selector<InspectorController, bool>(
                     selector: (_, inspectorController) =>
                         inspectorController.requestStopperEnabled,
@@ -214,7 +214,7 @@ class _Inspector extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Stop Responses'),
+                  const Text('Responses Stopper'),
                   Selector<InspectorController, bool>(
                     selector: (_, inspectorController) =>
                         inspectorController.responseStopperEnabled,

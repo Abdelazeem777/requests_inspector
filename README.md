@@ -156,6 +156,37 @@ you jus need to wrap your normal `HttpLink` with our `GraphQLInspectorLink` and 
 
 ```
 
+### Stopper (Requests & Responses)
+
+`requests_inspector` **(Stopper)** enables your to stop and edit requests (before sending it to server) and responses (before receiving it inside the app).
+
+- First, you need to add navigatorKey to your `MaterialApp` then pass it to `RequestsInspector` to show Stopper dialogs.
+
+```dart
+final navigatorKey = GlobalKey<NavigatorState>();
+
+void main() => runApp(
+  RequestsInspector(
+    // Add your `navigatorKey` to enable `Stopper` feature
+    navigatorKey: navigatorKey,
+    child: const MyApp(),
+  ),
+);
+
+...
+
+@override
+Widget build(BuildContext context) {
+  return MaterialApp(
+    navigatorKey: navigatorKey, // <== Here!
+    ...
+
+```
+
+- Second, just enable it from Inspector and it will stop all your requests and responses.
+
+<img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/stopper_feature.gif" width="600"/>
+
 ### For Web, Windows, MacOS and Linux
 
 Obviously, The shaking won't be good enough for those platforms 😅
