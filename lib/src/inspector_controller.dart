@@ -60,15 +60,15 @@ class InspectorController extends ChangeNotifier {
   );
 
   int _selectedTab = 0;
-  bool _userRequestStopperEnabled = false;
-  bool _userResponseStopperEnabled = false;
+  bool _requestStopperEnabled = false;
+  bool _responseStopperEnabled = false;
 
   final _requestsList = <RequestDetails>[];
   RequestDetails? _selectedRequest;
 
   int get selectedTab => _selectedTab;
-  bool get userRequestStopperEnabled => _userRequestStopperEnabled;
-  bool get userResponseStopperEnabled => _userResponseStopperEnabled;
+  bool get requestStopperEnabled => _requestStopperEnabled;
+  bool get responseStopperEnabled => _responseStopperEnabled;
   List<RequestDetails> get requestsList => _requestsList;
   RequestDetails? get selectedRequest => _selectedRequest;
   bool get _allowShaking => [
@@ -82,15 +82,15 @@ class InspectorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  set userRequestStopperEnabled(bool value) {
-    if (_userRequestStopperEnabled == value) return;
-    _userRequestStopperEnabled = value;
+  set requestStopperEnabled(bool value) {
+    if (_requestStopperEnabled == value) return;
+    _requestStopperEnabled = value;
     notifyListeners();
   }
 
-  set userResponseStopperEnabled(bool value) {
-    if (_userResponseStopperEnabled == value) return;
-    _userResponseStopperEnabled = value;
+  set responseStopperEnabled(bool value) {
+    if (_responseStopperEnabled == value) return;
+    _responseStopperEnabled = value;
     notifyListeners();
   }
 

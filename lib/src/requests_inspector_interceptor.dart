@@ -8,7 +8,7 @@ class RequestsInspectorInterceptor extends Interceptor {
       RequestOptions options, RequestInterceptorHandler handler) async {
     options.extra['startTime'] = DateTime.now();
 
-    if (!InspectorController().userRequestStopperEnabled)
+    if (!InspectorController().requestStopperEnabled)
       return super.onRequest(options, handler);
 
     final requestDetails = _convertToRequestDetails(options);
@@ -26,7 +26,7 @@ class RequestsInspectorInterceptor extends Interceptor {
       Response response, ResponseInterceptorHandler handler) async {
     final dateTime = DateTime.now();
 
-    if (InspectorController().userResponseStopperEnabled) {
+    if (InspectorController().responseStopperEnabled) {
       final oldResponseData = response.data;
 
       final newResponseData =

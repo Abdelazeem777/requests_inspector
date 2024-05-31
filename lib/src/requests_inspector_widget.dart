@@ -183,23 +183,23 @@ class _Inspector extends StatelessWidget {
         if (showStopperDialogsAllowed())
           PopupMenuItem(
             child: InkWell(
-              onTap: () => inspectorController.userRequestStopperEnabled =
-                  !inspectorController.userRequestStopperEnabled,
+              onTap: () => inspectorController.requestStopperEnabled =
+                  !inspectorController.requestStopperEnabled,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Stop Requests'),
                   Selector<InspectorController, bool>(
                     selector: (_, inspectorController) =>
-                        inspectorController.userRequestStopperEnabled,
-                    builder: (context, userRequestStopperEnabled, _) => Switch(
-                      value: userRequestStopperEnabled,
+                        inspectorController.requestStopperEnabled,
+                    builder: (context, requestStopperEnabled, _) => Switch(
+                      value: requestStopperEnabled,
                       activeColor: Colors.green,
                       activeTrackColor: Colors.grey[700],
                       inactiveThumbColor: Colors.white,
                       inactiveTrackColor: Colors.grey[700],
                       onChanged: (value) =>
-                          inspectorController.userRequestStopperEnabled = value,
+                          inspectorController.requestStopperEnabled = value,
                     ),
                   ),
                 ],
@@ -209,23 +209,23 @@ class _Inspector extends StatelessWidget {
         if (showStopperDialogsAllowed())
           PopupMenuItem(
             child: InkWell(
-              onTap: () => inspectorController.userResponseStopperEnabled =
-                  !inspectorController.userResponseStopperEnabled,
+              onTap: () => inspectorController.responseStopperEnabled =
+                  !inspectorController.responseStopperEnabled,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Stop Responses'),
                   Selector<InspectorController, bool>(
                     selector: (_, inspectorController) =>
-                        inspectorController.userResponseStopperEnabled,
-                    builder: (context, userResponseStopperEnabled, _) => Switch(
-                      value: userResponseStopperEnabled,
+                        inspectorController.responseStopperEnabled,
+                    builder: (context, responseStopperEnabled, _) => Switch(
+                      value: responseStopperEnabled,
                       activeColor: Colors.green,
                       activeTrackColor: Colors.grey[700],
                       inactiveThumbColor: Colors.white,
                       inactiveTrackColor: Colors.grey[700],
-                      onChanged: (value) => inspectorController
-                          .userResponseStopperEnabled = value,
+                      onChanged: (value) =>
+                          inspectorController.responseStopperEnabled = value,
                     ),
                   ),
                 ],
