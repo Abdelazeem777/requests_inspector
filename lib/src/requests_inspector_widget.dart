@@ -14,11 +14,11 @@ class RequestsInspector extends StatelessWidget {
   /// And if you don't want to use it, you can pass it as `null`.
   const RequestsInspector({
     super.key,
-    bool enabled = false,
+    bool enabled = true,
     bool hideInspectorBanner = false,
     ShowInspectorOn showInspectorOn = ShowInspectorOn.Both,
     required Widget child,
-    required GlobalKey<NavigatorState>? navigatorKey,
+    GlobalKey<NavigatorState>? navigatorKey,
   })  : _enabled = enabled,
         _hideInspectorBanner = hideInspectorBanner,
         _showInspectorOn = showInspectorOn,

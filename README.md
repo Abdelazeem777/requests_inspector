@@ -4,13 +4,21 @@
 
 [![pub package](https://img.shields.io/pub/v/requests_inspector.svg)](https://pub.dev/packages/requests_inspector)
 
-A Flutter package for **logging** API requests (**RESTful API** & **GraphQL**) requests and accessing it by
+A Flutter package for **logging** API requests (**Http Requests** & **GraphQL**) requests.
+
+### Main Features:
+
+1. Log your `Http request`, `GraphQL` and `WebSockets`.
+2. Intercept your requests and responses for testing.
+3. Share request details as json or as `cURL` to re-run it again (ex. `Postman`).
+
+And more and more
 
 ##### To get the `RequestsInspector` widget on your screen:
 
-- **Shaking** your phone
-  OR
-- **Long-Press** on any free space on the screen.
+1. 📱💃 : **Shake** your phone.
+
+2. 📱👈 : **Long-Press** on any free space on the screen.
 
 <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mobile_list.jpg" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mobile_request.jpg" width ="280" />
 
@@ -21,12 +29,13 @@ Now you can extract `cURL` command from the **inspector** to send the request ag
 
 <img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/curl_share_request.gif" width="600"/>
 
-### First, add it at the top of your `MaterialApp` with `enabled: true`.
+## `Setup`
+
+First, add it at the top of your `MaterialApp` with `enabled: true`.
 
 ```dart
 void main() {
   runApp(const RequestsInspector(
-    enabled: true,
     child: MyApp(),
   ));
 }
@@ -34,9 +43,14 @@ void main() {
 
 ### 1. RESTful API:
 
-**Note:** Don't forget to `enable` it!
+#### Using `Dio`, pass by `RequestsInspectorInterceptor()` to `Dio.interceptors` and we are good to go 🎉️🎉️.
 
-### Then, on your API request add a new `RequestDetails` using `RequestInspectorController` filled with the API data.
+```dart
+final dio = Dio()..interceptors.add(RequestsInspectorInterceptor());
+
+```
+
+### Or on your API request add a new `RequestDetails` using `RequestInspectorController` filled with the API data.
 
 ```dart
 InspectorController().addNewRequest(
@@ -49,13 +63,6 @@ InspectorController().addNewRequest(
         responseBody: responseData,
         ),
     );
-```
-
-### OR, if you are using `Dio`, then you can just pass `RequestsInspectorInterceptor()` to `Dio.interceptors` and we are good to go 🎉️🎉️.
-
-```dart
-final dio = Dio()..interceptors.add(RequestsInspectorInterceptor());
-
 ```
 
 ### Real Restful example
@@ -181,12 +188,14 @@ void main() {
 <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mac_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mac_request.png" width ="280" />
 <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/linux_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/linux_request.png" width ="280" />
 
-## Future plans
+## Future plans:
 
 - [x] Add support for `GraphQL`.
-- [ ] Enhance the `GraphQL` request and response displaying structure.
-- [ ] Improve the request tab UI and add expand/collapse for each data block.
+- [x] Enhance the `GraphQL` request and response displaying structure.
+- [x] Improve the request tab UI and add expand/collapse for each data block.
+- [ ] Support Dark/Light Modes.
 - [ ] Add search inside the request details page.
+- [ ] Add Http Interceptor.
 
 ## 📃 License
 
