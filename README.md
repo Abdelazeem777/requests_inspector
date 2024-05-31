@@ -50,7 +50,9 @@ final dio = Dio()..interceptors.add(RequestsInspectorInterceptor());
 
 ```
 
-### Or on your API request add a new `RequestDetails` using `RequestInspectorController` filled with the API data.
+### If you don't use `Dio` then don't worry
+
+In your API request just add a new `RequestDetails` using `RequestInspectorController` filled with the API data.
 
 ```dart
 InspectorController().addNewRequest(
