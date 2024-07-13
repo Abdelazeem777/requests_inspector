@@ -1,6 +1,6 @@
 [![Stand With Palestine](https://raw.githubusercontent.com/TheBSD/StandWithPalestine/main/banner-no-action.svg)](https://thebsd.github.io/StandWithPalestine)
 
-<div align="center" bgcolor="#ffffff">
+<div align="center" bgcolor="white">
 <img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/logo_with_text_right.jpg" height= "350">
 </div>
 
