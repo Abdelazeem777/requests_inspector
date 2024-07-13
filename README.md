@@ -1,5 +1,9 @@
 [![Stand With Palestine](https://raw.githubusercontent.com/TheBSD/StandWithPalestine/main/banner-no-action.svg)](https://thebsd.github.io/StandWithPalestine)
 
+<div style="text-align: center;">
+<img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/logo_with_text_right.png" height= "350">
+</div>
+
 # requests_inspector 🕵
 
 [![pub package](https://img.shields.io/pub/v/requests_inspector.svg)](https://pub.dev/packages/requests_inspector)
@@ -20,14 +24,14 @@ And more and more
 
 2. 📱👈 : **Long-Press** on any free space on the screen.
 
-<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mobile_list.jpg" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mobile_request.jpg" width ="280" />
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/mobile_list.jpg" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/mobile_request.jpg" width ="280" />
 
 Also you can share the request details as (**Log** or **cURL** command) with your team to help them debug the API requests.
 
 **From Inspector to Postman 🧡 🎉️**
 Now you can extract `cURL` command from the **inspector** to send the request again from your terminal or [Postman](https://www.postman.com/) 💪💪
 
-<img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/curl_share_request.gif" width="600"/>
+<img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/curl_share_request.gif" width="600"/>
 
 ## `Setup`
 
@@ -115,7 +119,7 @@ Future<List<Post>> fetchPosts() async {
 
 ### Finlay, `Shake` your phone to get the `Inspector`
 
-<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mobile_list.jpg" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mobile_request.jpg" width ="280" />
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/mobile_list.jpg" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/mobile_request.jpg" width ="280" />
 
 ### 2. GraphQl:
 
@@ -185,7 +189,7 @@ Widget build(BuildContext context) {
 
 - Second, just enable it from Inspector and it will stop all your requests and responses.
 
-<img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/stopper_feature.gif" width="280"/>
+<img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/stopper_feature.gif" width="280"/>
 
 ### For Web, Windows, MacOS and Linux
 
@@ -215,11 +219,11 @@ void main() {
 }
 ```
 
-## Some screenshots
+## Some images
 
-<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/web_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/web_request.png" width ="280" />
-<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mac_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/mac_request.png" width ="280" />
-<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/linux_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/screenshots/linux_request.png" width ="280" />
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/web_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/web_request.png" width ="280" />
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/mac_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/mac_request.png" width ="280" />
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/linux_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/linux_request.png" width ="280" />
 
 ## Future plans:
 

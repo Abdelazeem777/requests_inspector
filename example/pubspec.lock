@@ -430,7 +430,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "4.0.0"
+    version: "4.0.4"
   rxdart:
     dependency: transitive
     description:

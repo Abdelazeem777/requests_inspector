@@ -1,3 +1,8 @@
+## 4.0.4
+
+- Add a stunning and captivating new logo, thanks to the incredibly talented [Yumna Hossam](https://www.behance.net/yumnahossam). 🎉️🎉️
+- Update documentation (`README.md`) file.
+
 ## 4.0.3
 
 - Update documentation (`README.md`) file.
