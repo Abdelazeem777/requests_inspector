@@ -211,7 +211,7 @@ class _MyAppState extends State<MyApp> {
             if (posts.isNotEmpty) {
               return PostsListWidget(
                 postsList: posts,
-                onRefresh: () => fetchPosts().then(
+                onRefresh: () => fetchPostsUsingInterceptor().then(
                   (value) => setState(() => posts = value),
                 ),
               );
