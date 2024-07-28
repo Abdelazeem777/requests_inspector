@@ -36,9 +36,7 @@ class GraphQLInspectorLink extends Link {
         RequestDetails(
           requestName: request.operation.operationName,
           requestMethod: RequestMethod.POST,
-          requestBody: printNode(request.operation.document)
-              .replaceAll('\n', '')
-              .replaceAll('__typename', ''),
+          requestBody: request.variables,
           headers: responseContext?.headers,
           url: link.uri.toString(),
           responseBody: response.response,
@@ -61,9 +59,7 @@ class GraphQLInspectorLink extends Link {
         RequestDetails(
           requestName: request.operation.operationName ?? 'GraphQL',
           requestMethod: RequestMethod.WS,
-          requestBody: printNode(request.operation.document)
-              .replaceAll('\n', '')
-              .replaceAll('__typename', ''),
+          requestBody: request.variables,
           url: link.url,
           responseBody: response.response,
           statusCode: 200,
