@@ -1,4 +1,8 @@
-## 4.0.5
+## 4.1.1
+
+- Downgrade `connectivity_plus` to the most suitable version.
+
+## 4.1.0
 
 - Start depending on `sensor_plus` instead of using `shake` package to handle the shaking event.
 - Start using flutter v3.19.6.
