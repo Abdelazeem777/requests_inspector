@@ -162,6 +162,7 @@ class InspectorController extends ChangeNotifier {
   @override
   void dispose() {
     if (_allowShaking) _shakeDetector.stopListening();
+    _singleton = null;
     super.dispose();
   }
 
