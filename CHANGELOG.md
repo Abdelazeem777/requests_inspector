@@ -1,3 +1,7 @@
+## 4.1.2
+
+- Dispose singleton when dispose notifier thanks to [AnthonyXcode](https://github.com/AnthonyXcode).
+
 ## 4.1.1
 
 - Downgrade `connectivity_plus` to the most suitable version.
