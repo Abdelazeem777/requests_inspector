@@ -1,3 +1,7 @@
+## 4.2.0
+
+- Support Flutter v3.27.0 thanks to [MAlazhariy](https://github.com/MAlazhariy)
+
 ## 4.1.2
 
 - Dispose singleton when dispose notifier thanks to [AnthonyXcode](https://github.com/AnthonyXcode).
