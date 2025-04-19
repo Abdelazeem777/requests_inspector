@@ -175,6 +175,13 @@ class _InspectorState extends State<_Inspector> {
                   key: ValueKey(inspectorController.selectedRequest.hashCode),
                   onTap: inspectorController.runAgain,
                 ),
+              IconButton(
+                icon: context.read<InspectorController>().isDarkMode
+                    ? const Icon(Icons.wb_sunny, color: Colors.white, size: 20,)
+                    : const Icon(Icons.brightness_2, color: Colors.black87, size: 20,),
+                onPressed: context.read<InspectorController>().toggleInspectorTheme,
+              ),
+                  style: TextStyle(color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87),
         ),
         _buildPopUpMenu(inspectorController),
       ],
@@ -572,7 +579,7 @@ class _RequestDetailsPage extends StatelessWidget {
 
   Widget _buildRequestDetails(BuildContext context, RequestDetails request) {
     return ListView(
-      padding: const EdgeInsets.only(bottom: 96.0),
+      padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 96.0),
       children: [
         _buildRequestNameAndStatus(
           method: request.requestMethod,
@@ -617,33 +624,30 @@ class _RequestDetailsPage extends StatelessWidget {
     String? requestName,
     int? statusCode,
   }) {
-    return Padding(
-      padding: const EdgeInsets.all(6.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(
-            child: Text(
-              _createRequestName(method, requestName),
-              style: const TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold,
-              ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Expanded(
+          child: Text(
+            _createRequestName(method, requestName),
+            style: const TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          Container(
-            padding: const EdgeInsets.all(6.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              color: _specifyStatusCodeColor(statusCode),
-            ),
-            child: Text(
-              statusCode?.toString() ?? 'Err',
-              style: const TextStyle(fontSize: 16.0),
-            ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8.0),
+            color: _specifyStatusCodeColor(statusCode),
           ),
-        ],
-      ),
+          child: Text(
+            statusCode?.toString() ?? 'Err',
+            style: const TextStyle(fontSize: 16.0),
+          ),
+        ),
+      ],
     );
   }
 
@@ -730,18 +734,6 @@ class _RequestDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(6.0, 8.0, 6.0, 0.0),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 16.0,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
 }
 
 String _extractTimeText(DateTime sentTime) {
