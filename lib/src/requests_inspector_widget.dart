@@ -629,6 +629,7 @@ class _RequestDetailsPage extends StatelessWidget {
         if (request.headers != null)
         _buildExpandableSection(
           context: context,
+          initiallyExpanded: true,
           txtCopy: JsonPrettyConverter().convert(request.headers),
           title: 'Headers',
           children: _buildHeadersBlock(context, request.headers),
@@ -637,6 +638,8 @@ class _RequestDetailsPage extends StatelessWidget {
         if (request.queryParameters != null)
         _buildExpandableSection(
           context: context,
+          initiallyExpanded: true,
+          txtCopy: JsonPrettyConverter().convert(request.queryParameters),
           title: 'Query Parameters',
           children: _buildQueryBlock(context, request.queryParameters),
         ),
@@ -644,6 +647,7 @@ class _RequestDetailsPage extends StatelessWidget {
         if (request.requestBody != null)
         _buildExpandableSection(
           context: context,
+          txtCopy: JsonPrettyConverter().convert(request.requestBody),
           title: 'Request Body',
           children: _buildRequestBodyBlock(context, request.requestBody),
         ),
@@ -665,24 +669,12 @@ class _RequestDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBackgroundColor(index, item) {
-    Widget child = Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: item,
-    );
-    return index.isEven
-        ? child
-        : Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6.0),
-            child: DecoratedBox(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 19, 19, 19),
-                borderRadius: BorderRadius.all(Radius.circular(4.0)),
   Widget _buildExpandableSection({
     required BuildContext context,
     String? title,
     Widget? titleWidget,
     required List<Widget> children,
+    bool? initiallyExpanded,
   }) {
     final theme = Theme.of(context);
     final cardColor = theme.cardColor;
@@ -705,6 +697,7 @@ class _RequestDetailsPage extends StatelessWidget {
       child: Theme(
         data: theme.copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
+          initiallyExpanded: initiallyExpanded ??true,
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           childrenPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           expandedAlignment: Alignment.topLeft,
