@@ -202,4 +202,11 @@ class InspectorController extends ChangeNotifier {
     isDarkMode = !isDarkMode;
     notifyListeners();
   }
+
+  bool isTreeView = true;
+
+  void toggleInspectorJsonView() {
+    isTreeView = !isTreeView;
+    notifyListeners();
+  }
 }
