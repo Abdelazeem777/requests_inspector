@@ -602,16 +602,9 @@ class _RequestDetailsPage extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 96.0),
       children: [
-        _buildRequestNameAndStatus(
-          method: request.requestMethod,
-          requestName: request.requestName,
-          statusCode: request.statusCode,
-        ),
-        _buildRequestSentTimeAndDuration(
-          request.sentTime,
-          request.receivedTime,
         _buildExpandableSection(
           context: context,
+          txtCopy: JsonPrettyConverter().convert(request.url),
           titleWidget: _buildRequestNameAndStatus(
             method: request.requestMethod,
             requestName: request.requestName,
@@ -651,17 +644,11 @@ class _RequestDetailsPage extends StatelessWidget {
           title: 'Request Body',
           children: _buildRequestBodyBlock(context, request.requestBody),
         ),
-        _buildTitle('URL:'),
-        _buildSelectableText(request.url),
-        ..._buildHeadersBlock(request.headers),
-        ..._buildQueryBlock(request.queryParameters),
-        ..._buildRequestBodyBlock(request.requestBody),
-        ..._buildResponseBodyBlock(request.responseBody),
-      ].mapIndexed(_buildBackgroundColor).toList(),
 
         if (request.responseBody != null)
         _buildExpandableSection(
           context: context,
+          txtCopy: JsonPrettyConverter().convert(request.responseBody),
           title: 'Response Body',
           children: _buildResponseBodyBlock(context, request.responseBody),
         ),
@@ -672,6 +659,7 @@ class _RequestDetailsPage extends StatelessWidget {
   Widget _buildExpandableSection({
     required BuildContext context,
     String? title,
+    required String txtCopy,
     Widget? titleWidget,
     required List<Widget> children,
     bool? initiallyExpanded,
@@ -718,6 +706,10 @@ class _RequestDetailsPage extends StatelessWidget {
                   size: 20,
                 ),
                 onPressed: () {
+                  Clipboard.setData(ClipboardData(text: txtCopy));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Copied to clipboard')),
+                  );
                 },
               ),
             ],
@@ -778,6 +770,7 @@ class _RequestDetailsPage extends StatelessWidget {
   Widget _buildRequestSentTimeAndDuration(
     DateTime sentTime,
     DateTime? receivedTime,
+    String url,
   ) {
     final sentTimeText = _extractTimeText(sentTime);
     var text = 'Sent at: $sentTimeText';
@@ -788,9 +781,11 @@ class _RequestDetailsPage extends StatelessWidget {
       text += '\nReceived at: $receivedTimeText\nDuration: $durationText';
     }
 
+    text += '\n\nURL: $url';
+
     return Padding(
       padding: const EdgeInsets.all(6.0),
-      child: Text(
+      child: SelectableText(
         text,
         style: const TextStyle(fontSize: 16.0),
       ),
