@@ -194,4 +194,12 @@ class InspectorController extends ChangeNotifier {
 
     return _onStoppingResponse!(responseData);
   }
+
+
+  bool isDarkMode = false;
+
+  void toggleInspectorTheme() {
+    isDarkMode = !isDarkMode;
+    notifyListeners();
+  }
 }

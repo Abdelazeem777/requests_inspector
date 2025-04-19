@@ -117,7 +117,7 @@ class RequestsInspector extends StatelessWidget {
   }
 }
 
-class _Inspector extends StatelessWidget {
+class _Inspector extends StatefulWidget {
   const _Inspector({
     super.key,
     GlobalKey<NavigatorState>? navigatorKey,
@@ -125,14 +125,19 @@ class _Inspector extends StatelessWidget {
 
   final GlobalKey<NavigatorState>? _navigatorKey;
 
-  bool showStopperDialogsAllowed() => _navigatorKey?.currentContext != null;
+  @override
+  State<_Inspector> createState() => _InspectorState();
+}
+
+class _InspectorState extends State<_Inspector> {
+  bool showStopperDialogsAllowed() => widget._navigatorKey?.currentContext != null;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.dark().copyWith(
-        colorScheme: ColorScheme.dark(primary: Colors.grey[800]!),
-      ),
+      theme: context.watch<InspectorController>().isDarkMode
+          ? ThemeData.dark().copyWith(colorScheme: ColorScheme.dark(primary: Colors.grey[800]!))
+          : ThemeData.light(),
       home: Scaffold(
         appBar: _buildAppBar(context),
         body: _buildBody(),
@@ -145,12 +150,12 @@ class _Inspector extends StatelessWidget {
     final inspectorController = context.read<InspectorController>();
 
     return AppBar(
-      backgroundColor: Colors.black,
+      backgroundColor: context.read<InspectorController>().isDarkMode ? Colors.black : Colors.white,
       title: const Text('Inspector 🕵'),
       leading: IconButton(
         onPressed: inspectorController.hideInspector,
         icon: const Icon(Icons.close),
-        color: Colors.white,
+        color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87,
       ),
       actions: [
         Selector<InspectorController, int>(
@@ -178,7 +183,7 @@ class _Inspector extends StatelessWidget {
 
   Widget _buildPopUpMenu(InspectorController inspectorController) {
     return PopupMenuButton(
-      icon: const Icon(Icons.more_vert, color: Colors.white),
+      icon: Icon(Icons.more_vert, color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87),
       itemBuilder: (context) => [
         if (showStopperDialogsAllowed())
           PopupMenuItem(
@@ -254,12 +259,14 @@ class _Inspector extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildTabItem(
+          context: context,
           title: 'All',
           isSelected: selectedTab == 0,
           isLeft: true,
           onTap: () => inspectorController.selectedTab = 0,
         ),
         _buildTabItem(
+          context: context,
           title: 'Request Details',
           isSelected: selectedTab == 1,
           isLeft: false,
@@ -274,6 +281,7 @@ class _Inspector extends StatelessWidget {
     required bool isSelected,
     required bool isLeft,
     required VoidCallback onTap,
+    required BuildContext context,
   }) {
     return Expanded(
       child: InkWell(
@@ -282,22 +290,16 @@ class _Inspector extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF1C1B1F) : Colors.white,
-            borderRadius: isSelected
-                ? null
-                : BorderRadius.only(
-                    bottomRight: isLeft
-                        ? const Radius.circular(12.0)
-                        : const Radius.circular(0.0),
-                    bottomLeft: isLeft
-                        ? const Radius.circular(0.0)
-                        : const Radius.circular(12.0),
-                  ),
+            color: context.read<InspectorController>().isDarkMode
+                ? isSelected ? Theme.of(context).primaryColor : Colors.black87
+                : isSelected ? Theme.of(context).primaryColor : Colors.white,
           ),
           child: Text(
             title,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.black,
+              color: context.read<InspectorController>().isDarkMode
+                  ? Colors.white
+                  : isSelected ? Colors.white : Colors.black87,
               fontWeight: isSelected ? FontWeight.w800 : FontWeight.w300,
             ),
           ),
@@ -466,11 +468,11 @@ class _RunAgainButtonState extends State<_RunAgainButton> {
               _setBusy();
               widget.onTap().whenComplete(_setReady);
             },
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Run', style: TextStyle(color: Colors.white)),
-                Icon(Icons.play_arrow, color: Colors.white),
+                Text('Run', style: TextStyle(color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87)),
+                Icon(Icons.play_arrow, color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87),
               ],
             ));
   }
