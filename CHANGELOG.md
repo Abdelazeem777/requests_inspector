@@ -1,4 +1,20 @@
-## 4.0.5
+## 4.2.1
+
+- Fix `connectivity_plus` version dependency issue with `graphql` thanks to [MohamedGawdat](https://github.com/MohamedGawdat)
+
+## 4.2.0
+
+- Support Flutter v3.27.0 thanks to [MAlazhariy](https://github.com/MAlazhariy)
+
+## 4.1.2
+
+- Dispose singleton when dispose notifier thanks to [AnthonyXcode](https://github.com/AnthonyXcode).
+
+## 4.1.1
+
+- Downgrade `connectivity_plus` to the most suitable version.
+
+## 4.1.0
 
 - Start depending on `sensor_plus` instead of using `shake` package to handle the shaking event.
 - Start using flutter v3.19.6.
