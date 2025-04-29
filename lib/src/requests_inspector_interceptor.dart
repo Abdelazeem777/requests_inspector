@@ -68,7 +68,7 @@ class RequestsInspectorInterceptor extends Interceptor {
         headers: err.requestOptions.headers,
         queryParameters: queryParameters,
         requestBody: err.requestOptions.data,
-        responseBody: err.message,
+        responseBody: err.response?.data ?? err.message,
         sentTime: err.requestOptions.extra['startTime'],
         receivedTime: DateTime.now(),
       ),
