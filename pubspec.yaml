@@ -2,7 +2,7 @@ name: requests_inspector
 description: A Flutter package for logging REST-APIs and GraphQL requests and
   accessing it by Shaking your phone to get the RequestsInspector widget on your
   screen.
-version: 4.2.1
+version: 4.2.2
 homepage: https://github.com/Abdelazeem777/requests_inspector
 # we can add screenshots here using screenshots key
 # please check this link https://dart.dev/tools/pub/pubspec#screenshots
