@@ -1,12 +1,13 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:collection/collection.dart';
 import 'package:requests_inspector/src/json_pretty_converter.dart';
 import 'package:requests_inspector/src/request_stopper_editor_dialog.dart';
 import 'package:requests_inspector/src/response_stopper_editor_dialog.dart';
 import '../requests_inspector.dart';
+import 'json_tree_view_widget.dart';
 
 ///You can show the Inspector by **Shaking** your phone.
 class RequestsInspector extends StatelessWidget {
@@ -117,7 +118,7 @@ class RequestsInspector extends StatelessWidget {
   }
 }
 
-class _Inspector extends StatelessWidget {
+class _Inspector extends StatefulWidget {
   const _Inspector({
     super.key,
     GlobalKey<NavigatorState>? navigatorKey,
@@ -125,14 +126,19 @@ class _Inspector extends StatelessWidget {
 
   final GlobalKey<NavigatorState>? _navigatorKey;
 
-  bool showStopperDialogsAllowed() => _navigatorKey?.currentContext != null;
+  @override
+  State<_Inspector> createState() => _InspectorState();
+}
+
+class _InspectorState extends State<_Inspector> {
+  bool showStopperDialogsAllowed() => widget._navigatorKey?.currentContext != null;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData.dark().copyWith(
-        colorScheme: ColorScheme.dark(primary: Colors.grey[800]!),
-      ),
+      theme: context.watch<InspectorController>().isDarkMode
+          ? ThemeData.dark().copyWith(colorScheme: ColorScheme.dark(primary: Colors.grey[800]!))
+          : ThemeData.light(),
       home: Scaffold(
         appBar: _buildAppBar(context),
         body: _buildBody(),
@@ -145,31 +151,58 @@ class _Inspector extends StatelessWidget {
     final inspectorController = context.read<InspectorController>();
 
     return AppBar(
-      backgroundColor: Colors.black,
+      backgroundColor: context.read<InspectorController>().isDarkMode ? Colors.black : Colors.white,
       title: const Text('Inspector 🕵'),
       leading: IconButton(
         onPressed: inspectorController.hideInspector,
         icon: const Icon(Icons.close),
-        color: Colors.white,
+        color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87,
       ),
       actions: [
         Selector<InspectorController, int>(
           selector: (_, inspectorController) => inspectorController.selectedTab,
-          builder: (context, selectedTab, _) => selectedTab == 0
-              ? TextButton(
-                  onPressed: () => _showAreYouSureDialog(
-                    context,
-                    onYes: inspectorController.clearAllRequests,
-                  ),
-                  child: const Text(
-                    'Clear All',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                )
-              : _RunAgainButton(
-                  key: ValueKey(inspectorController.selectedRequest.hashCode),
-                  onTap: inspectorController.runAgain,
+          builder: (context, selectedTab, _) => Row(
+            children: [
+              IconButton(
+                icon: context.read<InspectorController>().isTreeView
+                    ? Icon(Icons.account_tree_rounded, color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87, size: 20,)
+                    : Icon(Icons.account_tree_outlined, color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87, size: 20,),
+                onPressed: context.read<InspectorController>().toggleInspectorJsonView,
+              ),
+
+              IconButton(
+                icon: context.read<InspectorController>().isDarkMode
+                    ? const Icon(Icons.wb_sunny, color: Colors.white, size: 20,)
+                    : const Icon(Icons.brightness_2, color: Colors.black87, size: 20,),
+                onPressed: context.read<InspectorController>().toggleInspectorTheme,
+              ),
+
+              Container(
+                width: 2,
+                height: 20,
+                color: Colors.grey[200],
+                margin: selectedTab == 0
+                    ? null
+                    : const EdgeInsets.only(right: 12),
+              ),
+
+              selectedTab == 0
+                  ? TextButton(
+                onPressed: () => _showAreYouSureDialog(
+                  context,
+                  onYes: inspectorController.clearAllRequests,
                 ),
+                child: Text(
+                  'Clear All',
+                  style: TextStyle(color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87),
+                ),
+              )
+                  : _RunAgainButton(
+                key: ValueKey(inspectorController.selectedRequest.hashCode),
+                onTap: inspectorController.runAgain,
+              ),
+            ]
+          ),
         ),
         _buildPopUpMenu(inspectorController),
       ],
@@ -178,7 +211,7 @@ class _Inspector extends StatelessWidget {
 
   Widget _buildPopUpMenu(InspectorController inspectorController) {
     return PopupMenuButton(
-      icon: const Icon(Icons.more_vert, color: Colors.white),
+      icon: Icon(Icons.more_vert, color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87),
       itemBuilder: (context) => [
         if (showStopperDialogsAllowed())
           PopupMenuItem(
@@ -254,12 +287,14 @@ class _Inspector extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildTabItem(
+          context: context,
           title: 'All',
           isSelected: selectedTab == 0,
           isLeft: true,
           onTap: () => inspectorController.selectedTab = 0,
         ),
         _buildTabItem(
+          context: context,
           title: 'Request Details',
           isSelected: selectedTab == 1,
           isLeft: false,
@@ -274,6 +309,7 @@ class _Inspector extends StatelessWidget {
     required bool isSelected,
     required bool isLeft,
     required VoidCallback onTap,
+    required BuildContext context,
   }) {
     return Expanded(
       child: InkWell(
@@ -282,22 +318,16 @@ class _Inspector extends StatelessWidget {
           padding: const EdgeInsets.all(12.0),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF1C1B1F) : Colors.white,
-            borderRadius: isSelected
-                ? null
-                : BorderRadius.only(
-                    bottomRight: isLeft
-                        ? const Radius.circular(12.0)
-                        : const Radius.circular(0.0),
-                    bottomLeft: isLeft
-                        ? const Radius.circular(0.0)
-                        : const Radius.circular(12.0),
-                  ),
+            color: context.read<InspectorController>().isDarkMode
+                ? isSelected ? Theme.of(context).primaryColor : Colors.black87
+                : isSelected ? Theme.of(context).primaryColor : Colors.white,
           ),
           child: Text(
             title,
             style: TextStyle(
-              color: isSelected ? Colors.white : Colors.black,
+              color: context.read<InspectorController>().isDarkMode
+                  ? Colors.white
+                  : isSelected ? Colors.white : Colors.black87,
               fontWeight: isSelected ? FontWeight.w800 : FontWeight.w300,
             ),
           ),
@@ -466,11 +496,11 @@ class _RunAgainButtonState extends State<_RunAgainButton> {
               _setBusy();
               widget.onTap().whenComplete(_setReady);
             },
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Run', style: TextStyle(color: Colors.white)),
-                Icon(Icons.play_arrow, color: Colors.white),
+                Text('Run', style: TextStyle(color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87)),
+                Icon(Icons.play_arrow, color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87),
               ],
             ));
   }
@@ -570,44 +600,134 @@ class _RequestDetailsPage extends StatelessWidget {
 
   Widget _buildRequestDetails(BuildContext context, RequestDetails request) {
     return ListView(
-      padding: const EdgeInsets.only(bottom: 96.0),
+      padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 96.0),
       children: [
-        _buildRequestNameAndStatus(
-          method: request.requestMethod,
-          requestName: request.requestName,
-          statusCode: request.statusCode,
+        _buildExpandableSection(
+          context: context,
+          txtCopy: JsonPrettyConverter().convert(request.url),
+          titleWidget: _buildRequestNameAndStatus(
+            method: request.requestMethod,
+            requestName: request.requestName,
+            statusCode: request.statusCode,
+          ),
+          children: [
+            _buildRequestSentTimeAndDuration(
+              request.sentTime,
+              request.receivedTime,
+              request.url,
+            ),
+          ],
         ),
-        _buildRequestSentTimeAndDuration(
-          request.sentTime,
-          request.receivedTime,
+
+        if (request.headers != null)
+        _buildExpandableSection(
+          context: context,
+          initiallyExpanded: true,
+          txtCopy: JsonPrettyConverter().convert(request.headers),
+          title: 'Headers',
+          children: _buildHeadersBlock(context, request.headers),
         ),
-        _buildTitle('URL:'),
-        _buildSelectableText(request.url),
-        ..._buildHeadersBlock(request.headers),
-        ..._buildQueryBlock(request.queryParameters),
-        ..._buildRequestBodyBlock(request.requestBody),
-        ..._buildResponseBodyBlock(request.responseBody),
-      ].mapIndexed(_buildBackgroundColor).toList(),
+
+        if (request.queryParameters != null)
+        _buildExpandableSection(
+          context: context,
+          initiallyExpanded: true,
+          txtCopy: JsonPrettyConverter().convert(request.queryParameters),
+          title: 'Query Parameters',
+          children: _buildQueryBlock(context, request.queryParameters),
+        ),
+
+        if (request.requestBody != null)
+        _buildExpandableSection(
+          context: context,
+          txtCopy: JsonPrettyConverter().convert(request.requestBody),
+          title: 'Request Body',
+          children: _buildRequestBodyBlock(context, request.requestBody),
+        ),
+
+        if (request.responseBody != null)
+        _buildExpandableSection(
+          context: context,
+          txtCopy: JsonPrettyConverter().convert(request.responseBody),
+          title: 'Response Body',
+          children: _buildResponseBodyBlock(context, request.responseBody),
+        ),
+      ],
     );
   }
 
-  Widget _buildBackgroundColor(index, item) {
-    Widget child = Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: item,
-    );
-    return index.isEven
-        ? child
-        : Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6.0),
-            child: DecoratedBox(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 19, 19, 19),
-                borderRadius: BorderRadius.all(Radius.circular(4.0)),
+  Widget _buildExpandableSection({
+    required BuildContext context,
+    String? title,
+    required String txtCopy,
+    Widget? titleWidget,
+    required List<Widget> children,
+    bool? initiallyExpanded,
+  }) {
+    final theme = Theme.of(context);
+    final cardColor = theme.cardColor;
+    final borderColor = theme.dividerColor;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: borderColor.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: theme.shadowColor.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Theme(
+        data: theme.copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          initiallyExpanded: initiallyExpanded ??true,
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          childrenPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          expandedAlignment: Alignment.topLeft,
+          title: Row(
+            children: [
+              Expanded(
+                child: titleWidget ?? Text(
+                  title ?? '',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-              child: child,
+              IconButton(
+                icon: const Icon(
+                  Icons.copy,
+                  color: Colors.grey,
+                  size: 20,
+                ),
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: txtCopy));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Copied to clipboard')),
+                  );
+                },
+              ),
+            ],
+          ),
+          backgroundColor: cardColor,
+          children: [
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: children,
+              ),
             ),
-          );
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildRequestNameAndStatus({
@@ -615,33 +735,30 @@ class _RequestDetailsPage extends StatelessWidget {
     String? requestName,
     int? statusCode,
   }) {
-    return Padding(
-      padding: const EdgeInsets.all(6.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(
-            child: Text(
-              _createRequestName(method, requestName),
-              style: const TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold,
-              ),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Expanded(
+          child: Text(
+            _createRequestName(method, requestName),
+            style: const TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          Container(
-            padding: const EdgeInsets.all(6.0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              color: _specifyStatusCodeColor(statusCode),
-            ),
-            child: Text(
-              statusCode?.toString() ?? 'Err',
-              style: const TextStyle(fontSize: 16.0),
-            ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8.0),
+            color: _specifyStatusCodeColor(statusCode),
           ),
-        ],
-      ),
+          child: Text(
+            statusCode?.toString() ?? 'Err',
+            style: const TextStyle(fontSize: 16.0),
+          ),
+        ),
+      ],
     );
   }
 
@@ -653,6 +770,7 @@ class _RequestDetailsPage extends StatelessWidget {
   Widget _buildRequestSentTimeAndDuration(
     DateTime sentTime,
     DateTime? receivedTime,
+    String url,
   ) {
     final sentTimeText = _extractTimeText(sentTime);
     var text = 'Sent at: $sentTimeText';
@@ -663,60 +781,71 @@ class _RequestDetailsPage extends StatelessWidget {
       text += '\nReceived at: $receivedTimeText\nDuration: $durationText';
     }
 
+    text += '\n\nURL: $url';
+
     return Padding(
       padding: const EdgeInsets.all(6.0),
-      child: Text(
+      child: SelectableText(
         text,
         style: const TextStyle(fontSize: 16.0),
       ),
     );
   }
 
-  Iterable<Widget> _buildHeadersBlock(headers) {
+  List<Widget> _buildHeadersBlock(BuildContext context, headers) {
     if (headers == null) return [];
     if ((headers is Map || headers is String || headers is List) &&
         headers.isEmpty) return [];
 
-    return [
-      _buildTitle('Headers:'),
-      _buildSelectableText(headers),
-    ];
+    if (context.read<InspectorController>().isTreeView) {
+      return [JsonTreeView(headers)];
+    }
+    else {
+      return [_buildSelectableText(headers)];
+    }
   }
 
-  Iterable<Widget> _buildQueryBlock(queryParameters) {
+  List<Widget> _buildQueryBlock(BuildContext context, queryParameters) {
     if (queryParameters == null) return [];
     if ((queryParameters is Map ||
             queryParameters is String ||
             queryParameters is List) &&
         queryParameters.isEmpty) return [];
 
-    return [
-      _buildTitle('Parameters:'),
-      _buildSelectableText(queryParameters),
-    ];
+    if (context.read<InspectorController>().isTreeView) {
+      return [JsonTreeView(queryParameters)];
+    }
+    else {
+      return [_buildSelectableText(queryParameters)];
+    }
   }
 
-  Iterable<Widget> _buildRequestBodyBlock(requestBody) {
+  List<Widget> _buildRequestBodyBlock(BuildContext context, requestBody) {
     if (requestBody == null) return [];
     if ((requestBody is Map || requestBody is String || requestBody is List) &&
         requestBody.isEmpty) return [];
 
-    return [
-      _buildTitle('RequestBody:'),
-      _buildSelectableText(requestBody),
-    ];
+    if (context.read<InspectorController>().isTreeView) {
+      return [JsonTreeView(requestBody)];
+    }
+    else {
+      return [_buildSelectableText(requestBody)];
+    }
   }
 
-  Iterable<Widget> _buildResponseBodyBlock(responseBody) {
+  List<Widget> _buildResponseBodyBlock(BuildContext context, responseBody) {
     if (responseBody == null) return [];
     if ((responseBody is Map ||
             responseBody is String ||
             responseBody is List) &&
         responseBody.isEmpty) return [];
-    return [
-      _buildTitle('ResponseBody:'),
-      _buildSelectableText(responseBody),
-    ];
+
+    if (context.read<InspectorController>().isTreeView) {
+      return [JsonTreeView(responseBody)];
+    }
+    else {
+      return [_buildSelectableText(responseBody)];
+    }
   }
 
   Widget _buildSelectableText(text) {
@@ -728,18 +857,6 @@ class _RequestDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(6.0, 8.0, 6.0, 0.0),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 16.0,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
 }
 
 String _extractTimeText(DateTime sentTime) {
