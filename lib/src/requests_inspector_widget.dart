@@ -7,6 +7,7 @@ import 'package:requests_inspector/src/json_pretty_converter.dart';
 import 'package:requests_inspector/src/request_stopper_editor_dialog.dart';
 import 'package:requests_inspector/src/response_stopper_editor_dialog.dart';
 import '../requests_inspector.dart';
+import 'share_type_enum.dart';
 
 ///You can show the Inspector by **Shaking** your phone.
 class RequestsInspector extends StatelessWidget {
@@ -386,16 +387,16 @@ class _Inspector extends StatelessWidget {
                 final selectedRequest = controller.selectedRequest!;
                 final isHttp = _isHttp(selectedRequest);
 
-                final isCurl =
-                    isHttp ? await _showDialogShareType(context) : false;
+                final shareType =
+                    isHttp ? await _showDialogShareType(context) : null;
 
-                if (isCurl == null) return;
+                if (shareType == null) return;
 
                 controller.shareSelectedRequest(
-                  box == null
+                  sharePositionOrigin: box == null
                       ? null
                       : box.localToGlobal(Offset.zero) & box.size,
-                  isCurl,
+                  shareType: shareType,
                 );
               })
           : const SizedBox(),
@@ -410,8 +411,8 @@ class _Inspector extends StatelessWidget {
         selectedRequest.requestMethod == RequestMethod.DELETE;
   }
 
-  Future<bool?> _showDialogShareType(BuildContext context) {
-    return showDialog<bool?>(
+  Future<ShareType?> _showDialogShareType(BuildContext context) {
+    return showDialog<ShareType?>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Normal Log or cURL command? 🤔'),
@@ -423,13 +424,20 @@ class _Inspector extends StatelessWidget {
               'cURL Command',
               style: TextStyle(color: Colors.green),
             ),
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => Navigator.of(context).pop(ShareType.CurlCommand),
           ),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => Navigator.of(context).pop(ShareType.NormalLog),
             child: const Text(
               'Normal Log',
               style: TextStyle(color: Colors.yellow),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(ShareType.Both),
+            child: const Text(
+              'Both',
+              style: TextStyle(color: Colors.red),
             ),
           ),
         ],

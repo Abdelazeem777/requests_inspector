@@ -1,3 +1,11 @@
+## 4.2.3
+
+- Add `ShareType` enum to choose the type of the share content and `Both` option to share both `cURL` and `Normal Log`.
+
+## 4.2.2
+
+- When there is data from error, show error first [#44](https://github.com/Abdelazeem777/requests_inspector/pull/44), thanks to [AnthonyXcode](https://github.com/AnthonyXcode)
+
 ## 4.2.1
 
 - Fix `connectivity_plus` version dependency issue with `graphql` thanks to [MohamedGawdat](https://github.com/MohamedGawdat)
