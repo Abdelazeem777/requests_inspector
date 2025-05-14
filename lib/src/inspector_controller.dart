@@ -203,7 +203,7 @@ class InspectorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool isTreeView = true;
+  bool isTreeView = false;
 
   void toggleInspectorJsonView() {
     isTreeView = !isTreeView;
