@@ -135,17 +135,27 @@ class _InspectorState extends State<_Inspector> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: context.watch<InspectorController>().isDarkMode
-          ? ThemeData.dark().copyWith(colorScheme: ColorScheme.dark(primary: Colors.grey[800]!))
-          : ThemeData.light(),
-      home: Scaffold(
-        appBar: _buildAppBar(context),
-        body: _buildBody(),
-        floatingActionButton: _buildShareFloatingButton(),
-      ),
+    return Selector<InspectorController, bool>(
+      selector: (_, controller) => controller.isDarkMode,
+      builder: (context, isDarkMode, child) {
+        return MaterialApp(
+          theme: isDarkMode
+              ? ThemeData.dark().copyWith(
+            colorScheme: ColorScheme.dark(
+              primary: Colors.grey[800]!,
+            ),
+          )
+              : ThemeData.light(),
+          home: Scaffold(
+            appBar: _buildAppBar(context),
+            body: _buildBody(),
+            floatingActionButton: _buildShareFloatingButton(),
+          ),
+        );
+      },
     );
   }
+
 
   AppBar _buildAppBar(BuildContext context) {
     final inspectorController = context.read<InspectorController>();
