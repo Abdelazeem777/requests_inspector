@@ -604,6 +604,7 @@ class _RequestDetailsPage extends StatelessWidget {
       children: [
         _buildExpandableSection(
           context: context,
+          initiallyExpanded: false,
           txtCopy: JsonPrettyConverter().convert(request.url),
           titleWidget: _buildRequestNameAndStatus(
             method: request.requestMethod,
@@ -622,7 +623,7 @@ class _RequestDetailsPage extends StatelessWidget {
         if (request.headers != null)
         _buildExpandableSection(
           context: context,
-          initiallyExpanded: true,
+          initiallyExpanded: false,
           txtCopy: JsonPrettyConverter().convert(request.headers),
           title: 'Headers',
           children: _buildHeadersBlock(context, request.headers),
@@ -631,7 +632,7 @@ class _RequestDetailsPage extends StatelessWidget {
         if (request.queryParameters != null)
         _buildExpandableSection(
           context: context,
-          initiallyExpanded: true,
+          initiallyExpanded: false,
           txtCopy: JsonPrettyConverter().convert(request.queryParameters),
           title: 'Query Parameters',
           children: _buildQueryBlock(context, request.queryParameters),
@@ -640,6 +641,7 @@ class _RequestDetailsPage extends StatelessWidget {
         if (request.requestBody != null)
         _buildExpandableSection(
           context: context,
+          initiallyExpanded: false,
           txtCopy: JsonPrettyConverter().convert(request.requestBody),
           title: 'Request Body',
           children: _buildRequestBodyBlock(context, request.requestBody),
@@ -841,6 +843,7 @@ class _RequestDetailsPage extends StatelessWidget {
         responseBody.isEmpty) return [];
 
     if (context.read<InspectorController>().isTreeView) {
+      responseBody = x;
       return [JsonTreeView(responseBody)];
     }
     else {
