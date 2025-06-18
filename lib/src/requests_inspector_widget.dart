@@ -939,6 +939,7 @@ class _RequestDetailsPage extends StatelessWidget {
         builder: (context, isTreeView, __) {
           return isTreeView
               ? JsonTreeView(responseBody)
+              // ? JsonTreeView(dummyData)
               : _buildSelectableText(responseBody);
         },
       )

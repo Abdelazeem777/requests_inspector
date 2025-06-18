@@ -10,57 +10,53 @@ class JsonTreeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: _buildNode(context, data, depth: 0),
+      child: _buildNode(context, data),
     );
   }
 
-  Widget _buildNode(BuildContext context, dynamic node, {String? keyName, required int depth}) {
+  Widget _buildNode(BuildContext context, dynamic node, {String? keyName}) {
     Widget content;
     if (node is Map<String, dynamic>) {
-      content = _buildMapNode(context, node, keyName, depth);
+      content = _buildMapNode(context, node, keyName);
     } else if (node is List) {
-      content = _buildListNode(context, node, keyName, depth);
+      content = _buildListNode(context, node, keyName);
     } else {
-      content = _buildLeafNode(context, keyName, node, depth);
+      content = _buildLeafNode(context, keyName, node);
     }
 
     return Padding(
-      padding: EdgeInsets.only(left: depth * 16.0),
+      padding: const EdgeInsets.only(left: 16.0), // Your established general indentation step
       child: content,
     );
   }
 
-  Widget _buildMapNode(BuildContext context, Map<String, dynamic> map, String? keyName, int depth) {
+  Widget _buildMapNode(BuildContext context, Map<String, dynamic> map, String? keyName) {
     final isEmpty = map.isEmpty;
 
     if (isEmpty) {
-      // Pass the actual empty map symbol string for display
-      return _buildLeafNode(context, keyName, '{}', depth);
+      return _buildLeafNode(context, keyName, '{}');
     }
-
-    final isListItemMap = keyName == null;
 
     return _buildExpandableTile(
       context: context,
       title: keyName != null ? '"$keyName": ' : '',
       children: [
         ...map.entries.map((e) {
-          return _buildNode(context, e.value, keyName: e.key, depth: isListItemMap ? depth : depth + 1);
-        }).toList(),
-        _buildClosingBracket(context, '}', depth),
+          return _buildNode(context, e.value, keyName: e.key);
+        }),
+        _buildClosingBracket(context, '}'),
       ],
       collapsedCount: map.length,
       isObject: true,
-      initiallyExpanded: true, // <--- Change this to true
+      initiallyExpanded: true,
     );
   }
 
-  Widget _buildListNode(BuildContext context, List list, String? keyName, int depth) {
+  Widget _buildListNode(BuildContext context, List list, String? keyName) {
     final isEmpty = list.isEmpty;
 
     if (isEmpty) {
-      // Pass the actual empty list symbol string for display
-      return _buildLeafNode(context, keyName, '[]', depth);
+      return _buildLeafNode(context, keyName, '[]');
     }
 
     return _buildExpandableTile(
@@ -68,18 +64,17 @@ class JsonTreeView extends StatelessWidget {
       title: keyName != null ? '"$keyName": ' : '',
       children: [
         ...list.asMap().entries.map((e) {
-          return _buildNode(context, e.value, keyName: null, depth: depth);
-        }).toList(),
-        _buildClosingBracket(context, ']', depth),
+          return _buildNode(context, e.value, keyName: null);
+        }),
+        _buildClosingBracket(context, ']'),
       ],
       collapsedCount: list.length,
       isObject: false,
-      initiallyExpanded: true, // <--- Change this to true
+      initiallyExpanded: true,
     );
   }
 
-  Widget _buildLeafNode(BuildContext context, String? key, dynamic value, int depth) {
-    // Use Consumer to only rebuild the text styles if isDarkMode changes
+  Widget _buildLeafNode(BuildContext context, String? key, dynamic value) {
     return Consumer<InspectorController>(
       builder: (context, controller, child) {
         final isDarkMode = controller.isDarkMode;
@@ -87,12 +82,11 @@ class JsonTreeView extends StatelessWidget {
         String formattedValue;
         Color valueColor;
 
-        // MODIFIED: Handle empty list/map string representations first
         if (value is String && (value == '{}' || value == '[]')) {
-          formattedValue = value; // Display as is, without extra quotes
-          valueColor = isDarkMode ? Colors.white : Colors.black87; // Treat as structural, like a key/bracket
+          formattedValue = value;
+          valueColor = isDarkMode ? Colors.white : Colors.black87;
         } else if (value is String) {
-          formattedValue = '"$value"'; // Original behavior for actual strings
+          formattedValue = '"$value"';
           valueColor = isDarkMode ? Colors.green.shade300 : Colors.green.shade700;
         } else if (value is num) {
           formattedValue = value.toString();
@@ -151,13 +145,12 @@ class JsonTreeView extends StatelessWidget {
     );
   }
 
-  Widget _buildClosingBracket(BuildContext context, String bracket, int depth) {
-    // Use Consumer here for the text color
+  Widget _buildClosingBracket(BuildContext context, String bracket) {
     return Consumer<InspectorController>(
       builder: (context, controller, child) {
         final isDarkMode = controller.isDarkMode;
         return Padding(
-          padding: EdgeInsets.only(left: depth * 16.0),
+          padding: const EdgeInsets.only(left: 16.0), // Consistent with general indentation
           child: Text(
             bracket,
             style: TextStyle(
@@ -173,14 +166,14 @@ class JsonTreeView extends StatelessWidget {
 
   Widget _buildExpandableTile({
     required BuildContext context,
-    required String title, // This 'title' is the pre-formatted string from _buildMapNode/_buildListNode
+    required String title,
     required List<Widget> children,
     required bool initiallyExpanded,
     int? collapsedCount,
     bool isObject = false,
   }) {
     return _CustomExpansionTile(
-      titleString: title, // Renamed parameter to avoid confusion
+      titleString: title,
       children: children,
       initiallyExpanded: initiallyExpanded,
       collapsedCount: collapsedCount,
@@ -199,7 +192,7 @@ class _CustomExpansionTile extends StatefulWidget {
   const _CustomExpansionTile({
     required this.titleString,
     required this.children,
-    this.initiallyExpanded = false, // This default value is overridden by the passed value
+    this.initiallyExpanded = false,
     this.collapsedCount,
     this.isObject = false,
   });
@@ -220,7 +213,6 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
 
   @override
   Widget build(BuildContext context) {
-    // MODIFIED: Use Consumer here to provide isDarkMode to the entire build method
     return Consumer<InspectorController>(
       builder: (context, controller, child) {
         final isDarkMode = controller.isDarkMode;
@@ -321,7 +313,7 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
             ),
             if (_expanded)
               Padding(
-                padding: const EdgeInsets.only(left: 8.0),
+                padding: const EdgeInsets.only(left: 8.0), // Your established 8.0 padding
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: widget.children,
