@@ -4,6 +4,7 @@ import 'package:requests_inspector/src/shared_widgets/request_details_page.dart'
 import 'package:requests_inspector/src/shared_widgets/request_item.dart';
 import 'package:requests_inspector/src/shared_widgets/run_again_widget.dart';
 import '../../requests_inspector.dart';
+import '../share_type_enum.dart';
 
 class Inspector extends StatefulWidget {
   const Inspector({
@@ -392,16 +393,16 @@ class _InspectorState extends State<Inspector> {
             final selectedRequest = controller.selectedRequest!;
             final isHttp = _isHttp(selectedRequest);
 
-            final isCurl =
-            isHttp ? await _showDialogShareType(context) : false;
+            final shareType =
+            isHttp ? await _showDialogShareType(context) : null;
 
-            if (isCurl == null) return;
+            if (shareType == null) return;
 
             controller.shareSelectedRequest(
-              box == null
+              sharePositionOrigin: box == null
                   ? null
                   : box.localToGlobal(Offset.zero) & box.size,
-              isCurl,
+              shareType: shareType,
             );
           })
           : const SizedBox(),
@@ -416,8 +417,8 @@ class _InspectorState extends State<Inspector> {
         selectedRequest.requestMethod == RequestMethod.DELETE;
   }
 
-  Future<bool?> _showDialogShareType(BuildContext context) {
-    return showDialog<bool?>(
+  Future<ShareType?> _showDialogShareType(BuildContext context) {
+    return showDialog<ShareType?>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Normal Log or cURL command? 🤔'),
@@ -429,13 +430,20 @@ class _InspectorState extends State<Inspector> {
               'cURL Command',
               style: TextStyle(color: Colors.green),
             ),
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => Navigator.of(context).pop(ShareType.CurlCommand),
           ),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => Navigator.of(context).pop(ShareType.NormalLog),
             child: const Text(
               'Normal Log',
               style: TextStyle(color: Colors.yellow),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(ShareType.Both),
+            child: const Text(
+              'Both',
+              style: TextStyle(color: Colors.red),
             ),
           ),
         ],
