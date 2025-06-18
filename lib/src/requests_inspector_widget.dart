@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:requests_inspector/src/request_inspector_sub_widgets/inspector.dart';
 import 'package:requests_inspector/src/request_stopper_editor_dialog.dart';
 import 'package:requests_inspector/src/response_stopper_editor_dialog.dart';
+import 'package:requests_inspector/src/shared_widgets/inspector.dart';
 import '../requests_inspector.dart';
 
 // Helper class for combining two values for a Selector

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../requests_inspector.dart';
+import '../helpers/inspector_helper.dart';
 
 class RequestItemWidget extends StatelessWidget {
   const RequestItemWidget({
@@ -26,7 +27,7 @@ class RequestItemWidget extends StatelessWidget {
 
     Widget child = ListTile(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
-      tileColor: _specifyStatusCodeColor(_request.statusCode),
+      tileColor: InspectorHelper.specifyStatusCodeColor(_request.statusCode),
       leading: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -39,8 +40,8 @@ class RequestItemWidget extends StatelessWidget {
           ),
           Text(
             _request.receivedTime != null
-                ? _calculateDuration(_request.sentTime, _request.receivedTime!)
-                : _extractTimeText(_request.sentTime),
+                ? InspectorHelper.calculateDuration(_request.sentTime, _request.receivedTime!)
+                : InspectorHelper.extractTimeText(_request.sentTime),
             style: TextStyle(color: Colors.grey[800]),
           ),
         ],
@@ -78,31 +79,3 @@ class RequestItemWidget extends StatelessWidget {
     );
   }
 }
-
-
-String _extractTimeText(DateTime sentTime) {
-  var sentTimeText = sentTime.toIso8601String().split('T').last.substring(0, 8);
-  sentTimeText = _replaceLastSeparatorWithDot(sentTimeText);
-  return sentTimeText;
-}
-
-String _calculateDuration(DateTime sentTime, DateTime receivedTime) {
-  final duration = receivedTime.difference(sentTime);
-
-  if (duration.inMilliseconds < 1000) return '${duration.inMilliseconds} ms';
-  if (duration.inSeconds < 60) return '${duration.inSeconds} s';
-  if (duration.inMinutes < 60) return '${duration.inMinutes} m';
-  if (duration.inHours < 24) return '${duration.inHours} h';
-  return '${duration.inDays} d';
-}
-
-String _replaceLastSeparatorWithDot(String sentTimeText) =>
-    sentTimeText.replaceFirst(':', '.', 5);
-
-Color? _specifyStatusCodeColor(int? statusCode) {
-  if (statusCode == null) return Colors.red[400];
-  if (statusCode > 399) return Colors.red[400];
-  if (statusCode > 299) return Colors.yellow[400];
-  return Colors.green[400];
-}
-

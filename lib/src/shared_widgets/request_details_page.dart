@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:requests_inspector/requests_inspector.dart';
 import 'package:requests_inspector/src/json_pretty_converter.dart';
 
+import '../helpers/inspector_helper.dart';
 import '../json_tree_view_widget.dart';
 
 class RequestDetailsPage extends StatelessWidget {
@@ -162,12 +163,12 @@ class RequestDetailsPage extends StatelessWidget {
       DateTime? receivedTime,
       String url,
       ) {
-    final sentTimeText = _extractTimeText(sentTime);
+    final sentTimeText = InspectorHelper.extractTimeText(sentTime);
     var text = 'Sent at: $sentTimeText';
 
     if (receivedTime != null) {
-      final durationText = _calculateDuration(sentTime, receivedTime);
-      final receivedTimeText = _extractTimeText(receivedTime);
+      final durationText = InspectorHelper.calculateDuration(sentTime, receivedTime);
+      final receivedTimeText = InspectorHelper.extractTimeText(receivedTime);
       text += '\nReceived at: $receivedTimeText\nDuration: $durationText';
     }
 
@@ -234,7 +235,7 @@ class RequestDetailsPage extends StatelessWidget {
           'Status: ${statusCode ?? 'N/A'}',
           style: TextStyle(
             fontSize: 14.0,
-            color: _specifyStatusCodeColor(statusCode),
+            color: InspectorHelper.specifyStatusCodeColor(statusCode),
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -242,31 +243,5 @@ class RequestDetailsPage extends StatelessWidget {
     );
   }
 
-}
-
-String _extractTimeText(DateTime sentTime) {
-  var sentTimeText = sentTime.toIso8601String().split('T').last.substring(0, 8);
-  sentTimeText = _replaceLastSeparatorWithDot(sentTimeText);
-  return sentTimeText;
-}
-
-String _calculateDuration(DateTime sentTime, DateTime receivedTime) {
-  final duration = receivedTime.difference(sentTime);
-
-  if (duration.inMilliseconds < 1000) return '${duration.inMilliseconds} ms';
-  if (duration.inSeconds < 60) return '${duration.inSeconds} s';
-  if (duration.inMinutes < 60) return '${duration.inMinutes} m';
-  if (duration.inHours < 24) return '${duration.inHours} h';
-  return '${duration.inDays} d';
-}
-
-String _replaceLastSeparatorWithDot(String sentTimeText) =>
-    sentTimeText.replaceFirst(':', '.', 5);
-
-Color? _specifyStatusCodeColor(int? statusCode) {
-  if (statusCode == null) return Colors.red[400];
-  if (statusCode > 399) return Colors.red[400];
-  if (statusCode > 299) return Colors.yellow[400];
-  return Colors.green[400];
 }
 

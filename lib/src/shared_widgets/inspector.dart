@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:requests_inspector/src/request_inspector_sub_widgets/request_details_page.dart';
-import 'package:requests_inspector/src/request_inspector_sub_widgets/request_item.dart';
-import 'package:requests_inspector/src/request_inspector_sub_widgets/run_again_widget.dart';
+import 'package:requests_inspector/src/shared_widgets/request_details_page.dart';
+import 'package:requests_inspector/src/shared_widgets/request_item.dart';
+import 'package:requests_inspector/src/shared_widgets/run_again_widget.dart';
 import '../../requests_inspector.dart';
 
 class Inspector extends StatefulWidget {
@@ -336,7 +336,7 @@ class _InspectorState extends State<Inspector> {
               // Modified onTap to pass context and request
               onTap: (itemContext, tappedRequest) {
                 itemContext.read<InspectorController>().selectedRequest =
-                    tappedRequest;
+                    tappedRequest as RequestDetails?;
               },
             );
           },
