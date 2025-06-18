@@ -196,14 +196,14 @@ class InspectorController extends ChangeNotifier {
   }
 
 
-  bool isDarkMode = false;
+  bool isDarkMode = true;
 
   void toggleInspectorTheme() {
     isDarkMode = !isDarkMode;
     notifyListeners();
   }
 
-  bool isTreeView = false;
+  bool isTreeView = true;
 
   void toggleInspectorJsonView() {
     isTreeView = !isTreeView;
