@@ -25,7 +25,7 @@ class JsonTreeView extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.only(left: 16.0), // Your established general indentation step
+      padding: const EdgeInsets.only(left: 12.0), // Your established general indentation step
       child: content,
     );
   }
@@ -39,12 +39,12 @@ class JsonTreeView extends StatelessWidget {
 
     return _buildExpandableTile(
       context: context,
-      title: keyName != null ? '"$keyName": ' : '',
+      title: keyName != null ? '"$keyName" : ' : '',
       children: [
         ...map.entries.map((e) {
           return _buildNode(context, e.value, keyName: e.key);
         }),
-        _buildClosingBracket(context, '}'),
+        _buildClosingBracket(context, '} ,'),
       ],
       collapsedCount: map.length,
       isObject: true,
@@ -61,12 +61,12 @@ class JsonTreeView extends StatelessWidget {
 
     return _buildExpandableTile(
       context: context,
-      title: keyName != null ? '"$keyName": ' : '',
+      title: keyName != null ? '"$keyName" : ' : '',
       children: [
         ...list.asMap().entries.map((e) {
           return _buildNode(context, e.value, keyName: null);
         }),
-        _buildClosingBracket(context, ']'),
+        _buildClosingBracket(context, '] ,'),
       ],
       collapsedCount: list.length,
       isObject: false,
@@ -102,43 +102,39 @@ class JsonTreeView extends StatelessWidget {
           valueColor = isDarkMode ? Colors.white : Colors.black87;
         }
 
-        return SelectableText.rich(
-          TextSpan(
-            children: [
-              if (key != null) ...[
+        return Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: SelectableText.rich(
+            TextSpan(
+              children: [
+                if (key != null) ...[
+                  TextSpan(
+                    text: '"$key" : ',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
                 TextSpan(
-                  text: '"$key"',
+                  text: formattedValue,
                   style: TextStyle(
                     fontSize: 14,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                    color: valueColor,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                TextSpan(
-                  text: ': ',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDarkMode ? Colors.white : Colors.black87,
+                if (key != null)
+                  TextSpan(
+                    text: ',',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
                   ),
-                ),
               ],
-              TextSpan(
-                text: formattedValue,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: valueColor,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              if (key != null)
-                TextSpan(
-                  text: ',',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDarkMode ? Colors.white : Colors.black87,
-                  ),
-                ),
-            ],
+            ),
           ),
         );
       },
@@ -155,8 +151,8 @@ class JsonTreeView extends StatelessWidget {
             bracket,
             style: TextStyle(
               fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+              fontWeight: FontWeight.w500,
+              color: isDarkMode ? Colors.grey.shade400 : Colors.black87,
             ),
           ),
         );
@@ -221,105 +217,101 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
 
         final bool hasTitleString = widget.titleString != null && widget.titleString!.isNotEmpty;
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            InkWell(
-              onTap: () {
-                setState(() {
-                  _expanded = !_expanded;
-                });
-              },
-              borderRadius: BorderRadius.circular(4),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Row(
-                  children: [
-                    AnimatedRotation(
-                      turns: _expanded ? 0.25 : 0,
-                      duration: const Duration(milliseconds: 200),
-                      child: Icon(
-                        Icons.arrow_right,
-                        size: 16,
-                        color: secondaryTextColor,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text.rich(
-                        TextSpan(
-                          children: [
-                            if (hasTitleString)
-                              TextSpan(
-                                text: widget.titleString,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: textColor,
-                                ),
-                              ),
-                            if (_expanded)
-                              TextSpan(
-                                text: widget.isObject ? '{' : '[',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: textColor,
-                                ),
-                              )
-                            else
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: widget.isObject ? '{' : '[',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: textColor,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  if (widget.collapsedCount != null)
-                                    TextSpan(
-                                      text: widget.collapsedCount.toString(),
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: secondaryTextColor,
-                                      ),
-                                    ),
-                                  TextSpan(
-                                    text: widget.isObject ? '}' : ']',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: textColor,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            TextSpan(
-                              text: ',',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: textColor,
-                              ),
-                            ),
-                          ],
+        return Padding(
+          padding: const EdgeInsets.only(left: 5.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    _expanded = !_expanded;
+                  });
+                },
+                borderRadius: BorderRadius.circular(4),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    children: [
+                      AnimatedRotation(
+                        turns: _expanded ? 0.25 : 0,
+                        duration: const Duration(milliseconds: 200),
+                        child: Icon(
+                          Icons.arrow_right,
+                          size: 16,
+                          color: secondaryTextColor,
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              if (hasTitleString)
+                                TextSpan(
+                                  text: widget.titleString,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                    color: textColor,
+                                  ),
+                                ),
+                              if (_expanded)
+                                TextSpan(
+                                  text: widget.isObject ? '{' : '[',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                    color: textColor,
+                                  ),
+                                )
+                              else
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: widget.isObject ? '{' : '[',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: textColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    if (widget.collapsedCount != null)
+                                      TextSpan(
+                                        text: widget.collapsedCount.toString(),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: secondaryTextColor,
+                                        ),
+                                      ),
+                                    TextSpan(
+                                      text: widget.isObject ? '} ,' : '] ,',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: textColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            if (_expanded)
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0), // Your established 8.0 padding
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: widget.children,
+              if (_expanded)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0), // Your established 8.0 padding
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: widget.children,
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         );
       },
     );
