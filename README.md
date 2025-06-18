@@ -230,139 +230,100 @@ void main() {
 
 ## Some images
 
-\<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests\_inspector/main/images/web\_list.png" width ="280" /\> \<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests\_inspector/main/images/web\_request.png" width ="280" /\>
-\<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests\_inspector/main/images/mac\_list.png" width ="280" /\> \<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests\_inspector/main/images/mac\_request.png" width ="280" /\>
-\<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests\_inspector/main/images/linux\_list.png" width ="280" /\> \<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests\_inspector/main/images/linux\_request.png" width ="280" /\>
-
----
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/web_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/web_request.png" width ="280" />
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/mac_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/mac_request.png" width ="280" />
+<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/linux_list.png" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/linux_request.png" width ="280" />
 
 ## 🤝 Contributors
 
-Contributors who help improving `requests_inspector` and making it better 💻🎨📖🚧 :
+Contributors helping improve `requests_inspector`: 💻🎨📖🚧
 
-<div style="display: flex; gap: 20px; flex-wrap: wrap;">
-  <div style="text-align: center;">
-    <a href="https://github.com/Abdelazeem777">
-      <img src="https://avatars.githubusercontent.com/u/30933932?v=4?s=100" width="70px;" alt="Abdelazeem Khaled" style="border-radius: 50%;"/>
-      <br />
-      <sub><b>Abdelazeem</b></sub>
-    </a>
-    <br />
-  </div>
-
-  <div style="text-align: center;">
-    <a href="https://github.com/BelalNayzak">
-      <img src="https://avatars.githubusercontent.com/u/50274195?v=4?s=100" width="70px;" alt="BelalNayzak" style="border-radius: 50%;"/>
-      <br />
-      <sub><b>Belal</b></sub>
-    </a>
-    <br />
-  </div>
-
-  <div style="text-align: center;">
-    <a href="https://github.com/the-best-is-best">
-      <img src="https://avatars.githubusercontent.com/u/72160249?v=4?s=100" width="70px;" alt="Michelle" style="border-radius: 50%;"/>
-      <br />
-      <sub><b>Michelle</b></sub>
-    </a>
-    <br />
-  </div>
-
-  <div style="text-align: center;">
-    <a href="https://github.com/moazelsawaf">
-      <img src="https://avatars.githubusercontent.com/u/43591891?v=4?s=100" width="70px;" alt="moazelsawaf" style="border-radius: 50%;"/>
-      <br />
-      <sub><b>Moaz</b></sub>
-    </a>
-    <br />
-  </div>
-
-  <div style="text-align: center;">
-    <a href="https://github.com/AnthonyXcode">
-      <img src="https://avatars.githubusercontent.com/u/16952651?v=4?s=100" width="70px;" alt="AnthonyXcode" style="border-radius: 50%;"/>
-      <br />
-      <sub><b>Anthony</b></sub>
-    </a>
-    <br />
-  </div>
-
-
-  <div style="text-align: center;">
-    <a href="https://github.com/AbdoTareq">
-      <img src="https://avatars.githubusercontent.com/u/29352955?v=4?s=100" width="70px;" alt="AbdoTareq" style="border-radius: 50%;"/>
-      <br />
-      <sub><b>Abdelrahman</b></sub>
-    </a>
-    <br />
-  </div>
-
-  <div style="text-align: center;">
-    <a href="https://github.com/Anthony-Chan-Synpulse">
-      <img src="https://avatars.githubusercontent.com/u/122436156?v=4?s=100" width="70px;" alt="Anthony-Chan-Synpulse" style="border-radius: 50%;"/>
-      <br />
-      <sub><b>Anthony</b></sub>
-    </a>
-    <br />
-  </div>
-
-  <div style="text-align: center;">
-    <a href="https://github.com/dev-hussein">
-      <img src="https://avatars.githubusercontent.com/u/6766413?v=4?s=100" width="70px;" alt="dev-hussein" style="border-radius: 50%;"/>
-      <br />
-      <sub><b>M Hussein</b></sub>
-    </a>
-    <br />
-  </div>
-
-  <div style="text-align: center;">
-    <a href="https://github.com/vlytvyne">
-      <img src="https://avatars.githubusercontent.com/u/44924680?v=4?s=100" width="70px;" alt="vlytvyne" style="border-radius: 50%;"/>
-      <br />
-      <sub><b>Vadym</b></sub>
-    </a>
-    <br />
-  </div>
-
-  <div style="text-align: center;">
-    <a href="https://github.com/MohamedGawdat">
-      <img src="https://avatars.githubusercontent.com/u/10387795?v=4?s=100" width="70px;" alt="MohamedGawdat" style="border-radius: 50%;"/>
-      <br />
-      <sub><b>M Gawdat</b></sub>
-    </a>
-    <br />
-  </div>
-
-  <div style="text-align: center;">
-    <a href="https://github.com/Abdullah-Mohammed-Ali">
-      <img src="https://avatars.githubusercontent.com/u/32640450?v=4?s=100" width="70px;" alt="Abdullah-Mohammed-Ali" style="border-radius: 50%;"/>
-      <br />
-      <sub><b>Abdullah</b></sub>
-    </a>
-    <br />
-  </div>
-
-
-  <div style="text-align: center;">
-    <a href="https://github.com/MAlazhariy">
-      <img src="https://avatars.githubusercontent.com/u/87443208?v=4?s=100" width="70px;" alt="MAlazhariy" style="border-radius: 50%;"/>
-      <br />
-      <sub><b>Mostafa</b></sub>
-    </a>
-    <br />
-  </div>
-
-
-  <div style="text-align: center;">
-    <a href="https://github.com/bonaparta13">
-      <img src="https://avatars.githubusercontent.com/u/67749770?v=4?s=100" width="70px;" alt="bonaparta13" style="border-radius: 50%;"/>
-      <br />
-      <sub><b>Anas</b></sub>
-    </a>
-    <br />
-  </div>
-
-
-</div>
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/Abdelazeem777">
+        <img src="https://avatars.githubusercontent.com/u/30933932?v=4?s=100" width="70px" /><br />
+        <sub><b>Abdelazeem</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/BelalNayzak">
+        <img src="https://avatars.githubusercontent.com/u/50274195?v=4?s=100" width="70px" /><br />
+        <sub><b>Belal</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/the-best-is-best">
+        <img src="https://avatars.githubusercontent.com/u/72160249?v=4?s=100" width="70px" /><br />
+        <sub><b>Michelle</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/moazelsawaf">
+        <img src="https://avatars.githubusercontent.com/u/43591891?v=4?s=100" width="70px" /><br />
+        <sub><b>Moaz</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/AnthonyXcode">
+        <img src="https://avatars.githubusercontent.com/u/16952651?v=4?s=100" width="70px" /><br />
+        <sub><b>Anthony</b></sub>
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/AbdoTareq">
+        <img src="https://avatars.githubusercontent.com/u/29352955?v=4?s=100" width="70px" /><br />
+        <sub><b>Abdelrahman</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Anthony-Chan-Synpulse">
+        <img src="https://avatars.githubusercontent.com/u/122436156?v=4?s=100" width="70px" /><br />
+        <sub><b>Anthony</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/dev-hussein">
+        <img src="https://avatars.githubusercontent.com/u/6766413?v=4?s=100" width="70px" /><br />
+        <sub><b>M Hussein</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/vlytvyne">
+        <img src="https://avatars.githubusercontent.com/u/44924680?v=4?s=100" width="70px" /><br />
+        <sub><b>Vadym</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/MohamedGawdat">
+        <img src="https://avatars.githubusercontent.com/u/10387795?v=4?s=100" width="70px" /><br />
+        <sub><b>M Gawdat</b></sub>
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/Abdullah-Mohammed-Ali">
+        <img src="https://avatars.githubusercontent.com/u/32640450?v=4?s=100" width="70px" /><br />
+        <sub><b>Abdullah</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/MAlazhariy">
+        <img src="https://avatars.githubusercontent.com/u/87443208?v=4?s=100" width="70px" /><br />
+        <sub><b>Mostafa</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/bonaparta13">
+        <img src="https://avatars.githubusercontent.com/u/67749770?v=4?s=100" width="70px" /><br />
+        <sub><b>Anas</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
 
 
 ### How to Contribute
