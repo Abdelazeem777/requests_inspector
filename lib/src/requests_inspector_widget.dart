@@ -216,12 +216,12 @@ class _InspectorState extends State<_Inspector> {
                     final iconIsDarkMode = iconData.item2;
                     return IconButton(
                       icon: isTreeView
-                          ? Icon(Icons.account_tree_rounded,
+                          ? Icon(Icons.text_fields,
                               color: iconIsDarkMode
                                   ? Colors.white
                                   : Colors.black87,
                               size: 20)
-                          : Icon(Icons.account_tree_outlined,
+                          : Icon(Icons.account_tree_rounded,
                               color: iconIsDarkMode
                                   ? Colors.white
                                   : Colors.black87,
@@ -673,7 +673,9 @@ class _RequestItemWidget extends StatelessWidget {
       // Use the locally derived isSelected
       child = DecoratedBox(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.white, width: 2.0),
+          border: context.select((InspectorController c) => c.isDarkMode)
+              ? Border.all(color: Colors.white, width: 2.0)
+              : Border.all(color: Colors.black, width: 2.0),
           borderRadius: BorderRadius.circular(4.0),
         ),
         child: child,
@@ -741,7 +743,7 @@ class _RequestDetailsPage extends StatelessWidget {
             initiallyExpanded: false,
             txtCopy: JsonPrettyConverter().convert(request.headers),
             title: 'Headers',
-            children: _buildHeadersBlock(context, request.headers),
+            children: _buildHeadersBlock(request.headers),
           ),
         if (request.queryParameters != null)
           _buildExpandableSection(
@@ -749,7 +751,7 @@ class _RequestDetailsPage extends StatelessWidget {
             initiallyExpanded: false,
             txtCopy: JsonPrettyConverter().convert(request.queryParameters),
             title: 'Query Parameters',
-            children: _buildQueryBlock(context, request.queryParameters),
+            children: _buildQueryBlock(request.queryParameters),
           ),
         if (request.requestBody != null)
           _buildExpandableSection(
@@ -757,14 +759,14 @@ class _RequestDetailsPage extends StatelessWidget {
             initiallyExpanded: false,
             txtCopy: JsonPrettyConverter().convert(request.requestBody),
             title: 'Request Body',
-            children: _buildRequestBodyBlock(context, request.requestBody),
+            children: _buildRequestBodyBlock(request.requestBody),
           ),
         if (request.responseBody != null)
           _buildExpandableSection(
             context: context,
             txtCopy: JsonPrettyConverter().convert(request.responseBody),
             title: 'Response Body',
-            children: _buildResponseBodyBlock(context, request.responseBody),
+            children: _buildResponseBodyBlock(request.responseBody),
           ),
       ],
     );
@@ -775,7 +777,7 @@ class _RequestDetailsPage extends StatelessWidget {
     String? title,
     required String txtCopy,
     Widget? titleWidget,
-    required List<Widget> children,
+    required Iterable<Widget> children,
     bool? initiallyExpanded,
   }) {
     final theme = Theme.of(context);
@@ -815,13 +817,13 @@ class _RequestDetailsPage extends StatelessWidget {
                       ),
                     ),
               ),
-              IconButton(
-                icon: const Icon(
+              InkWell(
+                child: const Icon(
                   Icons.copy,
                   color: Colors.grey,
                   size: 20,
                 ),
-                onPressed: () {
+                onTap: () {
                   Clipboard.setData(ClipboardData(text: txtCopy));
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Copied to clipboard')),
@@ -837,7 +839,7 @@ class _RequestDetailsPage extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: children,
+                children: children.toList(),
               ),
             ),
           ],
@@ -871,7 +873,7 @@ class _RequestDetailsPage extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildHeadersBlock(BuildContext context, headers) {
+  Iterable<Widget> _buildHeadersBlock(headers) {
     if (headers == null) return [];
     if ((headers is Map || headers is String || headers is List) &&
         headers.isEmpty) return [];
@@ -888,7 +890,7 @@ class _RequestDetailsPage extends StatelessWidget {
     ];
   }
 
-  List<Widget> _buildQueryBlock(BuildContext context, queryParameters) {
+  Iterable<Widget> _buildQueryBlock(queryParameters) {
     if (queryParameters == null) return [];
     if ((queryParameters is Map ||
             queryParameters is String ||
@@ -907,7 +909,7 @@ class _RequestDetailsPage extends StatelessWidget {
     ];
   }
 
-  List<Widget> _buildRequestBodyBlock(BuildContext context, requestBody) {
+  Iterable<Widget> _buildRequestBodyBlock(requestBody) {
     if (requestBody == null) return [];
     if ((requestBody is Map || requestBody is String || requestBody is List) &&
         requestBody.isEmpty) return [];
@@ -924,7 +926,7 @@ class _RequestDetailsPage extends StatelessWidget {
     ];
   }
 
-  List<Widget> _buildResponseBodyBlock(BuildContext context, responseBody) {
+  Iterable<Widget> _buildResponseBodyBlock(responseBody) {
     if (responseBody == null) return [];
     if ((responseBody is Map ||
             responseBody is String ||

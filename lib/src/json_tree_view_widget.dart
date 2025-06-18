@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../requests_inspector.dart'; // Ensure this path is correct for your project
+import '../requests_inspector.dart';
 
 class JsonTreeView extends StatelessWidget {
   final dynamic data;
@@ -10,10 +10,7 @@ class JsonTreeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0), // Root padding for the entire tree
-        child: _buildNode(context, data, depth: 0),
-      ),
+      child: _buildNode(context, data, depth: 0),
     );
   }
 
@@ -54,7 +51,7 @@ class JsonTreeView extends StatelessWidget {
       ],
       collapsedCount: map.length,
       isObject: true,
-      initiallyExpanded: false,
+      initiallyExpanded: true, // <--- Change this to true
     );
   }
 
@@ -77,7 +74,7 @@ class JsonTreeView extends StatelessWidget {
       ],
       collapsedCount: list.length,
       isObject: false,
-      initiallyExpanded: false,
+      initiallyExpanded: true, // <--- Change this to true
     );
   }
 
@@ -202,7 +199,7 @@ class _CustomExpansionTile extends StatefulWidget {
   const _CustomExpansionTile({
     required this.titleString,
     required this.children,
-    this.initiallyExpanded = false,
+    this.initiallyExpanded = false, // This default value is overridden by the passed value
     this.collapsedCount,
     this.isObject = false,
   });
