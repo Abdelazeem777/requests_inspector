@@ -9,6 +9,26 @@ import 'package:requests_inspector/src/response_stopper_editor_dialog.dart';
 import '../requests_inspector.dart';
 import 'json_tree_view_widget.dart';
 
+// Helper class for combining two values for a Selector
+// Placed at top-level for better organization
+class Tuple2<T1, T2> {
+  final T1 item1;
+  final T2 item2;
+
+  const Tuple2(this.item1, this.item2);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Tuple2 &&
+          runtimeType == other.runtimeType &&
+          item1 == other.item1 &&
+          item2 == other.item2;
+
+  @override
+  int get hashCode => item1.hashCode ^ item2.hashCode;
+}
+
 ///You can show the Inspector by **Shaking** your phone.
 class RequestsInspector extends StatelessWidget {
   /// Pass your `navigatorKey` of your MaterialApp to enable Request & Response `Stopper` Dialogs.
@@ -75,13 +95,14 @@ class RequestsInspector extends StatelessWidget {
           )
         : _child;
 
-    if (!_hideInspectorBanner && _enabled)
+    if (!_hideInspectorBanner && _enabled) {
       widget = Banner(
         message: 'INSPECTOR',
         textDirection: TextDirection.ltr,
         location: BannerLocation.topEnd,
         child: widget,
       );
+    }
 
     return Directionality(
       textDirection: TextDirection.ltr,
@@ -131,7 +152,8 @@ class _Inspector extends StatefulWidget {
 }
 
 class _InspectorState extends State<_Inspector> {
-  bool showStopperDialogsAllowed() => widget._navigatorKey?.currentContext != null;
+  bool showStopperDialogsAllowed() =>
+      widget._navigatorKey?.currentContext != null;
 
   @override
   Widget build(BuildContext context) {
@@ -141,10 +163,10 @@ class _InspectorState extends State<_Inspector> {
         return MaterialApp(
           theme: isDarkMode
               ? ThemeData.dark().copyWith(
-            colorScheme: ColorScheme.dark(
-              primary: Colors.grey[800]!,
-            ),
-          )
+                  colorScheme: ColorScheme.dark(
+                    primary: Colors.grey[800]!,
+                  ),
+                )
               : ThemeData.light(),
           home: Scaffold(
             appBar: _buildAppBar(context),
@@ -156,122 +178,185 @@ class _InspectorState extends State<_Inspector> {
     );
   }
 
-
   AppBar _buildAppBar(BuildContext context) {
-    final inspectorController = context.read<InspectorController>();
+    // Read the controller once for method calls that don't cause AppBar rebuilds.
+    final inspectorCtrl = context.read<InspectorController>();
 
     return AppBar(
-      backgroundColor: context.read<InspectorController>().isDarkMode ? Colors.black : Colors.white,
-      title: const Text('Inspector 🕵'),
+      // Use context.select for direct property access that triggers rebuilds
+      backgroundColor: context.select((InspectorController c) => c.isDarkMode)
+          ? Colors.black
+          : Colors.white,
+      title: const Text('Inspector 🕵️'),
       leading: IconButton(
-        onPressed: inspectorController.hideInspector,
-        icon: const Icon(Icons.close),
-        color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87,
+        onPressed: inspectorCtrl.hideInspector,
+        // Use context.select for direct property access that triggers rebuilds
+        icon: Icon(Icons.close,
+            color: context.select((InspectorController c) => c.isDarkMode)
+                ? Colors.white
+                : Colors.black87),
       ),
       actions: [
-        Selector<InspectorController, int>(
-          selector: (_, inspectorController) => inspectorController.selectedTab,
-          builder: (context, selectedTab, _) => Row(
-            children: [
-              IconButton(
-                icon: context.read<InspectorController>().isTreeView
-                    ? Icon(Icons.account_tree_rounded, color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87, size: 20,)
-                    : Icon(Icons.account_tree_outlined, color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87, size: 20,),
-                onPressed: context.read<InspectorController>().toggleInspectorJsonView,
-              ),
+        // Consolidate selectors that depend on selectedTab and isDarkMode for the actions row.
+        Selector<InspectorController, Tuple2<int, bool>>(
+          selector: (_, controller) =>
+              Tuple2(controller.selectedTab, controller.isDarkMode),
+          builder: (context, data, _) {
+            final selectedTab = data.item1;
+            final isDarkMode = data.item2;
 
-              IconButton(
-                icon: context.read<InspectorController>().isDarkMode
-                    ? const Icon(Icons.wb_sunny, color: Colors.white, size: 20,)
-                    : const Icon(Icons.brightness_2, color: Colors.black87, size: 20,),
-                onPressed: context.read<InspectorController>().toggleInspectorTheme,
-              ),
-
-              Container(
-                width: 2,
-                height: 20,
-                color: Colors.grey[200],
-                margin: selectedTab == 0
-                    ? null
-                    : const EdgeInsets.only(right: 12),
-              ),
-
-              selectedTab == 0
-                  ? TextButton(
-                onPressed: () => _showAreYouSureDialog(
-                  context,
-                  onYes: inspectorController.clearAllRequests,
+            return Row(
+              children: [
+                // JSON Tree Icon: Selector specifically for isTreeView and isDarkMode
+                Selector<InspectorController, Tuple2<bool, bool>>(
+                  selector: (_, controller) =>
+                      Tuple2(controller.isTreeView, controller.isDarkMode),
+                  builder: (context, iconData, __) {
+                    final isTreeView = iconData.item1;
+                    final iconIsDarkMode = iconData.item2;
+                    return IconButton(
+                      icon: isTreeView
+                          ? Icon(Icons.account_tree_rounded,
+                              color: iconIsDarkMode
+                                  ? Colors.white
+                                  : Colors.black87,
+                              size: 20)
+                          : Icon(Icons.account_tree_outlined,
+                              color: iconIsDarkMode
+                                  ? Colors.white
+                                  : Colors.black87,
+                              size: 20),
+                      onPressed: inspectorCtrl
+                          .toggleInspectorJsonView, // Use outer inspectorCtrl
+                    );
+                  },
                 ),
-                child: Text(
-                  'Clear All',
-                  style: TextStyle(color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87),
+                // Dark Mode Icon: Selector specifically for isDarkMode
+                Selector<InspectorController, bool>(
+                  selector: (_, controller) => controller.isDarkMode,
+                  builder: (context, iconIsDarkMode, __) {
+                    return IconButton(
+                      icon: iconIsDarkMode
+                          ? const Icon(Icons.wb_sunny,
+                              color: Colors.white, size: 20)
+                          : const Icon(Icons.brightness_2,
+                              color: Colors.black87, size: 20),
+                      onPressed: inspectorCtrl
+                          .toggleInspectorTheme, // Use outer inspectorCtrl
+                    );
+                  },
                 ),
-              )
-                  : _RunAgainButton(
-                key: ValueKey(inspectorController.selectedRequest.hashCode),
-                onTap: inspectorController.runAgain,
-              ),
-            ]
-          ),
+                // Separator: Its margin depends on selectedTab
+                Container(
+                  width: 2,
+                  height: 20,
+                  color: Colors.grey[200],
+                  margin: selectedTab == 0
+                      ? null
+                      : const EdgeInsets.only(right: 12),
+                ),
+                // Clear All / Run Again Button: Depends on selectedTab and isDarkMode
+                selectedTab == 0
+                    ? TextButton(
+                        onPressed: () => _showAreYouSureDialog(
+                          context,
+                          onYes: inspectorCtrl
+                              .clearAllRequests, // Use outer inspectorCtrl
+                        ),
+                        child: Text(
+                          'Clear All',
+                          style: TextStyle(
+                              color:
+                                  isDarkMode ? Colors.white : Colors.black87),
+                        ),
+                      )
+                    : _RunAgainButton(
+                        key: ValueKey(inspectorCtrl.selectedRequest.hashCode),
+                        // Key for efficient updates
+                        onTap: inspectorCtrl.runAgain,
+                        // Use outer inspectorCtrl
+                        isDarkMode: isDarkMode, // Pass theme state directly
+                      ),
+              ],
+            );
+          },
         ),
-        _buildPopUpMenu(inspectorController),
+        _buildPopUpMenu(inspectorCtrl),
       ],
     );
   }
 
   Widget _buildPopUpMenu(InspectorController inspectorController) {
     return PopupMenuButton(
-      icon: Icon(Icons.more_vert, color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87),
+      icon: Selector<InspectorController, bool>(
+        selector: (_, controller) => controller.isDarkMode,
+        builder: (context, isDarkMode, __) => Icon(Icons.more_vert,
+            color: isDarkMode ? Colors.white : Colors.black87),
+      ),
       itemBuilder: (context) => [
         if (showStopperDialogsAllowed())
           PopupMenuItem(
+            padding: EdgeInsets.zero,
+            // Remove default padding for InkWell to fill
             child: InkWell(
               onTap: () => inspectorController.requestStopperEnabled =
                   !inspectorController.requestStopperEnabled,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Requests Stopper'),
-                  Selector<InspectorController, bool>(
-                    selector: (_, inspectorController) =>
-                        inspectorController.requestStopperEnabled,
-                    builder: (context, requestStopperEnabled, _) => Switch(
-                      value: requestStopperEnabled,
-                      activeColor: Colors.green,
-                      activeTrackColor: Colors.grey[700],
-                      inactiveThumbColor: Colors.white,
-                      inactiveTrackColor: Colors.grey[700],
-                      onChanged: (value) =>
-                          inspectorController.requestStopperEnabled = value,
+              child: Padding(
+                // Add padding back for content
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Requests Stopper'),
+                    Selector<InspectorController, bool>(
+                      selector: (_, inspectorController) =>
+                          inspectorController.requestStopperEnabled,
+                      builder: (context, requestStopperEnabled, _) => Switch(
+                        value: requestStopperEnabled,
+                        activeColor: Colors.green,
+                        activeTrackColor: Colors.grey[700],
+                        inactiveThumbColor: Colors.white,
+                        inactiveTrackColor: Colors.grey[700],
+                        onChanged: (value) =>
+                            inspectorController.requestStopperEnabled = value,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
         if (showStopperDialogsAllowed())
           PopupMenuItem(
+            padding: EdgeInsets.zero,
+            // Remove default padding for InkWell to fill
             child: InkWell(
               onTap: () => inspectorController.responseStopperEnabled =
                   !inspectorController.responseStopperEnabled,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Responses Stopper'),
-                  Selector<InspectorController, bool>(
-                    selector: (_, inspectorController) =>
-                        inspectorController.responseStopperEnabled,
-                    builder: (context, responseStopperEnabled, _) => Switch(
-                      value: responseStopperEnabled,
-                      activeColor: Colors.green,
-                      activeTrackColor: Colors.grey[700],
-                      inactiveThumbColor: Colors.white,
-                      inactiveTrackColor: Colors.grey[700],
-                      onChanged: (value) =>
-                          inspectorController.responseStopperEnabled = value,
+              child: Padding(
+                // Add padding back for content
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Responses Stopper'),
+                    Selector<InspectorController, bool>(
+                      selector: (_, inspectorController) =>
+                          inspectorController.responseStopperEnabled,
+                      builder: (context, responseStopperEnabled, _) => Switch(
+                        value: responseStopperEnabled,
+                        activeColor: Colors.green,
+                        activeTrackColor: Colors.grey[700],
+                        inactiveThumbColor: Colors.white,
+                        inactiveTrackColor: Colors.grey[700],
+                        onChanged: (value) =>
+                            inspectorController.responseStopperEnabled = value,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -328,16 +413,16 @@ class _InspectorState extends State<_Inspector> {
           padding: const EdgeInsets.all(12.0),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: context.read<InspectorController>().isDarkMode
-                ? isSelected ? Theme.of(context).primaryColor : Colors.black87
-                : isSelected ? Theme.of(context).primaryColor : Colors.white,
+            color: context.select((InspectorController c) => c.isDarkMode)
+                ? (isSelected ? Theme.of(context).primaryColor : Colors.black87)
+                : (isSelected ? Theme.of(context).primaryColor : Colors.white),
           ),
           child: Text(
             title,
             style: TextStyle(
-              color: context.read<InspectorController>().isDarkMode
+              color: context.select((InspectorController c) => c.isDarkMode)
                   ? Colors.white
-                  : isSelected ? Colors.white : Colors.black87,
+                  : (isSelected ? Colors.white : Colors.black87),
               fontWeight: isSelected ? FontWeight.w800 : FontWeight.w300,
             ),
           ),
@@ -353,7 +438,6 @@ class _InspectorState extends State<_Inspector> {
   }
 
   Widget _buildAllRequests(BuildContext context) {
-    final inspectorController = context.read<InspectorController>();
     return Expanded(
       child: Selector<InspectorController, List<RequestDetails>>(
         selector: (_, controller) => controller.requestsList,
@@ -368,10 +452,12 @@ class _InspectorState extends State<_Inspector> {
                 itemBuilder: (context, index) {
                   final request = allRequests[index];
                   return _RequestItemWidget(
-                    isSelected: inspectorController.selectedRequest == request,
                     request: request,
-                    onTap: (request) =>
-                        inspectorController.selectedRequest = request,
+                    // Modified onTap to pass context and request
+                    onTap: (itemContext, tappedRequest) {
+                      itemContext.read<InspectorController>().selectedRequest =
+                          tappedRequest;
+                    },
                   );
                 },
               ),
@@ -482,9 +568,11 @@ class _RunAgainButton extends StatefulWidget {
   const _RunAgainButton({
     Key? key,
     required this.onTap,
+    required this.isDarkMode, // Pass isDarkMode directly
   }) : super(key: key);
 
   final Future<void> Function() onTap;
+  final bool isDarkMode; // New parameter
 
   @override
   _RunAgainButtonState createState() => _RunAgainButtonState();
@@ -495,6 +583,7 @@ class _RunAgainButtonState extends State<_RunAgainButton> {
 
   @override
   Widget build(BuildContext context) {
+    // No need for a Selector here, as isDarkMode is passed as a direct prop
     return _isLoading
         ? const Center(
             child: Padding(
@@ -509,32 +598,43 @@ class _RunAgainButtonState extends State<_RunAgainButton> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Run', style: TextStyle(color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87)),
-                Icon(Icons.play_arrow, color: context.read<InspectorController>().isDarkMode ? Colors.white : Colors.black87),
+                Text('Run',
+                    style: TextStyle(
+                        color:
+                            widget.isDarkMode ? Colors.white : Colors.black87)),
+                Icon(Icons.play_arrow,
+                    color: widget.isDarkMode ? Colors.white : Colors.black87),
               ],
-            ));
+            ),
+          );
   }
 
   void _setBusy() => setState(() => _isLoading = true);
+
   void _setReady() => setState(() => _isLoading = false);
 }
 
 class _RequestItemWidget extends StatelessWidget {
   const _RequestItemWidget({
     super.key,
-    required bool isSelected,
+    // Removed isSelected from here, it will be calculated internally
     required RequestDetails request,
-    required ValueChanged<RequestDetails> onTap,
-  })  : _isSelected = isSelected,
-        _request = request,
+    // Changed onTap signature to accept BuildContext
+    required void Function(BuildContext context, RequestDetails request) onTap,
+  })  : _request = request,
         _onTap = onTap;
 
-  final bool _isSelected;
+  // Removed _isSelected field
   final RequestDetails _request;
-  final ValueChanged<RequestDetails> _onTap;
+  final void Function(BuildContext context, RequestDetails request) _onTap;
 
   @override
   Widget build(BuildContext context) {
+    // Crucial change: Use context.select to listen only to the selectedRequest for THIS item
+    final isSelected = context.select<InspectorController, bool>(
+      (controller) => controller.selectedRequest == _request,
+    );
+
     Widget child = ListTile(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
       tileColor: _specifyStatusCodeColor(_request.statusCode),
@@ -565,10 +665,12 @@ class _RequestItemWidget extends StatelessWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
-      onTap: () => _onTap(_request),
+      // Pass the current context and the request to the onTap callback
+      onTap: () => _onTap(context, _request),
     );
 
-    if (_isSelected)
+    if (isSelected) {
+      // Use the locally derived isSelected
       child = DecoratedBox(
         decoration: BoxDecoration(
           border: Border.all(color: Colors.white, width: 2.0),
@@ -576,6 +678,9 @@ class _RequestItemWidget extends StatelessWidget {
         ),
         child: child,
       );
+    }
+    // This theme data copy will implicitly update if the main MaterialApp's theme changes,
+    // as it's rebuilding as part of the _InspectorState's build method
     return Theme(
       data: Theme.of(context).copyWith(colorScheme: const ColorScheme.light()),
       child: child,
@@ -599,10 +704,11 @@ class _RequestDetailsPage extends StatelessWidget {
       child: Selector<InspectorController, RequestDetails?>(
         selector: (_, inspectorController) =>
             inspectorController.selectedRequest,
-        shouldRebuild: (previous, next) => true,
+        shouldRebuild: (previous, next) => true, // Still good for list changes
         builder: (context, selectedRequest, _) => selectedRequest == null
             ? const Center(
-                child: Text('Please select a request first to view details'))
+                child: Text(
+                    'Please select a request first to view details')) // Added const
             : _buildRequestDetails(context, selectedRequest),
       ),
     );
@@ -629,41 +735,37 @@ class _RequestDetailsPage extends StatelessWidget {
             ),
           ],
         ),
-
         if (request.headers != null)
-        _buildExpandableSection(
-          context: context,
-          initiallyExpanded: false,
-          txtCopy: JsonPrettyConverter().convert(request.headers),
-          title: 'Headers',
-          children: _buildHeadersBlock(context, request.headers),
-        ),
-
+          _buildExpandableSection(
+            context: context,
+            initiallyExpanded: false,
+            txtCopy: JsonPrettyConverter().convert(request.headers),
+            title: 'Headers',
+            children: _buildHeadersBlock(context, request.headers),
+          ),
         if (request.queryParameters != null)
-        _buildExpandableSection(
-          context: context,
-          initiallyExpanded: false,
-          txtCopy: JsonPrettyConverter().convert(request.queryParameters),
-          title: 'Query Parameters',
-          children: _buildQueryBlock(context, request.queryParameters),
-        ),
-
+          _buildExpandableSection(
+            context: context,
+            initiallyExpanded: false,
+            txtCopy: JsonPrettyConverter().convert(request.queryParameters),
+            title: 'Query Parameters',
+            children: _buildQueryBlock(context, request.queryParameters),
+          ),
         if (request.requestBody != null)
-        _buildExpandableSection(
-          context: context,
-          initiallyExpanded: false,
-          txtCopy: JsonPrettyConverter().convert(request.requestBody),
-          title: 'Request Body',
-          children: _buildRequestBodyBlock(context, request.requestBody),
-        ),
-
+          _buildExpandableSection(
+            context: context,
+            initiallyExpanded: false,
+            txtCopy: JsonPrettyConverter().convert(request.requestBody),
+            title: 'Request Body',
+            children: _buildRequestBodyBlock(context, request.requestBody),
+          ),
         if (request.responseBody != null)
-        _buildExpandableSection(
-          context: context,
-          txtCopy: JsonPrettyConverter().convert(request.responseBody),
-          title: 'Response Body',
-          children: _buildResponseBodyBlock(context, request.responseBody),
-        ),
+          _buildExpandableSection(
+            context: context,
+            txtCopy: JsonPrettyConverter().convert(request.responseBody),
+            title: 'Response Body',
+            children: _buildResponseBodyBlock(context, request.responseBody),
+          ),
       ],
     );
   }
@@ -697,19 +799,21 @@ class _RequestDetailsPage extends StatelessWidget {
       child: Theme(
         data: theme.copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          initiallyExpanded: initiallyExpanded ??true,
+          initiallyExpanded: initiallyExpanded ?? true,
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          childrenPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          childrenPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           expandedAlignment: Alignment.topLeft,
           title: Row(
             children: [
               Expanded(
-                child: titleWidget ?? Text(
-                  title ?? '',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child: titleWidget ??
+                    Text(
+                      title ?? '',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
               ),
               IconButton(
                 icon: const Icon(
@@ -742,43 +846,6 @@ class _RequestDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRequestNameAndStatus({
-    RequestMethod? method,
-    String? requestName,
-    int? statusCode,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Expanded(
-          child: Text(
-            _createRequestName(method, requestName),
-            style: const TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8.0),
-            color: _specifyStatusCodeColor(statusCode),
-          ),
-          child: Text(
-            statusCode?.toString() ?? 'Err',
-            style: const TextStyle(fontSize: 16.0),
-          ),
-        ),
-      ],
-    );
-  }
-
-  String _createRequestName(RequestMethod? method, String? requestName) {
-    return (method?.name == null ? '' : '${method!.name}: ') +
-        (requestName ?? 'No name');
-  }
-
   Widget _buildRequestSentTimeAndDuration(
     DateTime sentTime,
     DateTime? receivedTime,
@@ -809,12 +876,16 @@ class _RequestDetailsPage extends StatelessWidget {
     if ((headers is Map || headers is String || headers is List) &&
         headers.isEmpty) return [];
 
-    if (context.read<InspectorController>().isTreeView) {
-      return [JsonTreeView(headers)];
-    }
-    else {
-      return [_buildSelectableText(headers)];
-    }
+    return [
+      Selector<InspectorController, bool>(
+        selector: (_, controller) => controller.isTreeView,
+        builder: (context, isTreeView, __) {
+          return isTreeView
+              ? JsonTreeView(headers)
+              : _buildSelectableText(headers);
+        },
+      )
+    ];
   }
 
   List<Widget> _buildQueryBlock(BuildContext context, queryParameters) {
@@ -824,12 +895,16 @@ class _RequestDetailsPage extends StatelessWidget {
             queryParameters is List) &&
         queryParameters.isEmpty) return [];
 
-    if (context.read<InspectorController>().isTreeView) {
-      return [JsonTreeView(queryParameters)];
-    }
-    else {
-      return [_buildSelectableText(queryParameters)];
-    }
+    return [
+      Selector<InspectorController, bool>(
+        selector: (_, controller) => controller.isTreeView,
+        builder: (context, isTreeView, __) {
+          return isTreeView
+              ? JsonTreeView(queryParameters)
+              : _buildSelectableText(queryParameters);
+        },
+      )
+    ];
   }
 
   List<Widget> _buildRequestBodyBlock(BuildContext context, requestBody) {
@@ -837,12 +912,16 @@ class _RequestDetailsPage extends StatelessWidget {
     if ((requestBody is Map || requestBody is String || requestBody is List) &&
         requestBody.isEmpty) return [];
 
-    if (context.read<InspectorController>().isTreeView) {
-      return [JsonTreeView(requestBody)];
-    }
-    else {
-      return [_buildSelectableText(requestBody)];
-    }
+    return [
+      Selector<InspectorController, bool>(
+        selector: (_, controller) => controller.isTreeView,
+        builder: (context, isTreeView, __) {
+          return isTreeView
+              ? JsonTreeView(requestBody)
+              : _buildSelectableText(requestBody);
+        },
+      )
+    ];
   }
 
   List<Widget> _buildResponseBodyBlock(BuildContext context, responseBody) {
@@ -852,13 +931,16 @@ class _RequestDetailsPage extends StatelessWidget {
             responseBody is List) &&
         responseBody.isEmpty) return [];
 
-    if (context.read<InspectorController>().isTreeView) {
-      responseBody = x;
-      return [JsonTreeView(responseBody)];
-    }
-    else {
-      return [_buildSelectableText(responseBody)];
-    }
+    return [
+      Selector<InspectorController, bool>(
+        selector: (_, controller) => controller.isTreeView,
+        builder: (context, isTreeView, __) {
+          return isTreeView
+              ? JsonTreeView(responseBody)
+              : _buildSelectableText(responseBody);
+        },
+      )
+    ];
   }
 
   Widget _buildSelectableText(text) {
@@ -870,6 +952,33 @@ class _RequestDetailsPage extends StatelessWidget {
     );
   }
 
+  Widget _buildRequestNameAndStatus({
+    required RequestMethod method,
+    required String requestName,
+    required int? statusCode,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${method.name} - $requestName',
+          style: const TextStyle(
+            fontSize: 18.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4.0),
+        Text(
+          'Status: ${statusCode ?? 'N/A'}',
+          style: TextStyle(
+            fontSize: 14.0,
+            color: _specifyStatusCodeColor(statusCode),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 String _extractTimeText(DateTime sentTime) {
