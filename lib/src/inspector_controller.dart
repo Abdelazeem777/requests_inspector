@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import '../requests_inspector.dart';
 import 'curl_command_generator.dart';
 import 'json_pretty_converter.dart';
+import 'share_type_enum.dart';
 
 typedef StoppingRequestCallback = Future<RequestDetails?> Function(
     RequestDetails requestDetails);
@@ -144,15 +145,28 @@ class InspectorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void shareSelectedRequest([Rect? sharePositionOrigin, bool isCurl = false]) {
+  void shareSelectedRequest({
+    Rect? sharePositionOrigin,
+    ShareType shareType = ShareType.NormalLog,
+  }) {
     String? requestShareContent;
-    if (isCurl) {
+    if (shareType == ShareType.CurlCommand) {
       final curlCommandGenerator = CurlCommandGenerator(_selectedRequest!);
       requestShareContent = curlCommandGenerator.generate();
-    } else {
+    } else if (shareType == ShareType.NormalLog) {
       final requestMap = _selectedRequest!.toMap();
       requestShareContent = _formatMap(requestMap);
+    } else {
+      final curlCommandGenerator = CurlCommandGenerator(_selectedRequest!);
+      final curlContent = curlCommandGenerator.generate();
+
+      final requestMap = _selectedRequest!.toMap();
+      final normalLogContent = _formatMap(requestMap);
+
+      requestShareContent =
+          '================[cURL Command]=================\n$curlContent\n\n==================[Normal Log]===================\n$normalLogContent';
     }
+
     Share.share(
       requestShareContent,
       sharePositionOrigin: sharePositionOrigin,
