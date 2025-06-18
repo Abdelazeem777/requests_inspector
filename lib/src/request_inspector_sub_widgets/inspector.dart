@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:requests_inspector/src/request_inspector_sub_widgets/request_details_page.dart';
 import 'package:requests_inspector/src/request_inspector_sub_widgets/request_item.dart';
 import 'package:requests_inspector/src/request_inspector_sub_widgets/run_again_widget.dart';
-
 import '../../requests_inspector.dart';
 
 class Inspector extends StatefulWidget {
@@ -74,55 +73,6 @@ class _InspectorState extends State<Inspector> {
 
             return Row(
               children: [
-                // JSON Tree Icon: Selector specifically for isTreeView and isDarkMode
-                if (selectedTab == 1)
-                  Selector<InspectorController, Tuple2<bool, bool>>(
-                    selector: (_, controller) =>
-                        Tuple2(controller.isTreeView, controller.isDarkMode),
-                    builder: (context, iconData, __) {
-                      final isTreeView = iconData.item1;
-                      final iconIsDarkMode = iconData.item2;
-                      return IconButton(
-                        icon: isTreeView
-                            ? Icon(Icons.text_fields,
-                            color: iconIsDarkMode
-                                ? Colors.white
-                                : Colors.black87,
-                            size: 20)
-                            : Icon(Icons.account_tree_rounded,
-                            color: iconIsDarkMode
-                                ? Colors.white
-                                : Colors.black87,
-                            size: 20),
-                        onPressed: inspectorCtrl
-                            .toggleInspectorJsonView, // Use outer inspectorCtrl
-                      );
-                    },
-                  ),
-                // Dark Mode Icon: Selector specifically for isDarkMode
-                Selector<InspectorController, bool>(
-                  selector: (_, controller) => controller.isDarkMode,
-                  builder: (context, iconIsDarkMode, __) {
-                    return IconButton(
-                      icon: iconIsDarkMode
-                          ? const Icon(Icons.wb_sunny,
-                          color: Colors.white, size: 20)
-                          : const Icon(Icons.brightness_2,
-                          color: Colors.black87, size: 20),
-                      onPressed: inspectorCtrl
-                          .toggleInspectorTheme, // Use outer inspectorCtrl
-                    );
-                  },
-                ),
-                // Separator: Its margin depends on selectedTab
-                Container(
-                  width: 2,
-                  height: 20,
-                  color: Colors.grey[200],
-                  margin: selectedTab == 0
-                      ? null
-                      : const EdgeInsets.only(right: 12),
-                ),
                 // Clear All / Run Again Button: Depends on selectedTab and isDarkMode
                 selectedTab == 0
                     ? TextButton(
@@ -162,6 +112,68 @@ class _InspectorState extends State<Inspector> {
             color: isDarkMode ? Colors.white : Colors.black87),
       ),
       itemBuilder: (context) => [
+        // Dark Mode Toggle
+        PopupMenuItem(
+          padding: EdgeInsets.zero,
+          child: InkWell(
+            onTap: inspectorController.toggleInspectorTheme,
+            child: Padding(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Dark Mode'),
+                  Selector<InspectorController, bool>(
+                    selector: (_, controller) => controller.isDarkMode,
+                    builder: (context, isDarkMode, __) {
+                      return Switch(
+                        value: isDarkMode,
+                        activeColor: Colors.green,
+                        activeTrackColor: Colors.grey[700],
+                        inactiveThumbColor: Colors.white,
+                        inactiveTrackColor: Colors.grey[700],
+                        onChanged: (value) =>
+                            inspectorController.toggleInspectorTheme(),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        // JSON Tree View Toggle
+        PopupMenuItem(
+          padding: EdgeInsets.zero,
+          child: InkWell(
+            onTap: inspectorController.toggleInspectorJsonView,
+            child: Padding(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('JSON Tree View'),
+                  Selector<InspectorController, bool>(
+                    selector: (_, controller) => controller.isTreeView,
+                    builder: (context, isTreeView, __) {
+                      return Switch(
+                        value: isTreeView,
+                        activeColor: Colors.green,
+                        activeTrackColor: Colors.grey[700],
+                        inactiveThumbColor: Colors.white,
+                        inactiveTrackColor: Colors.grey[700],
+                        onChanged: (value) =>
+                            inspectorController.toggleInspectorJsonView(),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
         if (showStopperDialogsAllowed())
           PopupMenuItem(
             padding: EdgeInsets.zero,
@@ -431,4 +443,3 @@ class _InspectorState extends State<Inspector> {
     );
   }
 }
-
