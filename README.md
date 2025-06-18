@@ -45,7 +45,7 @@ void main() {
     child: MyApp(),
   ));
 }
-````
+```
 
 ### 1\. RESTful API:
 
@@ -118,7 +118,7 @@ Future<List<Post>> fetchPosts() async {
 }
 ```
 
-### Finlay, `Shake` your phone to get the `Inspector`
+### Finaly, `Shake` your phone to get the `Inspector`
 
 \<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests\_inspector/main/images/mobile\_list.jpg" width ="280" /\> \<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests\_inspector/main/images/mobile\_request.jpg" width ="280" /\>
 
@@ -183,13 +183,13 @@ void main() => runApp(
   ),
 );
 
-...
+// ...
 
 @override
 Widget build(BuildContext context) {
   return MaterialApp(
     navigatorKey: navigatorKey, // <== Here!
-    ...
+    // ...
 ```
 
 - Second, just enable it from Inspector and it will stop all your requests and responses.
@@ -397,5 +397,4 @@ To add yourself as a contributor, simply follow the contribution guidelines and 
 
 This project is licensed under the MIT License - see the [LICENSE](https://www.google.com/search?q=LICENSE) file for details.
 
-```
-```
+## 🎉 Thank you for using Requests Inspector!
