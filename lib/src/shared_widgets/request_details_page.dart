@@ -113,8 +113,7 @@ class RequestDetailsPage extends StatelessWidget {
         child: ExpansionTile(
           initiallyExpanded: initiallyExpanded ?? true,
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          childrenPadding:
-          const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          childrenPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           expandedAlignment: Alignment.topLeft,
           title: Row(
             children: [
@@ -142,7 +141,6 @@ class RequestDetailsPage extends StatelessWidget {
               ),
             ],
           ),
-          backgroundColor: cardColor,
           children: [
             Container(
               alignment: Alignment.centerLeft,
