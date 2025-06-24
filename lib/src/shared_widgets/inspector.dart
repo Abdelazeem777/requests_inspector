@@ -4,7 +4,7 @@ import 'package:requests_inspector/src/shared_widgets/request_details_page.dart'
 import 'package:requests_inspector/src/shared_widgets/request_item.dart';
 import 'package:requests_inspector/src/shared_widgets/run_again_widget.dart';
 import '../../requests_inspector.dart';
-import '../share_type_enum.dart';
+import '../enums/share_type_enum.dart';
 
 class Inspector extends StatefulWidget {
   const Inspector({
@@ -30,10 +30,10 @@ class _InspectorState extends State<Inspector> {
         return MaterialApp(
           theme: isDarkMode
               ? ThemeData.dark().copyWith(
-            colorScheme: ColorScheme.dark(
-              primary: Colors.grey[800]!,
-            ),
-          )
+                  colorScheme: ColorScheme.dark(
+                    primary: Colors.grey[800]!,
+                  ),
+                )
               : ThemeData.light(),
           home: Scaffold(
             appBar: _buildAppBar(context),
@@ -77,25 +77,25 @@ class _InspectorState extends State<Inspector> {
                 // Clear All / Run Again Button: Depends on selectedTab and isDarkMode
                 selectedTab == 0
                     ? TextButton(
-                  onPressed: () => _showAreYouSureDialog(
-                    context,
-                    onYes: inspectorCtrl
-                        .clearAllRequests, // Use outer inspectorCtrl
-                  ),
-                  child: Text(
-                    'Clear All',
-                    style: TextStyle(
-                        color:
-                        isDarkMode ? Colors.white : Colors.black87),
-                  ),
-                )
+                        onPressed: () => _showAreYouSureDialog(
+                          context,
+                          onYes: inspectorCtrl
+                              .clearAllRequests, // Use outer inspectorCtrl
+                        ),
+                        child: Text(
+                          'Clear All',
+                          style: TextStyle(
+                              color:
+                                  isDarkMode ? Colors.white : Colors.black87),
+                        ),
+                      )
                     : RunAgainButton(
-                  key: ValueKey(inspectorCtrl.selectedRequest.hashCode),
-                  // Key for efficient updates
-                  onTap: inspectorCtrl.runAgain,
-                  // Use outer inspectorCtrl
-                  isDarkMode: isDarkMode, // Pass theme state directly
-                ),
+                        key: ValueKey(inspectorCtrl.selectedRequest.hashCode),
+                        // Key for efficient updates
+                        onTap: inspectorCtrl.runAgain,
+                        // Use outer inspectorCtrl
+                        isDarkMode: isDarkMode, // Pass theme state directly
+                      ),
               ],
             );
           },
@@ -120,7 +120,7 @@ class _InspectorState extends State<Inspector> {
             onTap: inspectorController.toggleInspectorTheme,
             child: Padding(
               padding:
-              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -151,7 +151,7 @@ class _InspectorState extends State<Inspector> {
             onTap: inspectorController.toggleInspectorJsonView,
             child: Padding(
               padding:
-              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -181,18 +181,18 @@ class _InspectorState extends State<Inspector> {
             // Remove default padding for InkWell to fill
             child: InkWell(
               onTap: () => inspectorController.requestStopperEnabled =
-              !inspectorController.requestStopperEnabled,
+                  !inspectorController.requestStopperEnabled,
               child: Padding(
                 // Add padding back for content
                 padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Requests Stopper'),
                     Selector<InspectorController, bool>(
                       selector: (_, inspectorController) =>
-                      inspectorController.requestStopperEnabled,
+                          inspectorController.requestStopperEnabled,
                       builder: (context, requestStopperEnabled, _) => Switch(
                         value: requestStopperEnabled,
                         activeColor: Colors.green,
@@ -200,7 +200,7 @@ class _InspectorState extends State<Inspector> {
                         inactiveThumbColor: Colors.white,
                         inactiveTrackColor: Colors.grey[700],
                         onChanged: (value) =>
-                        inspectorController.requestStopperEnabled = value,
+                            inspectorController.requestStopperEnabled = value,
                       ),
                     ),
                   ],
@@ -214,18 +214,18 @@ class _InspectorState extends State<Inspector> {
             // Remove default padding for InkWell to fill
             child: InkWell(
               onTap: () => inspectorController.responseStopperEnabled =
-              !inspectorController.responseStopperEnabled,
+                  !inspectorController.responseStopperEnabled,
               child: Padding(
                 // Add padding back for content
                 padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Responses Stopper'),
                     Selector<InspectorController, bool>(
                       selector: (_, inspectorController) =>
-                      inspectorController.responseStopperEnabled,
+                          inspectorController.responseStopperEnabled,
                       builder: (context, responseStopperEnabled, _) => Switch(
                         value: responseStopperEnabled,
                         activeColor: Colors.green,
@@ -233,7 +233,7 @@ class _InspectorState extends State<Inspector> {
                         inactiveThumbColor: Colors.white,
                         inactiveTrackColor: Colors.grey[700],
                         onChanged: (value) =>
-                        inspectorController.responseStopperEnabled = value,
+                            inspectorController.responseStopperEnabled = value,
                       ),
                     ),
                   ],
@@ -326,36 +326,36 @@ class _InspectorState extends State<Inspector> {
         builder: (context, allRequests, _) => allRequests.isEmpty
             ? const Center(child: Text('No requests added yet'))
             : ListView.separated(
-          padding:
-          const EdgeInsets.symmetric(vertical: 6.0, horizontal: 6.0),
-          separatorBuilder: (_, __) => const SizedBox(height: 6.0),
-          itemCount: allRequests.length,
-          itemBuilder: (context, index) {
-            final request = allRequests[index];
-            return RequestItemWidget(
-              request: request,
-              // Modified onTap to pass context and request
-              onTap: (itemContext, tappedRequest) {
-                itemContext.read<InspectorController>().selectedRequest =
-                    tappedRequest as RequestDetails?;
-              },
-            );
-          },
-        ),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 6.0, horizontal: 6.0),
+                separatorBuilder: (_, __) => const SizedBox(height: 6.0),
+                itemCount: allRequests.length,
+                itemBuilder: (context, index) {
+                  final request = allRequests[index];
+                  return RequestItemWidget(
+                    request: request,
+                    // Modified onTap to pass context and request
+                    onTap: (itemContext, tappedRequest) {
+                      itemContext.read<InspectorController>().selectedRequest =
+                          tappedRequest as RequestDetails?;
+                    },
+                  );
+                },
+              ),
       ),
     );
   }
 
   Future<void> _showAreYouSureDialog(
-      BuildContext context, {
-        required VoidCallback onYes,
-      }) {
+    BuildContext context, {
+    required VoidCallback onYes,
+  }) {
     return showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Are you sure? 🤔'),
         content:
-        const Text('This will clear all requests added to the inspector'),
+            const Text('This will clear all requests added to the inspector'),
         actions: [
           TextButton(
             child: const Text(
@@ -379,32 +379,32 @@ class _InspectorState extends State<Inspector> {
   Widget _buildShareFloatingButton() {
     return Selector<InspectorController, bool>(
       selector: (_, inspectorController) =>
-      inspectorController.selectedTab == 1 &&
+          inspectorController.selectedTab == 1 &&
           inspectorController.selectedRequest != null,
       builder: (context, showShareButton, _) => showShareButton
           ? FloatingActionButton(
-          backgroundColor: Colors.black,
-          foregroundColor: Colors.white,
-          child: const Icon(Icons.share),
-          onPressed: () async {
-            final box = context.findRenderObject() as RenderBox?;
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              child: const Icon(Icons.share),
+              onPressed: () async {
+                final box = context.findRenderObject() as RenderBox?;
 
-            final controller = context.read<InspectorController>();
-            final selectedRequest = controller.selectedRequest!;
-            final isHttp = _isHttp(selectedRequest);
+                final controller = context.read<InspectorController>();
+                final selectedRequest = controller.selectedRequest!;
+                final isHttp = _isHttp(selectedRequest);
 
-            final shareType =
-            isHttp ? await _showDialogShareType(context) : null;
+                final shareType =
+                    isHttp ? await _showDialogShareType(context) : null;
 
-            if (shareType == null) return;
+                if (shareType == null) return;
 
-            controller.shareSelectedRequest(
-              sharePositionOrigin: box == null
-                  ? null
-                  : box.localToGlobal(Offset.zero) & box.size,
-              shareType: shareType,
-            );
-          })
+                controller.shareSelectedRequest(
+                  sharePositionOrigin: box == null
+                      ? null
+                      : box.localToGlobal(Offset.zero) & box.size,
+                  shareType: shareType,
+                );
+              })
           : const SizedBox(),
     );
   }

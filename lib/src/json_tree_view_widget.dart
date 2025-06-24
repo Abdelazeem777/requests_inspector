@@ -25,12 +25,14 @@ class JsonTreeView extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.only(left: 12.0), // Your established general indentation step
+      padding: const EdgeInsets.only(left: 12.0),
+      // Your established general indentation step
       child: content,
     );
   }
 
-  Widget _buildMapNode(BuildContext context, Map<String, dynamic> map, String? keyName) {
+  Widget _buildMapNode(
+      BuildContext context, Map<String, dynamic> map, String? keyName) {
     final isEmpty = map.isEmpty;
 
     if (isEmpty) {
@@ -87,13 +89,15 @@ class JsonTreeView extends StatelessWidget {
           valueColor = isDarkMode ? Colors.white : Colors.black87;
         } else if (value is String) {
           formattedValue = '"$value"';
-          valueColor = isDarkMode ? Colors.green.shade300 : Colors.green.shade700;
+          valueColor =
+              isDarkMode ? Colors.green.shade300 : Colors.green.shade700;
         } else if (value is num) {
           formattedValue = value.toString();
           valueColor = isDarkMode ? Colors.blue.shade300 : Colors.blue.shade700;
         } else if (value is bool) {
           formattedValue = value.toString();
-          valueColor = isDarkMode ? Colors.orange.shade300 : Colors.orange.shade700;
+          valueColor =
+              isDarkMode ? Colors.orange.shade300 : Colors.orange.shade700;
         } else if (value == null) {
           formattedValue = 'null';
           valueColor = isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600;
@@ -146,7 +150,8 @@ class JsonTreeView extends StatelessWidget {
       builder: (context, controller, child) {
         final isDarkMode = controller.isDarkMode;
         return Padding(
-          padding: const EdgeInsets.only(left: 16.0), // Consistent with general indentation
+          padding: const EdgeInsets.only(left: 16.0),
+          // Consistent with general indentation
           child: Text(
             bracket,
             style: TextStyle(
@@ -213,9 +218,11 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
       builder: (context, controller, child) {
         final isDarkMode = controller.isDarkMode;
         final textColor = isDarkMode ? Colors.white : Colors.black87;
-        final secondaryTextColor = isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600;
+        final secondaryTextColor =
+            isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600;
 
-        final bool hasTitleString = widget.titleString != null && widget.titleString!.isNotEmpty;
+        final bool hasTitleString =
+            widget.titleString != null && widget.titleString!.isNotEmpty;
 
         return Padding(
           padding: const EdgeInsets.only(left: 5.0),
@@ -304,7 +311,8 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
               ),
               if (_expanded)
                 Padding(
-                  padding: const EdgeInsets.only(left: 8.0), // Your established 8.0 padding
+                  padding: const EdgeInsets.only(left: 8.0),
+                  // Your established 8.0 padding
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: widget.children,

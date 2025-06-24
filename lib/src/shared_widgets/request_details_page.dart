@@ -15,12 +15,12 @@ class RequestDetailsPage extends StatelessWidget {
     return Expanded(
       child: Selector<InspectorController, RequestDetails?>(
         selector: (_, inspectorController) =>
-        inspectorController.selectedRequest,
+            inspectorController.selectedRequest,
         shouldRebuild: (previous, next) => true, // Still good for list changes
         builder: (context, selectedRequest, _) => selectedRequest == null
             ? const Center(
-            child: Text(
-                'Please select a request first to view details')) // Added const
+                child: Text(
+                    'Please select a request first to view details')) // Added const
             : _buildRequestDetails(context, selectedRequest),
       ),
     );
@@ -113,7 +113,8 @@ class RequestDetailsPage extends StatelessWidget {
         child: ExpansionTile(
           initiallyExpanded: initiallyExpanded ?? true,
           tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          childrenPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          childrenPadding:
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           expandedAlignment: Alignment.topLeft,
           title: Row(
             children: [
@@ -157,15 +158,16 @@ class RequestDetailsPage extends StatelessWidget {
   }
 
   Widget _buildRequestSentTimeAndDuration(
-      DateTime sentTime,
-      DateTime? receivedTime,
-      String url,
-      ) {
+    DateTime sentTime,
+    DateTime? receivedTime,
+    String url,
+  ) {
     final sentTimeText = InspectorHelper.extractTimeText(sentTime);
     var text = 'Sent at: $sentTimeText';
 
     if (receivedTime != null) {
-      final durationText = InspectorHelper.calculateDuration(sentTime, receivedTime);
+      final durationText =
+          InspectorHelper.calculateDuration(sentTime, receivedTime);
       final receivedTimeText = InspectorHelper.extractTimeText(receivedTime);
       text += '\nReceived at: $receivedTimeText\nDuration: $durationText';
     }
@@ -198,7 +200,8 @@ class RequestDetailsPage extends StatelessWidget {
         builder: (context, isTreeView, __) {
           return isTreeView
               ? JsonTreeView(data)
-              : _buildSelectableText(data); // Assuming _buildSelectableText is accessible
+              : _buildSelectableText(
+                  data); // Assuming _buildSelectableText is accessible
         },
       )
     ];
@@ -240,6 +243,4 @@ class RequestDetailsPage extends StatelessWidget {
       ],
     );
   }
-
 }
-

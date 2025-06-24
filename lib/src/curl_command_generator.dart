@@ -3,7 +3,7 @@ import 'dart:convert'; // for jsonEncode and Uri.encodeQueryComponent
 import 'package:dio/dio.dart';
 
 import 'request_details.dart';
-import 'requests_methods.dart'; // for File
+import 'enums/requests_methods.dart'; // for File
 
 class CurlCommandGenerator {
   final RequestDetails details;

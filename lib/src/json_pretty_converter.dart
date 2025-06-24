@@ -7,6 +7,7 @@ class JsonPrettyConverter {
 
   factory JsonPrettyConverter() =>
       _instance ??= JsonPrettyConverter._internal();
+
   JsonPrettyConverter._internal() {
     _encoder = const JsonEncoder.withIndent('  ');
   }

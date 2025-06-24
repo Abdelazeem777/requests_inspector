@@ -6,7 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import '../requests_inspector.dart';
 import 'curl_command_generator.dart';
 import 'json_pretty_converter.dart';
-import 'share_type_enum.dart';
+import 'enums/share_type_enum.dart';
 
 typedef StoppingRequestCallback = Future<RequestDetails?> Function(
     RequestDetails requestDetails);
@@ -68,10 +68,15 @@ class InspectorController extends ChangeNotifier {
   RequestDetails? _selectedRequest;
 
   int get selectedTab => _selectedTab;
+
   bool get requestStopperEnabled => _requestStopperEnabled;
+
   bool get responseStopperEnabled => _responseStopperEnabled;
+
   List<RequestDetails> get requestsList => _requestsList;
+
   RequestDetails? get selectedRequest => _selectedRequest;
+
   bool get _allowShaking => [
         ShowInspectorOn.Shaking,
         ShowInspectorOn.Both,
@@ -208,7 +213,6 @@ class InspectorController extends ChangeNotifier {
 
     return _onStoppingResponse!(responseData);
   }
-
 
   bool isDarkMode = true;
 

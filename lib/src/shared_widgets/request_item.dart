@@ -22,7 +22,7 @@ class RequestItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     // Crucial change: Use context.select to listen only to the selectedRequest for THIS item
     final isSelected = context.select<InspectorController, bool>(
-          (controller) => controller.selectedRequest == _request,
+      (controller) => controller.selectedRequest == _request,
     );
 
     Widget child = ListTile(
@@ -40,7 +40,8 @@ class RequestItemWidget extends StatelessWidget {
           ),
           Text(
             _request.receivedTime != null
-                ? InspectorHelper.calculateDuration(_request.sentTime, _request.receivedTime!)
+                ? InspectorHelper.calculateDuration(
+                    _request.sentTime, _request.receivedTime!)
                 : InspectorHelper.extractTimeText(_request.sentTime),
             style: TextStyle(color: Colors.grey[800]),
           ),

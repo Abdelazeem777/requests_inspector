@@ -76,6 +76,7 @@ class Post {
   final int id;
   final String title;
   final String body;
+
   Post({
     required this.userId,
     required this.id,
@@ -237,6 +238,7 @@ class PostsListWidget extends StatelessWidget {
   final RefreshCallback onRefresh;
 
   final List<Post> postsList;
+
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(

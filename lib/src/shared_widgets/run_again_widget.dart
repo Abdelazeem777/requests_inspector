@@ -22,27 +22,27 @@ class _RunAgainButtonState extends State<RunAgainButton> {
     // No need for a Selector here, as isDarkMode is passed as a direct prop
     return _isLoading
         ? const Center(
-        child: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: CircularProgressIndicator(color: Colors.white),
-        ))
+            child: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CircularProgressIndicator(color: Colors.white),
+          ))
         : InkWell(
-      onTap: () {
-        _setBusy();
-        widget.onTap().whenComplete(_setReady);
-      },
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('Run',
-              style: TextStyle(
-                  color:
-                  widget.isDarkMode ? Colors.white : Colors.black87)),
-          Icon(Icons.play_arrow,
-              color: widget.isDarkMode ? Colors.white : Colors.black87),
-        ],
-      ),
-    );
+            onTap: () {
+              _setBusy();
+              widget.onTap().whenComplete(_setReady);
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Run',
+                    style: TextStyle(
+                        color:
+                            widget.isDarkMode ? Colors.white : Colors.black87)),
+                Icon(Icons.play_arrow,
+                    color: widget.isDarkMode ? Colors.white : Colors.black87),
+              ],
+            ),
+          );
   }
 
   void _setBusy() => setState(() => _isLoading = true);
