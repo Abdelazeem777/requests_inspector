@@ -6,7 +6,7 @@ import 'package:requests_inspector/src/shared_widgets/run_again_widget.dart';
 import '../../requests_inspector.dart';
 import '../enums/share_type_enum.dart';
 
-class Inspector extends StatefulWidget {
+class Inspector extends StatelessWidget {
   const Inspector({
     super.key,
     GlobalKey<NavigatorState>? navigatorKey,
@@ -14,13 +14,7 @@ class Inspector extends StatefulWidget {
 
   final GlobalKey<NavigatorState>? _navigatorKey;
 
-  @override
-  State<Inspector> createState() => _InspectorState();
-}
-
-class _InspectorState extends State<Inspector> {
-  bool showStopperDialogsAllowed() =>
-      widget._navigatorKey?.currentContext != null;
+  bool showStopperDialogsAllowed() => _navigatorKey?.currentContext != null;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +31,7 @@ class _InspectorState extends State<Inspector> {
               : ThemeData.light(),
           home: Scaffold(
             appBar: _buildAppBar(context),
-            body: _buildBody(),
+            body: _buildBody(isDarkMode: isDarkMode),
             floatingActionButton: _buildShareFloatingButton(),
           ),
         );
@@ -46,66 +40,69 @@ class _InspectorState extends State<Inspector> {
   }
 
   AppBar _buildAppBar(BuildContext context) {
-    // Read the controller once for method calls that don't cause AppBar rebuilds.
-    final inspectorCtrl = context.read<InspectorController>();
+    // Select only the needed property for rebuild optimization
+    final isDarkMode =
+        context.select<InspectorController, bool>((c) => c.isDarkMode);
 
     return AppBar(
-      // Use context.select for direct property access that triggers rebuilds
-      backgroundColor: context.select((InspectorController c) => c.isDarkMode)
-          ? Colors.black
-          : Colors.white,
-      title: const Text('Inspector 🕵️'),
-      leading: IconButton(
-        onPressed: inspectorCtrl.hideInspector,
-        // Use context.select for direct property access that triggers rebuilds
-        icon: Icon(Icons.close,
-            color: context.select((InspectorController c) => c.isDarkMode)
-                ? Colors.white
-                : Colors.black87),
-      ),
-      actions: [
-        // Consolidate selectors that depend on selectedTab and isDarkMode for the actions row.
-        Selector<InspectorController, Tuple2<int, bool>>(
-          selector: (_, controller) =>
-              Tuple2(controller.selectedTab, controller.isDarkMode),
-          builder: (context, data, _) {
-            final selectedTab = data.item1;
-            final isDarkMode = data.item2;
+      // Set background color based on dark mode status
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
 
-            return Row(
-              children: [
-                // Clear All / Run Again Button: Depends on selectedTab and isDarkMode
-                selectedTab == 0
-                    ? TextButton(
-                        onPressed: () => _showAreYouSureDialog(
-                          context,
-                          onYes: inspectorCtrl
-                              .clearAllRequests, // Use outer inspectorCtrl
-                        ),
-                        child: Text(
-                          'Clear All',
-                          style: TextStyle(
-                              color:
-                                  isDarkMode ? Colors.white : Colors.black87),
-                        ),
-                      )
-                    : RunAgainButton(
-                        key: ValueKey(inspectorCtrl.selectedRequest.hashCode),
-                        // Key for efficient updates
-                        onTap: inspectorCtrl.runAgain,
-                        // Use outer inspectorCtrl
-                        isDarkMode: isDarkMode, // Pass theme state directly
-                      ),
-              ],
-            );
-          },
-        ),
-        _buildPopUpMenu(inspectorCtrl),
-      ],
+      // Set default icon color for all icons inside AppBar (instead of per icon)
+      iconTheme: IconThemeData(
+        color: isDarkMode ? Colors.white : Colors.black87,
+      ),
+
+      title: const Text('Inspector 🕵️'),
+
+      leading: IconButton(
+        // Use method from controller (doesn't require listening)
+        onPressed: InspectorController().hideInspector,
+        icon: const Icon(Icons.close), // Icon color handled by iconTheme
+      ),
+
+      // Build action buttons, separating logic for better readability
+      actions: _buildActions(isDarkMode),
     );
   }
 
-  Widget _buildPopUpMenu(InspectorController inspectorController) {
+  List<Widget> _buildActions(
+    bool isDarkMode,
+  ) {
+    return [
+      Selector<InspectorController, int>(
+        selector: (_, c) => c.selectedTab,
+        builder: (context, selectedTab, _) {
+          return Row(
+            children: [
+              selectedTab == 0
+                  ? TextButton(
+                      onPressed: () => _showAreYouSureDialog(
+                        context,
+                        onYes: InspectorController().clearAllRequests,
+                      ),
+                      child: Text(
+                        'Clear All',
+                        style: TextStyle(
+                          color: isDarkMode ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                    )
+                  : RunAgainButton(
+                      key: ValueKey(
+                          InspectorController().selectedRequest.hashCode),
+                      onTap: InspectorController().runAgain,
+                      isDarkMode: isDarkMode,
+                    ),
+            ],
+          );
+        },
+      ),
+      _buildPopUpMenu(),
+    ];
+  }
+
+  Widget _buildPopUpMenu() {
     return PopupMenuButton(
       icon: Selector<InspectorController, bool>(
         selector: (_, controller) => controller.isDarkMode,
@@ -117,7 +114,7 @@ class _InspectorState extends State<Inspector> {
         PopupMenuItem(
           padding: EdgeInsets.zero,
           child: InkWell(
-            onTap: inspectorController.toggleInspectorTheme,
+            onTap: InspectorController().toggleInspectorTheme,
             child: Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -135,7 +132,7 @@ class _InspectorState extends State<Inspector> {
                         inactiveThumbColor: Colors.white,
                         inactiveTrackColor: Colors.grey[700],
                         onChanged: (value) =>
-                            inspectorController.toggleInspectorTheme(),
+                            InspectorController().toggleInspectorTheme(),
                       );
                     },
                   ),
@@ -148,7 +145,7 @@ class _InspectorState extends State<Inspector> {
         PopupMenuItem(
           padding: EdgeInsets.zero,
           child: InkWell(
-            onTap: inspectorController.toggleInspectorJsonView,
+            onTap: InspectorController().toggleInspectorJsonView,
             child: Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -166,7 +163,7 @@ class _InspectorState extends State<Inspector> {
                         inactiveThumbColor: Colors.white,
                         inactiveTrackColor: Colors.grey[700],
                         onChanged: (value) =>
-                            inspectorController.toggleInspectorJsonView(),
+                            InspectorController().toggleInspectorJsonView(),
                       );
                     },
                   ),
@@ -180,8 +177,8 @@ class _InspectorState extends State<Inspector> {
             padding: EdgeInsets.zero,
             // Remove default padding for InkWell to fill
             child: InkWell(
-              onTap: () => inspectorController.requestStopperEnabled =
-                  !inspectorController.requestStopperEnabled,
+              onTap: () => InspectorController().requestStopperEnabled =
+                  !InspectorController().requestStopperEnabled,
               child: Padding(
                 // Add padding back for content
                 padding:
@@ -200,7 +197,7 @@ class _InspectorState extends State<Inspector> {
                         inactiveThumbColor: Colors.white,
                         inactiveTrackColor: Colors.grey[700],
                         onChanged: (value) =>
-                            inspectorController.requestStopperEnabled = value,
+                            InspectorController().requestStopperEnabled = value,
                       ),
                     ),
                   ],
@@ -213,8 +210,8 @@ class _InspectorState extends State<Inspector> {
             padding: EdgeInsets.zero,
             // Remove default padding for InkWell to fill
             child: InkWell(
-              onTap: () => inspectorController.responseStopperEnabled =
-                  !inspectorController.responseStopperEnabled,
+              onTap: () => InspectorController().responseStopperEnabled =
+                  !InspectorController().responseStopperEnabled,
               child: Padding(
                 // Add padding back for content
                 padding:
@@ -232,8 +229,8 @@ class _InspectorState extends State<Inspector> {
                         activeTrackColor: Colors.grey[700],
                         inactiveThumbColor: Colors.white,
                         inactiveTrackColor: Colors.grey[700],
-                        onChanged: (value) =>
-                            inspectorController.responseStopperEnabled = value,
+                        onChanged: (value) => InspectorController()
+                            .responseStopperEnabled = value,
                       ),
                     ),
                   ],
@@ -245,36 +242,35 @@ class _InspectorState extends State<Inspector> {
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody({required bool isDarkMode}) {
     return Selector<InspectorController, int>(
       selector: (_, inspectorController) => inspectorController.selectedTab,
       builder: (context, selectedTab, _) => Column(
         children: [
-          _buildHeaderTabBar(context, selectedTab: selectedTab),
-          _buildSelectedTab(context, selectedTab: selectedTab),
+          _buildTabBar(isDarkMode: isDarkMode, selectedTab: selectedTab),
+          _buildSelectedTabBody(selectedTab: selectedTab),
         ],
       ),
     );
   }
 
-  Widget _buildHeaderTabBar(BuildContext context, {required int selectedTab}) {
-    final inspectorController = context.read<InspectorController>();
+  Widget _buildTabBar({required int selectedTab, required bool isDarkMode}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildTabItem(
-          context: context,
           title: 'All',
+          isDarkMode: isDarkMode,
           isSelected: selectedTab == 0,
           isLeft: true,
-          onTap: () => inspectorController.selectedTab = 0,
+          onTap: () => InspectorController().selectedTab = 0,
         ),
         _buildTabItem(
-          context: context,
           title: 'Request Details',
+          isDarkMode: isDarkMode,
           isSelected: selectedTab == 1,
           isLeft: false,
-          onTap: () => inspectorController.selectedTab = 1,
+          onTap: () => InspectorController().selectedTab = 1,
         ),
       ],
     );
@@ -283,9 +279,9 @@ class _InspectorState extends State<Inspector> {
   Widget _buildTabItem({
     required String title,
     required bool isSelected,
+    required bool isDarkMode,
     required bool isLeft,
     required VoidCallback onTap,
-    required BuildContext context,
   }) {
     return Expanded(
       child: InkWell(
@@ -294,14 +290,14 @@ class _InspectorState extends State<Inspector> {
           padding: const EdgeInsets.all(12.0),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: context.select((InspectorController c) => c.isDarkMode)
-                ? (isSelected ? Theme.of(context).primaryColor : Colors.black87)
-                : (isSelected ? Theme.of(context).primaryColor : Colors.white),
+            color: isDarkMode
+                ? (isSelected ? Colors.purple : Colors.black87)
+                : (isSelected ? Colors.purple : Colors.white),
           ),
           child: Text(
             title,
             style: TextStyle(
-              color: context.select((InspectorController c) => c.isDarkMode)
+              color: isDarkMode
                   ? Colors.white
                   : (isSelected ? Colors.white : Colors.black87),
               fontWeight: isSelected ? FontWeight.w800 : FontWeight.w300,
@@ -312,13 +308,13 @@ class _InspectorState extends State<Inspector> {
     );
   }
 
-  Widget _buildSelectedTab(BuildContext context, {required int selectedTab}) {
+  Widget _buildSelectedTabBody({required int selectedTab}) {
     return selectedTab == 0
-        ? _buildAllRequests(context)
+        ? _buildAllRequests()
         : const RequestDetailsPage();
   }
 
-  Widget _buildAllRequests(BuildContext context) {
+  Widget _buildAllRequests() {
     return Expanded(
       child: Selector<InspectorController, List<RequestDetails>>(
         selector: (_, controller) => controller.requestsList,
@@ -336,7 +332,7 @@ class _InspectorState extends State<Inspector> {
                     request: request,
                     // Modified onTap to pass context and request
                     onTap: (itemContext, tappedRequest) {
-                      itemContext.read<InspectorController>().selectedRequest =
+                      InspectorController().selectedRequest =
                           tappedRequest as RequestDetails?;
                     },
                   );
@@ -389,8 +385,7 @@ class _InspectorState extends State<Inspector> {
               onPressed: () async {
                 final box = context.findRenderObject() as RenderBox?;
 
-                final controller = context.read<InspectorController>();
-                final selectedRequest = controller.selectedRequest!;
+                final selectedRequest = InspectorController().selectedRequest!;
                 final isHttp = _isHttp(selectedRequest);
 
                 final shareType =
@@ -398,7 +393,7 @@ class _InspectorState extends State<Inspector> {
 
                 if (shareType == null) return;
 
-                controller.shareSelectedRequest(
+                InspectorController().shareSelectedRequest(
                   sharePositionOrigin: box == null
                       ? null
                       : box.localToGlobal(Offset.zero) & box.size,

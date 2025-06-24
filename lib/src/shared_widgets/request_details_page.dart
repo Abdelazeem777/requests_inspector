@@ -87,7 +87,7 @@ class RequestDetailsPage extends StatelessWidget {
     String? title,
     required String txtCopy,
     Widget? titleWidget,
-    required Iterable<Widget> children,
+    required List<Widget> children,
     bool? initiallyExpanded,
   }) {
     final theme = Theme.of(context);
@@ -148,7 +148,7 @@ class RequestDetailsPage extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: children.toList(),
+                children: children,
               ),
             ),
           ],
@@ -186,7 +186,7 @@ class RequestDetailsPage extends StatelessWidget {
   /// A generic function to build a content block based on provided data.
   /// It handles null/empty checks and switches between JsonTreeView and SelectableText
   /// based on the InspectorController's isTreeView state.
-  Iterable<Widget> _buildDataBlock(dynamic data) {
+  List<Widget> _buildDataBlock(dynamic data) {
     if (data == null) return [];
 
     // Check for empty collections or strings
@@ -200,8 +200,7 @@ class RequestDetailsPage extends StatelessWidget {
         builder: (context, isTreeView, __) {
           return isTreeView
               ? JsonTreeView(data)
-              : _buildSelectableText(
-                  data); // Assuming _buildSelectableText is accessible
+              : _buildSelectableText(data);
         },
       )
     ];
