@@ -10,7 +10,11 @@ class JsonTreeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: _buildNode(context, data),
+      scrollDirection: Axis.vertical,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: _buildNode(context, data),
+      ),
     );
   }
 
@@ -107,7 +111,7 @@ class JsonTreeView extends StatelessWidget {
         }
 
         return Padding(
-          padding: const EdgeInsets.only(left: 8.0),
+          padding: const EdgeInsets.only(left: 12.0),
           child: SelectableText.rich(
             TextSpan(
               children: [
@@ -150,7 +154,7 @@ class JsonTreeView extends StatelessWidget {
       builder: (context, controller, child) {
         final isDarkMode = controller.isDarkMode;
         return Padding(
-          padding: const EdgeInsets.only(left: 16.0),
+          padding: const EdgeInsets.only(left: 8.0),
           // Consistent with general indentation
           child: Text(
             bracket,
@@ -225,7 +229,7 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
             widget.titleString != null && widget.titleString!.isNotEmpty;
 
         return Padding(
-          padding: const EdgeInsets.only(left: 5.0),
+          padding: const EdgeInsets.only(left: 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -239,6 +243,7 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       AnimatedRotation(
                         turns: _expanded ? 0.25 : 0,
@@ -250,7 +255,8 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
                         ),
                       ),
                       const SizedBox(width: 4),
-                      Expanded(
+                      Flexible(
+                        fit: FlexFit.loose,
                         child: Text.rich(
                           TextSpan(
                             children: [
@@ -311,8 +317,7 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
               ),
               if (_expanded)
                 Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  // Your established 8.0 padding
+                  padding: const EdgeInsets.only(left: 12.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: widget.children,
