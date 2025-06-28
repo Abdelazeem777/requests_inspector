@@ -94,64 +94,67 @@ class RequestDetailsPage extends StatelessWidget {
     final cardColor = theme.cardColor;
     final borderColor = theme.dividerColor;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor.withOpacity(0.3)),
-        boxShadow: [
-          BoxShadow(
-            color: theme.shadowColor.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Theme(
-        data: theme.copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          initiallyExpanded: initiallyExpanded ?? true,
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          childrenPadding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          expandedAlignment: Alignment.topLeft,
-          title: Row(
-            children: [
-              Expanded(
-                child: titleWidget ??
-                    Text(
-                      title ?? '',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor.withOpacity(0.3)),
+          boxShadow: [
+            BoxShadow(
+              color: theme.shadowColor.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Theme(
+          data: theme.copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            initiallyExpanded: initiallyExpanded ?? true,
+            tilePadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            childrenPadding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            expandedAlignment: Alignment.topLeft,
+            title: Row(
+              children: [
+                Expanded(
+                  child: titleWidget ??
+                      Text(
+                        title ?? '',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-              ),
-              InkWell(
-                child: const Icon(
-                  Icons.copy,
-                  color: Colors.grey,
-                  size: 20,
                 ),
-                onTap: () {
-                  Clipboard.setData(ClipboardData(text: txtCopy));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Copied to clipboard')),
-                  );
-                },
+                InkWell(
+                  child: const Icon(
+                    Icons.copy,
+                    color: Colors.grey,
+                    size: 20,
+                  ),
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: txtCopy));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Copied to clipboard')),
+                    );
+                  },
+                ),
+              ],
+            ),
+            children: [
+              Container(
+                alignment: Alignment.centerLeft,
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: children,
+                ),
               ),
             ],
           ),
-          children: [
-            Container(
-              alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: children,
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -198,9 +201,7 @@ class RequestDetailsPage extends StatelessWidget {
       Selector<InspectorController, bool>(
         selector: (_, controller) => controller.isTreeView,
         builder: (context, isTreeView, __) {
-          return isTreeView
-              ? JsonTreeView(data)
-              : _buildSelectableText(data);
+          return isTreeView ? JsonTreeView(data) : _buildSelectableText(data);
         },
       )
     ];
