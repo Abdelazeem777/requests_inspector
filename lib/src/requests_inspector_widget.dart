@@ -7,26 +7,6 @@ import 'package:requests_inspector/src/response_stopper_editor_dialog.dart';
 import 'package:requests_inspector/src/shared_widgets/inspector.dart';
 import '../requests_inspector.dart';
 
-// Helper class for combining two values for a Selector
-// Placed at top-level for better organization
-class Tuple2<T1, T2> {
-  final T1 item1;
-  final T2 item2;
-
-  const Tuple2(this.item1, this.item2);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Tuple2 &&
-          runtimeType == other.runtimeType &&
-          item1 == other.item1 &&
-          item2 == other.item2;
-
-  @override
-  int get hashCode => item1.hashCode ^ item2.hashCode;
-}
-
 ///You can show the Inspector by **Shaking** your phone.
 class RequestsInspector extends StatelessWidget {
   /// Pass your `navigatorKey` of your MaterialApp to enable Request & Response `Stopper` Dialogs.
@@ -71,16 +51,15 @@ class RequestsInspector extends StatelessWidget {
               ),
             ),
             builder: (context, _) {
-              final inspectorController = context.read<InspectorController>();
               return WillPopScope(
                 onWillPop: () async =>
-                inspectorController.pageController.page == 0,
+                    InspectorController().pageController.page == 0,
                 child: GestureDetector(
                   onLongPress: _showInspectorOn != ShowInspectorOn.Shaking
-                      ? inspectorController.showInspector
+                      ? InspectorController().showInspector
                       : null,
                   child: PageView(
-                    controller: inspectorController.pageController,
+                    controller: InspectorController().pageController,
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
                       _child,
