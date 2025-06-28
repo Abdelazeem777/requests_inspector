@@ -6,7 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import '../requests_inspector.dart';
 import 'curl_command_generator.dart';
 import 'json_pretty_converter.dart';
-import 'share_type_enum.dart';
+import 'enums/share_type_enum.dart';
 
 typedef StoppingRequestCallback = Future<RequestDetails?> Function(
     RequestDetails requestDetails);
@@ -63,15 +63,26 @@ class InspectorController extends ChangeNotifier {
   int _selectedTab = 0;
   bool _requestStopperEnabled = false;
   bool _responseStopperEnabled = false;
+  bool _isDarkMode = true;
+  bool _isTreeView = true;
 
   final _requestsList = <RequestDetails>[];
   RequestDetails? _selectedRequest;
 
   int get selectedTab => _selectedTab;
+
   bool get requestStopperEnabled => _requestStopperEnabled;
+
   bool get responseStopperEnabled => _responseStopperEnabled;
+
+  bool get isDarkMode => _isDarkMode;
+
+  bool get isTreeView => _isTreeView;
+
   List<RequestDetails> get requestsList => _requestsList;
+
   RequestDetails? get selectedRequest => _selectedRequest;
+
   bool get _allowShaking => [
         ShowInspectorOn.Shaking,
         ShowInspectorOn.Both,
@@ -207,5 +218,15 @@ class InspectorController extends ChangeNotifier {
         .startsWith(e))) return Future.value(null);
 
     return _onStoppingResponse!(responseData);
+  }
+
+  void toggleInspectorTheme() {
+    _isDarkMode = !_isDarkMode;
+    notifyListeners();
+  }
+
+  void toggleInspectorJsonView() {
+    _isTreeView = !_isTreeView;
+    notifyListeners();
   }
 }

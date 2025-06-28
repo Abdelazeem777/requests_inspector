@@ -15,6 +15,7 @@ class RequestDetails {
   final dynamic responseBody;
   late final DateTime sentTime;
   final DateTime? receivedTime;
+
   RequestDetails({
     String? requestName,
     required this.requestMethod,

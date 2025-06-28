@@ -7,6 +7,7 @@ class JsonPrettyConverter {
 
   factory JsonPrettyConverter() =>
       _instance ??= JsonPrettyConverter._internal();
+
   JsonPrettyConverter._internal() {
     _encoder = const JsonEncoder.withIndent('  ');
   }
@@ -14,6 +15,7 @@ class JsonPrettyConverter {
   static late final JsonEncoder _encoder;
 
   String convert(text) {
+    // text = dummyData;
     late final String prettyprint;
     if (text is Map || text is String || text is List)
       prettyprint = _convertToPrettyJsonFromMapOrJson(text);
