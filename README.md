@@ -122,11 +122,11 @@ Future<List<Post>> fetchPosts() async {
 
 \<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests\_inspector/main/images/mobile\_list.jpg" width ="280" /\> \<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests\_inspector/main/images/mobile\_request.jpg" width ="280" /\>
 
------
+---
 
 ### 2\. GraphQl:
 
-To use `requests_inspector` with [graphql\_flutter](https://pub.dev/packages/graphql_flutter) library.
+To use `requests_inspector` with [graphql_flutter](https://pub.dev/packages/graphql_flutter) library.
 you jus need to wrap your normal `HttpLink` with our `GraphQLInspectorLink` and we are done.
 
 **Example:**
@@ -162,7 +162,7 @@ you jus need to wrap your normal `HttpLink` with our `GraphQLInspectorLink` and 
 }
 ```
 
------
+---
 
 ### Stopper (Requests & Responses)
 
@@ -196,7 +196,7 @@ Widget build(BuildContext context) {
 
 \<img src="https://raw.githubusercontent.com/Abdelazeem777/requests\_inspector/main/images/stopper\_feature.gif" width="280"/\>
 
------
+---
 
 ### For Web, Windows, MacOS and Linux
 
@@ -226,7 +226,7 @@ void main() {
 }
 ```
 
------
+---
 
 ## Some images
 
@@ -325,7 +325,6 @@ Contributors helping improve `requests_inspector`: 💻🎨📖🚧
   </tr>
 </table>
 
-
 ### How to Contribute
 
 We welcome contributions from everyone\! Here's how you can help:
@@ -337,7 +336,7 @@ We welcome contributions from everyone\! Here's how you can help:
 
 To add yourself as a contributor, simply follow the contribution guidelines and your efforts will be recognized here\!
 
------
+---
 
 ## Future plans:
 
@@ -351,8 +350,9 @@ To add yourself as a contributor, simply follow the contribution guidelines and 
 - [x] Click to Copy Content of each section.
 - [ ] Add search inside the request details page.
 - [ ] Add Http Interceptor.
+- [ ] 'WillPopScope' is deprecated and shouldn't be used. Use PopScope instead. The Android predictive back feature will not work with WillPopScope.
 
------
+---
 
 ## 📃 License
 
