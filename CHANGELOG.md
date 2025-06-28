@@ -1,3 +1,15 @@
+## 5.0.0
+
+- 🌗 **Dark/Light Mode Toggle**: Automatically adapts to system theme or user preference with manual toggle option.
+- 📋 **Click to Copy Content**: Makes it easier to copy values such as headers, URLs, and JSON content with a single tap.
+- 📂 **Expandable/Collapsible Sections**: Improves navigation by letting users toggle visibility of large sections like headers, request/response bodies, etc.
+- 🌳 **JSON Tree View**: Added JSON-Tree display option with a structured, interactive tree view — expandable and more readable.
+- 🎨 **UI/UX Refinements**: Added spacing, border radius, section highlights, and consistent padding for better layout and readability in both light and dark modes.
+- Major code refactoring with better separation of concerns and improved widget structure.
+- Enhanced user experience with modern, clean interface design.
+
+Special thanks to [BelalNayzak](https://github.com/BelalNayzak) for this amazing contribution that makes the inspector much more powerful and user-friendly! 🎉
+
 ## 4.2.3
 
 - Add `ShareType` enum to choose the type of the share content and `Both` option to share both `cURL` and `Normal Log`.
