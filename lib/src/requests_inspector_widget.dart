@@ -50,6 +50,7 @@ class RequestsInspector extends StatelessWidget {
                 responseData: responseData,
               ),
             ),
+            lazy: false,
             builder: (context, _) {
               return WillPopScope(
                 onWillPop: () async =>
