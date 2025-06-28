@@ -27,58 +27,68 @@ class RequestDetailsPage extends StatelessWidget {
   }
 
   Widget _buildRequestDetails(BuildContext context, RequestDetails request) {
-    return ListView(
-      padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 96.0),
-      children: [
-        _buildExpandableSection(
-          context: context,
-          initiallyExpanded: false,
-          txtCopy: JsonPrettyConverter().convert(request.url),
-          titleWidget: _buildRequestNameAndStatus(
-            method: request.requestMethod,
-            requestName: request.requestName,
-            statusCode: request.statusCode,
-          ),
+    return Selector<InspectorController, bool>(
+      selector: (_, inspectorController) => inspectorController.isTreeView,
+      builder: (context, isTreeView, _) => Selector<InspectorController, bool>(
+        selector: (_, inspectorController) => inspectorController.isDarkMode,
+        builder: (context, isDarkMode, _) => ListView(
+          padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 96.0),
           children: [
-            _buildRequestSentTimeAndDuration(
-              request.sentTime,
-              request.receivedTime,
-              request.url,
+            _buildExpandableSection(
+              context: context,
+              initiallyExpanded: false,
+              txtCopy: JsonPrettyConverter().convert(request.url),
+              titleWidget: _buildRequestNameAndStatus(
+                method: request.requestMethod,
+                requestName: request.requestName,
+                statusCode: request.statusCode,
+              ),
+              children: [
+                _buildRequestSentTimeAndDuration(
+                  request.sentTime,
+                  request.receivedTime,
+                  request.url,
+                ),
+              ],
             ),
+            if (request.headers != null)
+              _buildExpandableSection(
+                context: context,
+                initiallyExpanded: false,
+                txtCopy: JsonPrettyConverter().convert(request.headers),
+                title: 'Headers',
+                children: _buildDataBlock(request.headers,
+                    isTreeView: isTreeView, isDarkMode: isDarkMode),
+              ),
+            if (request.queryParameters != null)
+              _buildExpandableSection(
+                context: context,
+                initiallyExpanded: false,
+                txtCopy: JsonPrettyConverter().convert(request.queryParameters),
+                title: 'Query Parameters',
+                children: _buildDataBlock(request.queryParameters,
+                    isTreeView: isTreeView, isDarkMode: isDarkMode),
+              ),
+            if (request.requestBody != null)
+              _buildExpandableSection(
+                context: context,
+                initiallyExpanded: false,
+                txtCopy: JsonPrettyConverter().convert(request.requestBody),
+                title: 'Request Body',
+                children: _buildDataBlock(request.requestBody,
+                    isTreeView: isTreeView, isDarkMode: isDarkMode),
+              ),
+            if (request.responseBody != null)
+              _buildExpandableSection(
+                context: context,
+                txtCopy: JsonPrettyConverter().convert(request.responseBody),
+                title: 'Response Body',
+                children: _buildDataBlock(request.responseBody,
+                    isTreeView: isTreeView, isDarkMode: isDarkMode),
+              ),
           ],
         ),
-        if (request.headers != null)
-          _buildExpandableSection(
-            context: context,
-            initiallyExpanded: false,
-            txtCopy: JsonPrettyConverter().convert(request.headers),
-            title: 'Headers',
-            children: _buildDataBlock(request.headers),
-          ),
-        if (request.queryParameters != null)
-          _buildExpandableSection(
-            context: context,
-            initiallyExpanded: false,
-            txtCopy: JsonPrettyConverter().convert(request.queryParameters),
-            title: 'Query Parameters',
-            children: _buildDataBlock(request.queryParameters),
-          ),
-        if (request.requestBody != null)
-          _buildExpandableSection(
-            context: context,
-            initiallyExpanded: false,
-            txtCopy: JsonPrettyConverter().convert(request.requestBody),
-            title: 'Request Body',
-            children: _buildDataBlock(request.requestBody),
-          ),
-        if (request.responseBody != null)
-          _buildExpandableSection(
-            context: context,
-            txtCopy: JsonPrettyConverter().convert(request.responseBody),
-            title: 'Response Body',
-            children: _buildDataBlock(request.responseBody),
-          ),
-      ],
+      ),
     );
   }
 
@@ -189,7 +199,11 @@ class RequestDetailsPage extends StatelessWidget {
   /// A generic function to build a content block based on provided data.
   /// It handles null/empty checks and switches between JsonTreeView and SelectableText
   /// based on the InspectorController's isTreeView state.
-  List<Widget> _buildDataBlock(dynamic data) {
+  List<Widget> _buildDataBlock(
+    dynamic data, {
+    required bool isTreeView,
+    required bool isDarkMode,
+  }) {
     if (data == null) return [];
 
     // Check for empty collections or strings
@@ -198,12 +212,9 @@ class RequestDetailsPage extends StatelessWidget {
     }
 
     return [
-      Selector<InspectorController, bool>(
-        selector: (_, controller) => controller.isTreeView,
-        builder: (context, isTreeView, __) {
-          return isTreeView ? JsonTreeView(data) : _buildSelectableText(data);
-        },
-      )
+      isTreeView
+          ? JsonTreeView(data, isDarkMode: isDarkMode)
+          : _buildSelectableText(data)
     ];
   }
 

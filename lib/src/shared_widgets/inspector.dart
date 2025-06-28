@@ -244,7 +244,8 @@ class Inspector extends StatelessWidget {
       builder: (context, selectedTab, _) => Column(
         children: [
           _buildTabBar(isDarkMode: isDarkMode, selectedTab: selectedTab),
-          _buildSelectedTabBody(selectedTab: selectedTab),
+          _buildSelectedTabBody(
+              isDarkMode: isDarkMode, selectedTab: selectedTab),
         ],
       ),
     );
@@ -287,14 +288,14 @@ class Inspector extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: isDarkMode
-                ? (isSelected ? Colors.purple : Colors.black87)
-                : (isSelected ? Colors.purple : Colors.white),
+                ? (isSelected ? Colors.white : Colors.black87)
+                : (isSelected ? Colors.black87 : Colors.white),
           ),
           child: Text(
             title,
             style: TextStyle(
               color: isDarkMode
-                  ? Colors.white
+                  ? (isSelected ? Colors.black87 : Colors.white)
                   : (isSelected ? Colors.white : Colors.black87),
               fontWeight: isSelected ? FontWeight.w800 : FontWeight.w300,
             ),
@@ -304,33 +305,39 @@ class Inspector extends StatelessWidget {
     );
   }
 
-  Widget _buildSelectedTabBody({required int selectedTab}) {
-    return selectedTab == 0 ? _buildAllRequests() : const RequestDetailsPage();
+  Widget _buildSelectedTabBody(
+      {required int selectedTab, required bool isDarkMode}) {
+    return selectedTab == 0
+        ? _buildAllRequests(isDarkMode: isDarkMode)
+        : const RequestDetailsPage();
   }
 
-  Widget _buildAllRequests() {
+  Widget _buildAllRequests({required bool isDarkMode}) {
     return Expanded(
       child: Selector<InspectorController, List<RequestDetails>>(
         selector: (_, controller) => controller.requestsList,
         shouldRebuild: (previous, next) => true,
         builder: (context, allRequests, _) => allRequests.isEmpty
             ? const Center(child: Text('No requests added yet'))
-            : ListView.separated(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 6.0, horizontal: 6.0),
-                separatorBuilder: (_, __) => const SizedBox(height: 6.0),
-                itemCount: allRequests.length,
-                itemBuilder: (context, index) {
-                  final request = allRequests[index];
-                  return RequestItemWidget(
-                    request: request,
-                    // Modified onTap to pass context and request
-                    onTap: (itemContext, tappedRequest) {
-                      InspectorController().selectedRequest =
-                          tappedRequest as RequestDetails?;
-                    },
-                  );
-                },
+            : Selector<InspectorController, RequestDetails?>(
+                selector: (_, controller) => controller.selectedRequest,
+                builder: (context, selectedRequest, _) => ListView.separated(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 6.0, horizontal: 6.0),
+                  separatorBuilder: (_, __) => const SizedBox(height: 6.0),
+                  itemCount: allRequests.length,
+                  itemBuilder: (context, index) {
+                    final request = allRequests[index];
+                    return RequestItemWidget(
+                      request: request,
+                      isSelected: selectedRequest == request,
+                      isDarkMode: isDarkMode,
+                      onTap: (itemContext, tappedRequest) {
+                        InspectorController().selectedRequest = tappedRequest;
+                      },
+                    );
+                  },
+                ),
               ),
       ),
     );

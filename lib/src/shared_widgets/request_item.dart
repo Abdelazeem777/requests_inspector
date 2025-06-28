@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../requests_inspector.dart';
 import '../helpers/inspector_helper.dart';
@@ -7,24 +6,22 @@ import '../helpers/inspector_helper.dart';
 class RequestItemWidget extends StatelessWidget {
   const RequestItemWidget({
     super.key,
-    // Removed isSelected from here, it will be calculated internally
     required RequestDetails request,
-    // Changed onTap signature to accept BuildContext
+    required bool isSelected,
+    required bool isDarkMode,
     required void Function(BuildContext context, RequestDetails request) onTap,
   })  : _request = request,
+        _isSelected = isSelected,
+        _isDarkMode = isDarkMode,
         _onTap = onTap;
 
-  // Removed _isSelected field
   final RequestDetails _request;
+  final bool _isSelected;
+  final bool _isDarkMode;
   final void Function(BuildContext context, RequestDetails request) _onTap;
 
   @override
   Widget build(BuildContext context) {
-    // Crucial change: Use context.select to listen only to the selectedRequest for THIS item
-    final isSelected = context.select<InspectorController, bool>(
-      (controller) => controller.selectedRequest == _request,
-    );
-
     Widget child = ListTile(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
       tileColor: InspectorHelper.specifyStatusCodeColor(_request.statusCode),
@@ -60,11 +57,10 @@ class RequestItemWidget extends StatelessWidget {
       onTap: () => _onTap(context, _request),
     );
 
-    if (isSelected) {
-      // Use the locally derived isSelected
+    if (_isSelected) {
       child = DecoratedBox(
         decoration: BoxDecoration(
-          border: context.select((InspectorController c) => c.isDarkMode)
+          border: _isDarkMode
               ? Border.all(color: Colors.white, width: 2.0)
               : Border.all(color: Colors.black, width: 2.0),
           borderRadius: BorderRadius.circular(4.0),
