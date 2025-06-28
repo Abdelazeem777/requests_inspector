@@ -27,11 +27,7 @@ class JsonTreeView extends StatelessWidget {
       content = _buildLeafNode(context, keyName, node);
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(left: 12.0),
-      // Your established general indentation step
-      child: content,
-    );
+    return content;
   }
 
   Widget _buildMapNode(
