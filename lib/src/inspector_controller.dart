@@ -63,6 +63,8 @@ class InspectorController extends ChangeNotifier {
   int _selectedTab = 0;
   bool _requestStopperEnabled = false;
   bool _responseStopperEnabled = false;
+  bool _isDarkMode = true;
+  bool _isTreeView = true;
 
   final _requestsList = <RequestDetails>[];
   RequestDetails? _selectedRequest;
@@ -72,6 +74,10 @@ class InspectorController extends ChangeNotifier {
   bool get requestStopperEnabled => _requestStopperEnabled;
 
   bool get responseStopperEnabled => _responseStopperEnabled;
+
+  bool get isDarkMode => _isDarkMode;
+
+  bool get isTreeView => _isTreeView;
 
   List<RequestDetails> get requestsList => _requestsList;
 
@@ -214,17 +220,13 @@ class InspectorController extends ChangeNotifier {
     return _onStoppingResponse!(responseData);
   }
 
-  bool isDarkMode = true;
-
   void toggleInspectorTheme() {
-    isDarkMode = !isDarkMode;
+    _isDarkMode = !_isDarkMode;
     notifyListeners();
   }
 
-  bool isTreeView = true;
-
   void toggleInspectorJsonView() {
-    isTreeView = !isTreeView;
+    _isTreeView = !_isTreeView;
     notifyListeners();
   }
 }
