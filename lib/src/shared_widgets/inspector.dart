@@ -30,7 +30,7 @@ class Inspector extends StatelessWidget {
                 )
               : ThemeData.light(),
           home: Scaffold(
-            appBar: _buildAppBar(context),
+            appBar: _buildAppBar(isDarkMode),
             body: _buildBody(isDarkMode: isDarkMode),
             floatingActionButton: _buildShareFloatingButton(),
           ),
@@ -39,11 +39,7 @@ class Inspector extends StatelessWidget {
     );
   }
 
-  AppBar _buildAppBar(BuildContext context) {
-    // Select only the needed property for rebuild optimization
-    final isDarkMode =
-        context.select<InspectorController, bool>((c) => c.isDarkMode);
-
+  AppBar _buildAppBar(bool isDarkMode) {
     return AppBar(
       // Set background color based on dark mode status
       backgroundColor: isDarkMode ? Colors.black : Colors.white,
@@ -309,9 +305,7 @@ class Inspector extends StatelessWidget {
   }
 
   Widget _buildSelectedTabBody({required int selectedTab}) {
-    return selectedTab == 0
-        ? _buildAllRequests()
-        : const RequestDetailsPage();
+    return selectedTab == 0 ? _buildAllRequests() : const RequestDetailsPage();
   }
 
   Widget _buildAllRequests() {
