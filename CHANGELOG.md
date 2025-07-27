@@ -1,3 +1,11 @@
+## 5.0.2
+
+- Set `initiallyExpanded` to `true` by default.
+
+## 5.0.1
+
+- Update dependencies, thanks to [ahmedsabahi](https://github.com/ahmedsabahi).
+
 ## 5.0.0
 
 - 🌗 **Dark/Light Mode Toggle**: Automatically adapts to system theme or user preference with manual toggle option.
