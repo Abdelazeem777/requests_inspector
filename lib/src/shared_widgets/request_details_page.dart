@@ -36,7 +36,6 @@ class RequestDetailsPage extends StatelessWidget {
           children: [
             _buildExpandableSection(
               context: context,
-              initiallyExpanded: false,
               txtCopy: JsonPrettyConverter().convert(request.url),
               titleWidget: _buildRequestNameAndStatus(
                 method: request.requestMethod,
@@ -54,7 +53,6 @@ class RequestDetailsPage extends StatelessWidget {
             if (request.headers != null)
               _buildExpandableSection(
                 context: context,
-                initiallyExpanded: false,
                 txtCopy: JsonPrettyConverter().convert(request.headers),
                 title: 'Headers',
                 children: _buildDataBlock(request.headers,
@@ -63,7 +61,6 @@ class RequestDetailsPage extends StatelessWidget {
             if (request.queryParameters != null)
               _buildExpandableSection(
                 context: context,
-                initiallyExpanded: false,
                 txtCopy: JsonPrettyConverter().convert(request.queryParameters),
                 title: 'Query Parameters',
                 children: _buildDataBlock(request.queryParameters,
@@ -72,7 +69,6 @@ class RequestDetailsPage extends StatelessWidget {
             if (request.requestBody != null)
               _buildExpandableSection(
                 context: context,
-                initiallyExpanded: false,
                 txtCopy: JsonPrettyConverter().convert(request.requestBody),
                 title: 'Request Body',
                 children: _buildDataBlock(request.requestBody,
@@ -98,7 +94,7 @@ class RequestDetailsPage extends StatelessWidget {
     required String txtCopy,
     Widget? titleWidget,
     required List<Widget> children,
-    bool? initiallyExpanded,
+    bool initiallyExpanded = true,
   }) {
     final theme = Theme.of(context);
     final cardColor = theme.cardColor;
@@ -122,7 +118,7 @@ class RequestDetailsPage extends StatelessWidget {
         child: Theme(
           data: theme.copyWith(dividerColor: Colors.transparent),
           child: ExpansionTile(
-            initiallyExpanded: initiallyExpanded ?? true,
+            initiallyExpanded: initiallyExpanded,
             tilePadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             childrenPadding:
