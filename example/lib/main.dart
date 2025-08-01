@@ -33,18 +33,22 @@ Future<List<Post>> fetchPosts() async {
 }
 
 Future<List<Post>> fetchPostsUsingInterceptor() async {
-  final dio = Dio(BaseOptions(validateStatus: (_) => true))
-    ..interceptors.add(RequestsInspectorInterceptor());
-  final params = {'userId': 1};
-  final response = await dio.get(
-    'https://jsonplaceholder.typicode.com/posts',
-    queryParameters: params,
-  );
+ try{
+   final dio = Dio(BaseOptions(validateStatus: (_) => true))
+     ..interceptors.add(RequestsInspectorInterceptor());
+   final params = {'userId': 1};
+   final response = await dio.get(
+     'https://to-deal.code-link.com/api/products',
+     queryParameters: params,
+   );
+   final postsMap = response.data as List;
+   final posts = postsMap.map((postMap) => Post.fromMap(postMap)).toList();
 
-  final postsMap = response.data as List;
-  final posts = postsMap.map((postMap) => Post.fromMap(postMap)).toList();
-
-  return posts;
+   return posts;
+ }catch (e){
+   print(e);
+   return [];
+ }
 }
 
 Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
