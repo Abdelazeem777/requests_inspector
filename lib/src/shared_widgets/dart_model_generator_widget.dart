@@ -17,6 +17,8 @@ class _DartModelGeneratorWidgetState extends State<DartModelGeneratorWidget> {
   String _generatedDartCode = '';
   bool _isGenerating = false;
   String _className = 'MyModel';
+  bool _includeToJson = true;
+  bool _includeCopyWith = true;
   final TextEditingController _classNameController = TextEditingController();
   RequestDetails? _lastSelectedRequest;
 
@@ -65,7 +67,7 @@ class _DartModelGeneratorWidgetState extends State<DartModelGeneratorWidget> {
       }
 
       // Use the advanced ModelGenerator for proper nested object handling
-      final modelGenerator = ModelGenerator(_className);
+      final modelGenerator = ModelGenerator.withOptions(_className, false, _includeToJson, _includeCopyWith);
       final dartCode = modelGenerator.generateDartClasses(jsonString);
 
       setState(() {
@@ -150,6 +152,61 @@ class _DartModelGeneratorWidgetState extends State<DartModelGeneratorWidget> {
               ),
               const SizedBox(height: 16),
 
+              // Method options
+              Wrap(
+                spacing: 8.0,
+                runSpacing: 4.0,
+                children: [
+                  IntrinsicWidth(
+                    child: CheckboxListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      visualDensity: VisualDensity(horizontal: -4),
+                      title: Text(
+                        'toJson()',
+                        style: TextStyle(
+                          color: isDarkMode ? Colors.white : Colors.black,
+                          fontSize: 14,
+                        ),
+                      ),
+                      value: _includeToJson,
+                      onChanged: (value) {
+                        setState(() {
+                          _includeToJson = value ?? true;
+                        });
+                      },
+                      activeColor: isDarkMode ? Colors.blue : Colors.blue,
+                      checkColor: Colors.white,
+                      controlAffinity: ListTileControlAffinity.leading,
+                    ),
+                  ),
+                  IntrinsicWidth(
+                    child: CheckboxListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      visualDensity: VisualDensity(horizontal: -4),
+                      title: Text(
+                        'copyWith()',
+                        style: TextStyle(
+                          color: isDarkMode ? Colors.white : Colors.black,
+                          fontSize: 14,
+                        ),
+                      ),
+                      value: _includeCopyWith,
+                      onChanged: (value) {
+                        setState(() {
+                          _includeCopyWith = value ?? true;
+                        });
+                      },
+                      activeColor: isDarkMode ? Colors.blue : Colors.blue,
+                      checkColor: Colors.white,
+                      controlAffinity: ListTileControlAffinity.leading,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
               // Generated code display
               Expanded(
                 child: Stack(
@@ -194,6 +251,7 @@ class _DartModelGeneratorWidgetState extends State<DartModelGeneratorWidget> {
                               ),
                             ),
                     ),
+                    // Copy button
                     if (_generatedDartCode.isNotEmpty)
                       PositionedDirectional(
                         end: 0,
@@ -221,7 +279,6 @@ class _DartModelGeneratorWidgetState extends State<DartModelGeneratorWidget> {
                 ),
               ),
 
-              // Copy button
             ],
           ),
         );

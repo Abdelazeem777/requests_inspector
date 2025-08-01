@@ -24,11 +24,22 @@ class Hint {
 class ModelGenerator {
   final String _rootClassName;
   final bool _privateFields;
+  final bool _includeToJson;
+  final bool _includeCopyWith;
   List<ClassDefinition> allClasses = <ClassDefinition>[];
   final Map<String, String> sameClassMapping = HashMap<String, String>();
   late List<Hint> hints;
 
-  ModelGenerator(this._rootClassName, [this._privateFields = false, hints]) {
+  ModelGenerator(this._rootClassName, [this._privateFields = false, hints]) 
+      : _includeToJson = true, _includeCopyWith = true {
+    if (hints != null) {
+      this.hints = hints;
+    } else {
+      this.hints = <Hint>[];
+    }
+  }
+
+  ModelGenerator.withOptions(this._rootClassName, this._privateFields, this._includeToJson, this._includeCopyWith, [hints]) {
     if (hints != null) {
       this.hints = hints;
     } else {
@@ -56,7 +67,7 @@ class ModelGenerator {
       final Map<dynamic, dynamic> jsonRawData = jsonRawDynamicData;
       final keys = jsonRawData.keys;
       ClassDefinition classDefinition =
-      ClassDefinition(className, _privateFields);
+      ClassDefinition.withOptions(className, _privateFields, _includeToJson, _includeCopyWith);
       for (var key in keys) {
         TypeDefinition typeDef;
         final hint = _hintForPath('$path/$key');
@@ -81,7 +92,7 @@ class ModelGenerator {
         classDefinition.addField(key, typeDef);
       }
       final similarClass = allClasses.firstWhere((cd) => cd == classDefinition,
-          orElse: () => ClassDefinition(""));
+          orElse: () => ClassDefinition.withOptions("", false, false, false));
       if (similarClass.name != "") {
         final similarClassName = similarClass.name;
         final currentClassName = classDefinition.name;

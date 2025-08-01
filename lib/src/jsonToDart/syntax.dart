@@ -156,6 +156,8 @@ class Dependency {
 class ClassDefinition {
   final String _name;
   final bool _privateFields;
+  final bool _includeToJson;
+  final bool _includeCopyWith;
   final Map<String, TypeDefinition> fields = <String, TypeDefinition>{};
 
   String get name => _name;
@@ -174,7 +176,9 @@ class ClassDefinition {
     return dependenciesList;
   }
 
-  ClassDefinition(this._name, [this._privateFields = false]);
+  ClassDefinition(this._name, [this._privateFields = false]) : _includeToJson = true, _includeCopyWith = true;
+
+  ClassDefinition.withOptions(this._name, this._privateFields, this._includeToJson, this._includeCopyWith);
 
   bool operator(other) {
     if (other is ClassDefinition) {
@@ -371,10 +375,26 @@ class ClassDefinition {
 
   @override
   String toString() {
+    final sb = StringBuffer();
+    sb.write('class $name {\n$_fieldList\n\n');
+
     if (privateFields) {
-      return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithMethod\n}\n';
+      sb.write('$_defaultPrivateConstructor\n\n$_gettersSetters\n\n');
     } else {
-      return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithMethod\n}\n';
+      sb.write('$_defaultConstructor\n\n');
     }
+
+    sb.write('$_jsonParseFunc\n\n');
+
+    if (_includeToJson) {
+      sb.write('$_jsonGenFunc\n\n');
+    }
+
+    if (_includeCopyWith) {
+      sb.write('$_copyWithMethod\n\n');
+    }
+
+    sb.write('}\n');
+    return sb.toString();
   }
 }
