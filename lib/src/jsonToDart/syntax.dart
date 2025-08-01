@@ -322,12 +322,59 @@ class ClassDefinition {
     return sb.toString();
   }
 
+  String get _copyWithMethod {
+    final sb = StringBuffer();
+    sb.write('\t$name copyWith({\n');
+
+    // Add parameters
+    var i = 0;
+    var len = fields.keys.length - 1;
+    for (var key in fields.keys) {
+      final f = fields[key]!;
+      final publicFieldName = fixFieldName(key, typeDef: f, privateField: false);
+      sb.write('\t\t');
+      _addTypeDef(f, sb);
+      sb.write('? $publicFieldName');
+      if (i != len) {
+        sb.write(',');
+      }
+      sb.write('\n');
+      i++;
+    }
+
+    sb.write('\t}) {\n');
+    sb.write('\t\treturn $name(\n');
+
+    // Add constructor arguments
+    i = 0;
+    for (var key in fields.keys) {
+      final f = fields[key]!;
+      final publicFieldName = fixFieldName(key, typeDef: f, privateField: false);
+      final currentFieldName = fixFieldName(key, typeDef: f, privateField: privateFields);
+      sb.write('\t\t\t$publicFieldName: $publicFieldName ?? ');
+      if (privateFields) {
+        sb.write('this.$publicFieldName');
+      } else {
+        sb.write('this.$currentFieldName');
+      }
+      if (i != len) {
+        sb.write(',');
+      }
+      sb.write('\n');
+      i++;
+    }
+
+    sb.write('\t\t);\n');
+    sb.write('\t}');
+    return sb.toString();
+  }
+
   @override
   String toString() {
     if (privateFields) {
-      return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
+      return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithMethod\n}\n';
     } else {
-      return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
+      return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithMethod\n}\n';
     }
   }
 }
