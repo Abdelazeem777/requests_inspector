@@ -8,7 +8,7 @@ homepage: https://github.com/Abdelazeem777/requests_inspector
 # please check this link https://dart.dev/tools/pub/pubspec#screenshots
 
 environment:
-  sdk: ">=2.17.0 <4.0.0"
+  sdk: ">=3.0.0 <4.0.0"
   flutter: ">=1.20.0"
 
 dependencies:
