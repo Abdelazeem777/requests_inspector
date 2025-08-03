@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:requests_inspector/requests_inspector.dart';
 import 'package:graphql/client.dart';
 
+// Fetching methods
 Future<List<Post>> fetchPosts() async {
   final dio = Dio(BaseOptions(validateStatus: (_) => true));
   final params = {'userId': 1};
@@ -47,12 +48,16 @@ Future<List<Post>> fetchPostsUsingInterceptor() async {
     ),
   )..interceptors.add(RequestsInspectorInterceptor());
   final params = {'userId': 1};
+
+  /// Unnecessary FormData, but added for TESTING
+  final formData = await _getDummyFormData(dio);
+
   final response = await dio.get(
     'https://jsonplaceholder.typicode.com/posts',
     queryParameters: params,
+    // The request does no need the body, but added for TESTING
+    data: formData,
   );
-
-  debugPrint("> ${response.data}");
 
   final posts = List.from(response.data).map((e) => Post.fromMap(e)).toList();
 
@@ -83,6 +88,44 @@ Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
   return [post];
 }
 
+/// Unnecessary FormData, but added for TESTING
+Future<FormData> _getDummyFormData(final Dio dio) async {
+  final formData = FormData();
+  formData.fields.addAll(List.generate(4, (i) => MapEntry("test_$i", "$i")));
+  final imageBytes = await _getFlutterImageBytes(dio);
+  if (imageBytes != null) {
+    formData.files.add(
+      MapEntry(
+        'test_image',
+        MultipartFile.fromBytes(
+          imageBytes,
+          filename: "flutter_logo.png",
+          contentType: DioMediaType('image', 'png'),
+        ),
+      ),
+    );
+  }
+  formData.files.add(
+    MapEntry(
+      'test_file',
+      MultipartFile.fromString('test', filename: "test.txt"),
+    ),
+  );
+  return formData;
+}
+
+/// Gets Flutter logo image in bytes from the server
+Future<List<int>?> _getFlutterImageBytes(final Dio dio) async {
+  const imageUrl = "https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png";
+  final imgResp = await dio.get<List<int>>(
+    imageUrl,
+    options: Options(responseType: ResponseType.bytes),
+  );
+
+  return imgResp.data;
+}
+
+// Post model
 class Post {
   final int userId;
   final int id;
@@ -150,6 +193,7 @@ class Post {
   }
 }
 
+// Posts widget
 class PostsListWidget extends StatelessWidget {
   const PostsListWidget({
     Key? key,
