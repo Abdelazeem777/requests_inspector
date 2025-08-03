@@ -1,10 +1,15 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class JsonTreeView extends StatelessWidget {
   final dynamic data;
   final bool _isDarkMode;
-  const JsonTreeView(this.data, {super.key, required bool isDarkMode})
-      : _isDarkMode = isDarkMode;
+
+  const JsonTreeView(
+    this.data, {
+    super.key,
+    required bool isDarkMode,
+  }) : _isDarkMode = isDarkMode;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +28,8 @@ class JsonTreeView extends StatelessWidget {
       content = _buildMapNode(context, node, keyName);
     } else if (node is List) {
       content = _buildListNode(context, node, keyName);
+    } else if (node is FormData) {
+      content = _buildFormDataNode(context, node, keyName);
     } else {
       content = _buildLeafNode(context, keyName, node);
     }
@@ -30,8 +37,7 @@ class JsonTreeView extends StatelessWidget {
     return content;
   }
 
-  Widget _buildMapNode(
-      BuildContext context, Map<String, dynamic> map, String? keyName) {
+  Widget _buildMapNode(BuildContext context, Map<String, dynamic> map, String? keyName) {
     final isEmpty = map.isEmpty;
 
     if (isEmpty) {
@@ -75,6 +81,42 @@ class JsonTreeView extends StatelessWidget {
     );
   }
 
+  // FormData
+  Widget _buildFormDataNode(BuildContext context, FormData formData, String? keyName) {
+    final length = formData.fields.length + formData.files.length;
+    final isEmpty = length == 0;
+
+    if (isEmpty) {
+      return _buildLeafNode(context, keyName, '{}');
+    }
+
+    return _CustomExpansionTile(
+      titleString: keyName != null ? '"$keyName" : ' : '',
+      children: [
+        // fields
+        ...formData.fields.map((e) {
+          return _buildNode(context, e.value, keyName: e.key);
+        }),
+        // files
+        ...formData.files.map((e) {
+          final sizeInMb = e.value.length ~/ 1024;
+          final fileSizeString = '${sizeInMb.toStringAsFixed(1)} kb';
+          // final fileType = e.value.contentType?.type;
+          // final fileTypeString = fileType == null ? '' : "$fileType ";
+          final nodeValue = "($fileSizeString) - ${e.value.filename}";
+
+          return _buildNode(context, nodeValue, keyName: e.key);
+        }),
+
+        _buildClosingBracket(context, '} ,'),
+      ],
+      collapsedCount: length,
+      isObject: true,
+      initiallyExpanded: true,
+      isDarkMode: _isDarkMode,
+    );
+  }
+
   Widget _buildLeafNode(BuildContext context, String? key, dynamic value) {
     String formattedValue;
     Color valueColor;
@@ -90,8 +132,7 @@ class JsonTreeView extends StatelessWidget {
       valueColor = _isDarkMode ? Colors.blue.shade300 : Colors.blue.shade700;
     } else if (value is bool) {
       formattedValue = value.toString();
-      valueColor =
-          _isDarkMode ? Colors.orange.shade300 : Colors.orange.shade700;
+      valueColor = _isDarkMode ? Colors.orange.shade300 : Colors.orange.shade700;
     } else if (value == null) {
       formattedValue = 'null';
       valueColor = _isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600;
@@ -174,8 +215,7 @@ class _CustomExpansionTile extends StatefulWidget {
   State<_CustomExpansionTile> createState() => _CustomExpansionTileState();
 }
 
-class _CustomExpansionTileState extends State<_CustomExpansionTile>
-    with SingleTickerProviderStateMixin {
+class _CustomExpansionTileState extends State<_CustomExpansionTile> with SingleTickerProviderStateMixin {
   late bool _expanded;
 
   @override
@@ -187,11 +227,9 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
   @override
   Widget build(BuildContext context) {
     final textColor = widget.isDarkMode ? Colors.white : Colors.black87;
-    final secondaryTextColor =
-        widget.isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600;
+    final secondaryTextColor = widget.isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600;
 
-    final bool hasTitleString =
-        widget.titleString != null && widget.titleString!.isNotEmpty;
+    final bool hasTitleString = widget.titleString != null && widget.titleString!.isNotEmpty;
 
     return Padding(
       padding: const EdgeInsets.only(left: 0),
