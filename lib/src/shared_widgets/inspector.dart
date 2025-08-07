@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:requests_inspector/src/shared_widgets/request_details_page.dart';
 import 'package:requests_inspector/src/shared_widgets/request_item.dart';
 import 'package:requests_inspector/src/shared_widgets/run_again_widget.dart';
+import 'package:requests_inspector/src/shared_widgets/dart_model_generator_widget.dart';
 import '../../requests_inspector.dart';
 import '../enums/share_type_enum.dart';
 
@@ -260,6 +261,7 @@ class Inspector extends StatelessWidget {
           isDarkMode: isDarkMode,
           isSelected: selectedTab == 0,
           isLeft: true,
+          isMiddle: false,
           onTap: () => InspectorController().selectedTab = 0,
         ),
         _buildTabItem(
@@ -267,7 +269,16 @@ class Inspector extends StatelessWidget {
           isDarkMode: isDarkMode,
           isSelected: selectedTab == 1,
           isLeft: false,
+          isMiddle: true,
           onTap: () => InspectorController().selectedTab = 1,
+        ),
+        _buildTabItem(
+          title: 'Dart Model',
+          isDarkMode: isDarkMode,
+          isSelected: selectedTab == 2,
+          isLeft: false,
+          isMiddle: false,
+          onTap: () => InspectorController().selectedTab = 2,
         ),
       ],
     );
@@ -278,6 +289,7 @@ class Inspector extends StatelessWidget {
     required bool isSelected,
     required bool isDarkMode,
     required bool isLeft,
+    required bool isMiddle,
     required VoidCallback onTap,
   }) {
     return Expanded(
@@ -307,9 +319,16 @@ class Inspector extends StatelessWidget {
 
   Widget _buildSelectedTabBody(
       {required int selectedTab, required bool isDarkMode}) {
-    return selectedTab == 0
-        ? _buildAllRequests(isDarkMode: isDarkMode)
-        : const RequestDetailsPage();
+    switch (selectedTab) {
+      case 0:
+        return _buildAllRequests(isDarkMode: isDarkMode);
+      case 1:
+        return const RequestDetailsPage();
+      case 2:
+        return const Expanded(child: DartModelGeneratorWidget());
+      default:
+        return _buildAllRequests(isDarkMode: isDarkMode);
+    }
   }
 
   Widget _buildAllRequests({required bool isDarkMode}) {

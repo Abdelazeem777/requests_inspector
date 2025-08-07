@@ -145,12 +145,12 @@ class Post {
 final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() => runApp(
-      RequestsInspector(
-        // Add your `navigatorKey` to enable `Stopper` feature
-        navigatorKey: navigatorKey,
-        child: const MyApp(),
-      ),
-    );
+  RequestsInspector(
+    // Add your `navigatorKey` to enable `Stopper` feature
+    navigatorKey: navigatorKey,
+    child: const MyApp(),
+  ),
+);
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -166,7 +166,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     fetchPostsUsingInterceptor().then(
-      (value) => setState(() {
+          (value) => setState(() {
         posts = value;
         isLoading = false;
       }),
@@ -197,7 +197,7 @@ class _MyAppState extends State<MyApp> {
             onTap: () {
               setState(() => isLoading = true);
               fetchPostsUsingInterceptor().then(
-                (value) => setState(() {
+                    (value) => setState(() {
                   posts = value;
                   isLoading = false;
                 }),
@@ -213,7 +213,7 @@ class _MyAppState extends State<MyApp> {
               return PostsListWidget(
                 postsList: posts,
                 onRefresh: () => fetchPostsUsingInterceptor().then(
-                  (value) => setState(() => posts = value),
+                      (value) => setState(() => posts = value),
                 ),
               );
             }
