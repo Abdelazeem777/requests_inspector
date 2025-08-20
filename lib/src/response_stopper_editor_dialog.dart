@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:requests_inspector/src/json_pretty_converter.dart';
+import 'response_details.dart';
 
 import 'shared_widgets/inspector_dialog_text_field.dart';
 
 class ResponseStopperEditorDialog extends StatefulWidget {
-  const ResponseStopperEditorDialog({super.key, required responseData})
-      : _responseData = responseData;
+  const ResponseStopperEditorDialog({
+    super.key,
+    required this.responseDetails,
+  });
 
-  final _responseData;
+  final ResponseDetails responseDetails;
 
   @override
   State<ResponseStopperEditorDialog> createState() =>
@@ -16,12 +20,12 @@ class ResponseStopperEditorDialog extends StatefulWidget {
 
 class _ResponseStopperEditorDialogState
     extends State<ResponseStopperEditorDialog> {
-  late dynamic _newResponseData;
+  late ResponseDetails _newResponseDetails;
 
   @override
   void initState() {
     super.initState();
-    _newResponseData = widget._responseData;
+    _newResponseDetails = widget.responseDetails.copyWith();
   }
 
   @override
@@ -54,7 +58,7 @@ class _ResponseStopperEditorDialogState
                         ElevatedButton.styleFrom(foregroundColor: Colors.white),
                     child: const Text('Receive'),
                     onPressed: () =>
-                        Navigator.of(context).pop(_newResponseData),
+                        Navigator.of(context).pop(_newResponseDetails),
                   ),
                 ),
               ],
@@ -66,7 +70,8 @@ class _ResponseStopperEditorDialogState
   }
 
   Widget _buildBody(BuildContext context) {
-    final responseDataType = _newResponseData.runtimeType.toString();
+    final responseDataType =
+        _newResponseDetails.responseBody.runtimeType.toString();
     return Scrollbar(
       trackVisibility: true,
       thumbVisibility: true,
@@ -74,16 +79,90 @@ class _ResponseStopperEditorDialogState
         shrinkWrap: true,
         padding: const EdgeInsets.all(16.0),
         children: [
-          const Text('Response Body: '),
-          const SizedBox(height: 4.0),
-          InspectorDialogTextField(
-            text: JsonPrettyConverter().convert(_newResponseData),
-            onChanged: (value) => _newResponseData =
-                JsonPrettyConverter().deconvertFrom(value, responseDataType),
-          ),
+          _buildStatusCodeField(),
+          const SizedBox(height: 16.0),
+          _buildResponseBodyField(responseDataType),
+          const SizedBox(height: 16.0),
+          _buildHeadersField(),
           const SizedBox(height: 8.0),
         ],
       ),
+    );
+  }
+
+  Widget _buildStatusCodeField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Status Code: '),
+        const SizedBox(height: 4.0),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4.0),
+            color: const Color.fromARGB(255, 19, 19, 19),
+            border: Border.all(color: Colors.grey[600]!),
+          ),
+          child: TextFormField(
+            initialValue: _newResponseDetails.statusCode.toString(),
+            style: const TextStyle(color: Colors.white),
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(3),
+            ],
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              contentPadding:
+                  EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              hintText: '200',
+              hintStyle: TextStyle(color: Colors.grey),
+            ),
+            onChanged: (value) {
+              final statusCode = int.tryParse(value) ?? 200;
+              _newResponseDetails =
+                  _newResponseDetails.copyWith(statusCode: statusCode);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeadersField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Response Headers: '),
+        const SizedBox(height: 4.0),
+        InspectorDialogTextField(
+          text: JsonPrettyConverter().convert(_newResponseDetails.headers),
+          onChanged: (value) =>
+              _newResponseDetails = _newResponseDetails.copyWith(
+            headers: JsonPrettyConverter().deconvertFrom(
+              value,
+              _newResponseDetails.headers.runtimeType.toString(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildResponseBodyField(String responseDataType) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Response Body: '),
+        const SizedBox(height: 4.0),
+        InspectorDialogTextField(
+          text: JsonPrettyConverter().convert(_newResponseDetails.responseBody),
+          onChanged: (value) =>
+              _newResponseDetails = _newResponseDetails.copyWith(
+            responseBody:
+                JsonPrettyConverter().deconvertFrom(value, responseDataType),
+          ),
+        ),
+      ],
     );
   }
 }

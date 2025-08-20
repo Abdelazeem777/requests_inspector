@@ -1,3 +1,7 @@
+## 5.0.3
+
+- Add status code and headers input fields in `Responses Stopper` Dialog.
+
 ## 5.0.2
 
 - Set `initiallyExpanded` to `true` by default.

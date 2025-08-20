@@ -11,7 +11,8 @@ import 'enums/share_type_enum.dart';
 typedef StoppingRequestCallback = Future<RequestDetails?> Function(
     RequestDetails requestDetails);
 
-typedef StoppingResponseCallback = Future Function(dynamic responseData);
+typedef StoppingResponseCallback = Future<ResponseDetails?> Function(
+    ResponseDetails responseDetails);
 
 ///Singleton
 class InspectorController extends ChangeNotifier {
@@ -209,15 +210,16 @@ class InspectorController extends ChangeNotifier {
     return _onStoppingRequest!(requestDetails);
   }
 
-  Future editResponse(responseData) {
+  Future<ResponseDetails?> editResponse(ResponseDetails responseDetails) {
     if (!_enabled || _onStoppingResponse == null) return Future.value(null);
 
-    if (!['Map', 'String', 'List'].any((e) => responseData.runtimeType
+    if (!['Map', 'String', 'List'].any((e) => responseDetails
+        .responseBody.runtimeType
         .toString()
         .replaceFirst('_', '')
         .startsWith(e))) return Future.value(null);
 
-    return _onStoppingResponse!(responseData);
+    return _onStoppingResponse!(responseDetails);
   }
 
   void toggleInspectorTheme() {
