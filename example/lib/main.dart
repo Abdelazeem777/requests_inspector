@@ -178,7 +178,7 @@ Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
 /// Unnecessary FormData, but added for TESTING
 Future<FormData> _getDummyFormData(final Dio dio) async {
   final formData = FormData();
-  formData.fields.addAll(List.generate(4, (i) => MapEntry("test_$i", "$i")));
+  formData.fields.addAll(List.generate(4, (i) => MapEntry("test[$i]", "$i")));
   final imageBytes = await _getFlutterImageBytes(dio);
   if (imageBytes != null) {
     formData.files.add(
