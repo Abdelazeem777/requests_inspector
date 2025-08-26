@@ -74,11 +74,14 @@ class CurlCommandGenerator {
       StringBuffer paramString = StringBuffer("?");
       details.queryParameters.forEach((key, value) {
         paramString.write(
-            "${Uri.encodeQueryComponent(key)}=${Uri.encodeQueryComponent(value.toString())}&");
+          "${Uri.encodeQueryComponent(key)}=${Uri.encodeQueryComponent(value.toString())}&",
+        );
       });
       String paramStringFinal = paramString.toString();
       paramStringFinal = paramStringFinal.substring(
-          0, paramStringFinal.length - 1); // remove last &
+        0,
+        paramStringFinal.length - 1,
+      ); // remove last &
       curlCommand.write(paramStringFinal);
     }
 
@@ -87,18 +90,22 @@ class CurlCommandGenerator {
 
   void _addRequestBody(StringBuffer curlCommand) {
     if (details.requestBody != null) {
-      String contentType = details.headers?['content-type'] ??
+      String contentType =
+          details.headers?['content-type'] ??
           details.headers?['Content-Type'] ??
           '';
       if (contentType.contains('application/x-www-form-urlencoded')) {
         StringBuffer bodyBuffer = StringBuffer();
         (details.requestBody as Map).forEach((key, value) {
           bodyBuffer.write(
-              "${Uri.encodeQueryComponent(key)}=${Uri.encodeQueryComponent(value.toString())}&");
+            "${Uri.encodeQueryComponent(key)}=${Uri.encodeQueryComponent(value.toString())}&",
+          );
         });
         String bodyString = bodyBuffer.toString();
-        bodyString =
-            bodyString.substring(0, bodyString.length - 1); // Remove last &
+        bodyString = bodyString.substring(
+          0,
+          bodyString.length - 1,
+        ); // Remove last &
         curlCommand.write("-d '$bodyString' ");
       } else if (contentType.contains('multipart/form-data')) {
         if (details.requestBody is FormData) {

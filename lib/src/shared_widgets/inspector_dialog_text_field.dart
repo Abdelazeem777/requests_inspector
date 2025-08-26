@@ -16,9 +16,7 @@ class InspectorDialogTextField extends StatelessWidget {
       decoration: const InputDecoration(
         filled: true,
         fillColor: Color.fromARGB(255, 19, 19, 19),
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-        ),
+        border: OutlineInputBorder(borderSide: BorderSide.none),
       ),
       maxLines: null,
       minLines: 2,

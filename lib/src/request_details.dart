@@ -127,8 +127,9 @@ class RequestDetails {
   factory RequestDetails.fromMap(Map<String, dynamic> map) {
     return RequestDetails(
       requestName: map['requestName'],
-      requestMethod: RequestMethod.values
-          .firstWhere((e) => e.name == map['requestMethod']),
+      requestMethod: RequestMethod.values.firstWhere(
+        (e) => e.name == map['requestMethod'],
+      ),
       url: map['url'] as String,
       statusCode: map['statusCode'] != null ? map['statusCode'] as int : null,
       headers: map['headers'] as dynamic,
