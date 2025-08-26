@@ -2,17 +2,16 @@ import 'package:example/posts_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:requests_inspector/requests_inspector.dart';
 
-
 final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() {
   runApp(
-      RequestsInspector(
-        // Add your `navigatorKey` to enable `Stopper` feature
-        navigatorKey: navigatorKey,
-        child: const MyApp(),
-      ),
-    );
+    RequestsInspector(
+      // Add your `navigatorKey` to enable `Stopper` feature
+      navigatorKey: navigatorKey,
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -34,7 +33,8 @@ class _MyAppState extends State<MyApp> {
         isLoading = false;
       }),
     );
-    /*for restful apis Interceptor example use => fetchPostsUsingInterceptor() */;
+    /*for restful apis Interceptor example use => fetchPostsUsingInterceptor() */
+    ;
     // fetchPostsGraphQlUsingGraphQLFlutterInterceptor() /*for graph ql Interceptor example */;
     super.initState();
   }
@@ -45,10 +45,7 @@ class _MyAppState extends State<MyApp> {
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'Fetch Data Example',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: false,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: false),
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Fetch Data Example'),

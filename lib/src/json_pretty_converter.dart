@@ -31,7 +31,7 @@ class JsonPrettyConverter {
   String _convertToPrettyFromFormData(FormData text) {
     final map = {
       for (final e in text.fields) e.key: e.value,
-      for (final e in text.files) e.key: e.value.filename
+      for (final e in text.files) e.key: e.value.filename,
     };
 
     return _convertToPrettyJsonFromMapOrJson(map);
@@ -45,7 +45,7 @@ class JsonPrettyConverter {
         if (e.value is Map || e.value is List || e.value is String)
           e.key: e.value
         else
-          e.key: convert(e.value)
+          e.key: convert(e.value),
     };
     return _encoder.convert(text);
   }

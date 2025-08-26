@@ -5,15 +5,18 @@ import '../requests_inspector.dart';
 class RequestsInspectorInterceptor extends Interceptor {
   @override
   Future<void> onRequest(
-      RequestOptions options, RequestInterceptorHandler handler) async {
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     options.extra['startTime'] = DateTime.now();
 
     if (!InspectorController().requestStopperEnabled)
       return super.onRequest(options, handler);
 
     final requestDetails = _convertToRequestDetails(options);
-    final newRequestDetails =
-        await InspectorController().editRequest(requestDetails);
+    final newRequestDetails = await InspectorController().editRequest(
+      requestDetails,
+    );
 
     if (newRequestDetails == null) return super.onRequest(options, handler);
 
@@ -23,14 +26,17 @@ class RequestsInspectorInterceptor extends Interceptor {
 
   @override
   Future<void> onResponse(
-      Response response, ResponseInterceptorHandler handler) async {
+    Response response,
+    ResponseInterceptorHandler handler,
+  ) async {
     final dateTime = DateTime.now();
 
     if (InspectorController().responseStopperEnabled) {
       final oldResponseData = response.data;
 
-      final newResponseData =
-          await InspectorController().editResponse(oldResponseData);
+      final newResponseData = await InspectorController().editResponse(
+        oldResponseData,
+      );
 
       response.data = newResponseData ?? oldResponseData;
     }
@@ -40,8 +46,9 @@ class RequestsInspectorInterceptor extends Interceptor {
     final queryParameters = urlAndQueryParMapEntry.value;
     InspectorController().addNewRequest(
       RequestDetails(
-        requestMethod: RequestMethod.values
-            .firstWhere((e) => e.name == response.requestOptions.method),
+        requestMethod: RequestMethod.values.firstWhere(
+          (e) => e.name == response.requestOptions.method,
+        ),
         url: url,
         statusCode: response.statusCode ?? 0,
         headers: response.requestOptions.headers,
@@ -62,8 +69,9 @@ class RequestsInspectorInterceptor extends Interceptor {
     final queryParameters = urlAndQueryParMapEntry.value;
     InspectorController().addNewRequest(
       RequestDetails(
-        requestMethod: RequestMethod.values
-            .firstWhere((e) => e.name == err.requestOptions.method),
+        requestMethod: RequestMethod.values.firstWhere(
+          (e) => e.name == err.requestOptions.method,
+        ),
         url: url,
         headers: err.requestOptions.headers,
         queryParameters: queryParameters,
@@ -91,7 +99,7 @@ class RequestsInspectorInterceptor extends Interceptor {
         : Map.fromEntries(buildInQueryParamsList);
     final queryParameters = {
       ...?builtInQueryParams,
-      ...requestOptions.queryParameters
+      ...requestOptions.queryParameters,
     };
 
     return MapEntry(baseUrl, queryParameters);
@@ -99,8 +107,9 @@ class RequestsInspectorInterceptor extends Interceptor {
 
   RequestDetails _convertToRequestDetails(RequestOptions options) =>
       RequestDetails(
-        requestMethod:
-            RequestMethod.values.firstWhere((e) => e.name == options.method),
+        requestMethod: RequestMethod.values.firstWhere(
+          (e) => e.name == options.method,
+        ),
         url: options.uri.toString(),
         headers: options.headers,
         queryParameters: options.queryParameters,
@@ -109,13 +118,14 @@ class RequestsInspectorInterceptor extends Interceptor {
       );
 
   RequestOptions _copyRequestToNewOptions(
-          RequestOptions options, RequestDetails requestDetails) =>
-      options.copyWith(
-        method: requestDetails.requestMethod.name,
-        headers: requestDetails.headers,
-        queryParameters: requestDetails.queryParameters,
-        data: requestDetails.requestBody,
-        path: requestDetails.url,
-        extra: {...options.extra, 'startTime': DateTime.now()},
-      );
+    RequestOptions options,
+    RequestDetails requestDetails,
+  ) => options.copyWith(
+    method: requestDetails.requestMethod.name,
+    headers: requestDetails.headers,
+    queryParameters: requestDetails.queryParameters,
+    data: requestDetails.requestBody,
+    path: requestDetails.url,
+    extra: {...options.extra, 'startTime': DateTime.now()},
+  );
 }

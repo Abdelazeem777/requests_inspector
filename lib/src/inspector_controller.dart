@@ -8,8 +8,8 @@ import 'curl_command_generator.dart';
 import 'json_pretty_converter.dart';
 import 'enums/share_type_enum.dart';
 
-typedef StoppingRequestCallback = Future<RequestDetails?> Function(
-    RequestDetails requestDetails);
+typedef StoppingRequestCallback =
+    Future<RequestDetails?> Function(RequestDetails requestDetails);
 
 typedef StoppingResponseCallback = Future Function(dynamic responseData);
 
@@ -20,23 +20,22 @@ class InspectorController extends ChangeNotifier {
     ShowInspectorOn showInspectorOn = ShowInspectorOn.Shaking,
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
-  }) =>
-      _singleton ??= InspectorController._internal(
-        enabled: enabled,
-        showInspectorOn: showInspectorOn,
-        onStoppingRequest: onStoppingRequest,
-        onStoppingResponse: onStoppingResponse,
-      );
+  }) => _singleton ??= InspectorController._internal(
+    enabled: enabled,
+    showInspectorOn: showInspectorOn,
+    onStoppingRequest: onStoppingRequest,
+    onStoppingResponse: onStoppingResponse,
+  );
 
   InspectorController._internal({
     required bool enabled,
     required ShowInspectorOn showInspectorOn,
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
-  })  : _enabled = enabled,
-        _showInspectorOn = showInspectorOn,
-        _onStoppingRequest = onStoppingRequest,
-        _onStoppingResponse = onStoppingResponse {
+  }) : _enabled = enabled,
+       _showInspectorOn = showInspectorOn,
+       _onStoppingRequest = onStoppingRequest,
+       _onStoppingResponse = onStoppingResponse {
     if (_enabled && _allowShaking)
       _shakeDetector = ShakeDetector.autoStart(
         onPhoneShake: showInspector,
@@ -84,9 +83,9 @@ class InspectorController extends ChangeNotifier {
   RequestDetails? get selectedRequest => _selectedRequest;
 
   bool get _allowShaking => [
-        ShowInspectorOn.Shaking,
-        ShowInspectorOn.Both,
-      ].contains(_showInspectorOn);
+    ShowInspectorOn.Shaking,
+    ShowInspectorOn.Both,
+  ].contains(_showInspectorOn);
 
   set selectedTab(int value) {
     if (_selectedTab == value) return;
@@ -178,10 +177,7 @@ class InspectorController extends ChangeNotifier {
           '================[cURL Command]=================\n$curlContent\n\n==================[Normal Log]===================\n$normalLogContent';
     }
 
-    Share.share(
-      requestShareContent,
-      sharePositionOrigin: sharePositionOrigin,
-    );
+    Share.share(requestShareContent, sharePositionOrigin: sharePositionOrigin);
   }
 
   @override
@@ -212,10 +208,13 @@ class InspectorController extends ChangeNotifier {
   Future editResponse(responseData) {
     if (!_enabled || _onStoppingResponse == null) return Future.value(null);
 
-    if (!['Map', 'String', 'List'].any((e) => responseData.runtimeType
-        .toString()
-        .replaceFirst('_', '')
-        .startsWith(e))) return Future.value(null);
+    if (!['Map', 'String', 'List'].any(
+      (e) => responseData.runtimeType
+          .toString()
+          .replaceFirst('_', '')
+          .startsWith(e),
+    ))
+      return Future.value(null);
 
     return _onStoppingResponse!(responseData);
   }

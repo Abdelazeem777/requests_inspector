@@ -40,7 +40,8 @@ Future<List<Post>> fetchPostsUsingInterceptor() async {
       validateStatus: (_) => true,
       // Headers added to bypass CloudFlare protection
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+        'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
             '(KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
         'Accept': 'application/json, text/plain, */*',
         'Accept-Language': 'en-US,en;q=0.9',
@@ -116,7 +117,8 @@ Future<FormData> _getDummyFormData(final Dio dio) async {
 
 /// Gets Flutter logo image in bytes from the server
 Future<List<int>?> _getFlutterImageBytes(final Dio dio) async {
-  const imageUrl = "https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png";
+  const imageUrl =
+      "https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png";
   final imgResp = await dio.get<List<int>>(
     imageUrl,
     options: Options(responseType: ResponseType.bytes),
@@ -139,12 +141,7 @@ class Post {
     required this.body,
   });
 
-  Post copyWith({
-    int? userId,
-    int? id,
-    String? title,
-    String? body,
-  }) {
+  Post copyWith({int? userId, int? id, String? title, String? body}) {
     return Post(
       userId: userId ?? this.userId,
       id: id ?? this.id,
@@ -154,12 +151,7 @@ class Post {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'userId': userId,
-      'id': id,
-      'title': title,
-      'body': body,
-    };
+    return {'userId': userId, 'id': id, 'title': title, 'body': body};
   }
 
   factory Post.fromMap(Map<String, dynamic> map) {
@@ -184,7 +176,11 @@ class Post {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is Post && other.userId == userId && other.id == id && other.title == title && other.body == body;
+    return other is Post &&
+        other.userId == userId &&
+        other.id == id &&
+        other.title == title &&
+        other.body == body;
   }
 
   @override
@@ -213,16 +209,15 @@ class PostsListWidget extends StatelessWidget {
         shrinkWrap: true,
         physics: const AlwaysScrollableScrollPhysics(),
         itemCount: postsList.length,
-        itemBuilder: (context, index) => _PostItemBuilder(post: postsList[index]),
+        itemBuilder: (context, index) =>
+            _PostItemBuilder(post: postsList[index]),
       ),
     );
   }
 }
 
 class _PostItemBuilder extends StatelessWidget {
-  const _PostItemBuilder({
-    required this.post,
-  });
+  const _PostItemBuilder({required this.post});
 
   final Post post;
 

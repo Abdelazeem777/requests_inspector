@@ -7,10 +7,8 @@ import '../../requests_inspector.dart';
 import '../enums/share_type_enum.dart';
 
 class Inspector extends StatelessWidget {
-  const Inspector({
-    super.key,
-    GlobalKey<NavigatorState>? navigatorKey,
-  }) : _navigatorKey = navigatorKey;
+  const Inspector({super.key, GlobalKey<NavigatorState>? navigatorKey})
+    : _navigatorKey = navigatorKey;
 
   final GlobalKey<NavigatorState>? _navigatorKey;
 
@@ -24,9 +22,7 @@ class Inspector extends StatelessWidget {
         return MaterialApp(
           theme: isDarkMode
               ? ThemeData.dark().copyWith(
-                  colorScheme: ColorScheme.dark(
-                    primary: Colors.grey[800]!,
-                  ),
+                  colorScheme: ColorScheme.dark(primary: Colors.grey[800]!),
                 )
               : ThemeData.light(),
           home: Scaffold(
@@ -62,9 +58,7 @@ class Inspector extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildActions(
-    bool isDarkMode,
-  ) {
+  List<Widget> _buildActions(bool isDarkMode) {
     return [
       Selector<InspectorController, int>(
         selector: (_, c) => c.selectedTab,
@@ -86,7 +80,8 @@ class Inspector extends StatelessWidget {
                     )
                   : RunAgainButton(
                       key: ValueKey(
-                          InspectorController().selectedRequest.hashCode),
+                        InspectorController().selectedRequest.hashCode,
+                      ),
                       onTap: InspectorController().runAgain,
                       isDarkMode: isDarkMode,
                     ),
@@ -102,8 +97,10 @@ class Inspector extends StatelessWidget {
     return PopupMenuButton(
       icon: Selector<InspectorController, bool>(
         selector: (_, controller) => controller.isDarkMode,
-        builder: (context, isDarkMode, __) => Icon(Icons.more_vert,
-            color: isDarkMode ? Colors.white : Colors.black87),
+        builder: (context, isDarkMode, __) => Icon(
+          Icons.more_vert,
+          color: isDarkMode ? Colors.white : Colors.black87,
+        ),
       ),
       itemBuilder: (context) => [
         // Dark Mode Toggle
@@ -112,8 +109,10 @@ class Inspector extends StatelessWidget {
           child: InkWell(
             onTap: InspectorController().toggleInspectorTheme,
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -143,8 +142,10 @@ class Inspector extends StatelessWidget {
           child: InkWell(
             onTap: InspectorController().toggleInspectorJsonView,
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -177,8 +178,10 @@ class Inspector extends StatelessWidget {
                   !InspectorController().requestStopperEnabled,
               child: Padding(
                 // Add padding back for content
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -210,8 +213,10 @@ class Inspector extends StatelessWidget {
                   !InspectorController().responseStopperEnabled,
               child: Padding(
                 // Add padding back for content
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -225,8 +230,9 @@ class Inspector extends StatelessWidget {
                         activeTrackColor: Colors.grey[700],
                         inactiveThumbColor: Colors.white,
                         inactiveTrackColor: Colors.grey[700],
-                        onChanged: (value) => InspectorController()
-                            .responseStopperEnabled = value,
+                        onChanged: (value) =>
+                            InspectorController().responseStopperEnabled =
+                                value,
                       ),
                     ),
                   ],
@@ -245,7 +251,9 @@ class Inspector extends StatelessWidget {
         children: [
           _buildTabBar(isDarkMode: isDarkMode, selectedTab: selectedTab),
           _buildSelectedTabBody(
-              isDarkMode: isDarkMode, selectedTab: selectedTab),
+            isDarkMode: isDarkMode,
+            selectedTab: selectedTab,
+          ),
         ],
       ),
     );
@@ -305,8 +313,10 @@ class Inspector extends StatelessWidget {
     );
   }
 
-  Widget _buildSelectedTabBody(
-      {required int selectedTab, required bool isDarkMode}) {
+  Widget _buildSelectedTabBody({
+    required int selectedTab,
+    required bool isDarkMode,
+  }) {
     return selectedTab == 0
         ? _buildAllRequests(isDarkMode: isDarkMode)
         : const RequestDetailsPage();
@@ -323,7 +333,9 @@ class Inspector extends StatelessWidget {
                 selector: (_, controller) => controller.selectedRequest,
                 builder: (context, selectedRequest, _) => ListView.separated(
                   padding: const EdgeInsets.symmetric(
-                      vertical: 6.0, horizontal: 6.0),
+                    vertical: 6.0,
+                    horizontal: 6.0,
+                  ),
                   separatorBuilder: (_, __) => const SizedBox(height: 6.0),
                   itemCount: allRequests.length,
                   itemBuilder: (context, index) {
@@ -351,14 +363,12 @@ class Inspector extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Are you sure? 🤔'),
-        content:
-            const Text('This will clear all requests added to the inspector'),
+        content: const Text(
+          'This will clear all requests added to the inspector',
+        ),
         actions: [
           TextButton(
-            child: const Text(
-              'Yes',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Yes', style: TextStyle(color: Colors.red)),
             onPressed: () {
               Navigator.of(context).pop();
               onYes();
@@ -389,8 +399,9 @@ class Inspector extends StatelessWidget {
                 final selectedRequest = InspectorController().selectedRequest!;
                 final isHttp = _isHttp(selectedRequest);
 
-                final shareType =
-                    isHttp ? await _showDialogShareType(context) : null;
+                final shareType = isHttp
+                    ? await _showDialogShareType(context)
+                    : null;
 
                 if (shareType == null) return;
 
@@ -400,7 +411,8 @@ class Inspector extends StatelessWidget {
                       : box.localToGlobal(Offset.zero) & box.size,
                   shareType: shareType,
                 );
-              })
+              },
+            )
           : const SizedBox(),
     );
   }
@@ -419,7 +431,8 @@ class Inspector extends StatelessWidget {
       builder: (context) => AlertDialog(
         title: const Text('Normal Log or cURL command? 🤔'),
         content: const Text(
-            'The cURL command is more useful for exporting to Postman or run it again from terminal'),
+          'The cURL command is more useful for exporting to Postman or run it again from terminal',
+        ),
         actions: [
           TextButton(
             child: const Text(
@@ -437,10 +450,7 @@ class Inspector extends StatelessWidget {
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(ShareType.Both),
-            child: const Text(
-              'Both',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: const Text('Both', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

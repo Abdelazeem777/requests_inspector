@@ -5,7 +5,7 @@ import 'shared_widgets/inspector_dialog_text_field.dart';
 
 class ResponseStopperEditorDialog extends StatefulWidget {
   const ResponseStopperEditorDialog({super.key, required responseData})
-      : _responseData = responseData;
+    : _responseData = responseData;
 
   final _responseData;
 
@@ -50,8 +50,9 @@ class _ResponseStopperEditorDialogState
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
-                    style:
-                        ElevatedButton.styleFrom(foregroundColor: Colors.white),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                    ),
                     child: const Text('Receive'),
                     onPressed: () =>
                         Navigator.of(context).pop(_newResponseData),
@@ -78,8 +79,8 @@ class _ResponseStopperEditorDialogState
           const SizedBox(height: 4.0),
           InspectorDialogTextField(
             text: JsonPrettyConverter().convert(_newResponseData),
-            onChanged: (value) => _newResponseData =
-                JsonPrettyConverter().deconvertFrom(value, responseDataType),
+            onChanged: (value) => _newResponseData = JsonPrettyConverter()
+                .deconvertFrom(value, responseDataType),
           ),
           const SizedBox(height: 8.0),
         ],
