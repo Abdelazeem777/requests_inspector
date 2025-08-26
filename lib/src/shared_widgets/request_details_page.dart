@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
@@ -76,7 +77,7 @@ class RequestDetailsPage extends StatelessWidget {
               _buildExpandableSection(
                 context: context,
                 txtCopy: JsonPrettyConverter().convert(request.requestBody),
-                title: 'Request Body',
+                title: 'Request Body${request.requestBody is FormData ? " (Form Data)" : ""}',
                 children: _buildDataBlock(
                   request.requestBody,
                   isTreeView: isTreeView,
