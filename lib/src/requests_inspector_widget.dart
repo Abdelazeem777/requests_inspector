@@ -45,9 +45,10 @@ class RequestsInspector extends StatelessWidget {
                 context,
                 requestDetails: requestDetails,
               ),
-              onStoppingResponse: (responseData) => _showResponseEditorDialog(
+              onStoppingResponse: (responseDetails) =>
+                  _showResponseEditorDialog(
                 context,
-                responseData: responseData,
+                responseDetails: responseDetails,
               ),
             ),
             lazy: false,
@@ -100,16 +101,16 @@ class RequestsInspector extends StatelessWidget {
     );
   }
 
-  Future _showResponseEditorDialog(
+  Future<ResponseDetails?> _showResponseEditorDialog(
     BuildContext context, {
-    required responseData,
+    required ResponseDetails responseDetails,
   }) {
     if (_navigatorKey?.currentContext == null) return Future.value(null);
 
-    return showDialog(
+    return showDialog<ResponseDetails>(
       context: _navigatorKey!.currentContext!,
       builder: (context) =>
-          ResponseStopperEditorDialog(responseData: responseData),
+          ResponseStopperEditorDialog(responseDetails: responseDetails),
     );
   }
 }

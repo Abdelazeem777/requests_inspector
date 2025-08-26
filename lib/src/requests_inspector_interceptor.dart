@@ -32,13 +32,29 @@ class RequestsInspectorInterceptor extends Interceptor {
     final dateTime = DateTime.now();
 
     if (InspectorController().responseStopperEnabled) {
-      final oldResponseData = response.data;
+      final oldResponseData = ResponseDetails(
+        statusCode: response.statusCode ?? 0,
+        headers: response.headers.map,
+        responseBody: response.data,
+      );
 
       final newResponseData = await InspectorController().editResponse(
         oldResponseData,
       );
 
-      response.data = newResponseData ?? oldResponseData;
+      if (newResponseData != null) {
+        response.data = newResponseData.responseBody;
+        response.statusCode = newResponseData.statusCode;
+        // Update headers if they were modified
+        if (newResponseData.headers != null) {
+          response.headers.clear();
+          if (newResponseData.headers is Map) {
+            (newResponseData.headers as Map).forEach((key, value) {
+              response.headers.add(key.toString(), value.toString());
+            });
+          }
+        }
+      }
     }
 
     final urlAndQueryParMapEntry = _extractUrl(response.requestOptions);
@@ -73,6 +89,7 @@ class RequestsInspectorInterceptor extends Interceptor {
           (e) => e.name == err.requestOptions.method,
         ),
         url: url,
+        statusCode: err.response?.statusCode ?? 0,
         headers: err.requestOptions.headers,
         queryParameters: queryParameters,
         requestBody: err.requestOptions.data,
