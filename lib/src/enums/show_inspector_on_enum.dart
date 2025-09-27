@@ -1,5 +1,1 @@
-enum ShowInspectorOn {
-  LongPress,
-  Shaking,
-  Both,
-}
+enum ShowInspectorOn { LongPress, Shaking, Both }

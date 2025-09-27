@@ -10,10 +10,10 @@ class RequestItemWidget extends StatelessWidget {
     required bool isSelected,
     required bool isDarkMode,
     required void Function(BuildContext context, RequestDetails request) onTap,
-  })  : _request = request,
-        _isSelected = isSelected,
-        _isDarkMode = isDarkMode,
-        _onTap = onTap;
+  }) : _request = request,
+       _isSelected = isSelected,
+       _isDarkMode = isDarkMode,
+       _onTap = onTap;
 
   final RequestDetails _request;
   final bool _isSelected;
@@ -30,15 +30,14 @@ class RequestItemWidget extends StatelessWidget {
         children: [
           Text(
             _request.requestMethod.name,
-            style: const TextStyle(
-              fontSize: 18.0,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
           ),
           Text(
             _request.receivedTime != null
                 ? InspectorHelper.calculateDuration(
-                    _request.sentTime, _request.receivedTime!)
+                    _request.sentTime,
+                    _request.receivedTime!,
+                  )
                 : InspectorHelper.extractTimeText(_request.sentTime),
             style: TextStyle(color: Colors.grey[800]),
           ),
@@ -48,10 +47,7 @@ class RequestItemWidget extends StatelessWidget {
       subtitle: Text(_request.url),
       trailing: Text(
         _request.statusCode?.toString() ?? 'Err',
-        style: const TextStyle(
-          fontSize: 16.0,
-          fontWeight: FontWeight.bold,
-        ),
+        style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
       ),
       // Pass the current context and the request to the onTap callback
       onTap: () => _onTap(context, _request),

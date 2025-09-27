@@ -23,9 +23,10 @@ class _RunAgainButtonState extends State<RunAgainButton> {
     return _isLoading
         ? const Center(
             child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CircularProgressIndicator(color: Colors.white),
-          ))
+              padding: EdgeInsets.all(8.0),
+              child: CircularProgressIndicator(color: Colors.white),
+            ),
+          )
         : InkWell(
             onTap: () {
               _setBusy();
@@ -34,12 +35,16 @@ class _RunAgainButtonState extends State<RunAgainButton> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Run',
-                    style: TextStyle(
-                        color:
-                            widget.isDarkMode ? Colors.white : Colors.black87)),
-                Icon(Icons.play_arrow,
-                    color: widget.isDarkMode ? Colors.white : Colors.black87),
+                Text(
+                  'Run',
+                  style: TextStyle(
+                    color: widget.isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                ),
+                Icon(
+                  Icons.play_arrow,
+                  color: widget.isDarkMode ? Colors.white : Colors.black87,
+                ),
               ],
             ),
           );
