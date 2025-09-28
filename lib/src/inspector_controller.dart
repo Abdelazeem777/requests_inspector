@@ -19,23 +19,31 @@ class InspectorController extends ChangeNotifier {
   factory InspectorController({
     bool enabled = false,
     ShowInspectorOn showInspectorOn = ShowInspectorOn.Shaking,
+    bool defaultTreeViewEnabled = true,
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
-  }) =>
-      _singleton ??= InspectorController._internal(
-        enabled: enabled,
-        showInspectorOn: showInspectorOn,
-        onStoppingRequest: onStoppingRequest,
-        onStoppingResponse: onStoppingResponse,
-      );
+  }) {
+    if (_singleton != null) {
+      return _singleton!;
+    }
+    return _singleton = InspectorController._internal(
+      enabled: enabled,
+      showInspectorOn: showInspectorOn,
+      defaultTreeViewEnabled: defaultTreeViewEnabled,
+      onStoppingRequest: onStoppingRequest,
+      onStoppingResponse: onStoppingResponse,
+    );
+  }
 
   InspectorController._internal({
     required bool enabled,
     required ShowInspectorOn showInspectorOn,
+    required bool defaultTreeViewEnabled,
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
   })  : _enabled = enabled,
         _showInspectorOn = showInspectorOn,
+        _isTreeView = defaultTreeViewEnabled,
         _onStoppingRequest = onStoppingRequest,
         _onStoppingResponse = onStoppingResponse {
     if (_enabled && _allowShaking)
@@ -65,7 +73,7 @@ class InspectorController extends ChangeNotifier {
   bool _requestStopperEnabled = false;
   bool _responseStopperEnabled = false;
   bool _isDarkMode = true;
-  bool _isTreeView = true;
+  bool _isTreeView;
 
   final _requestsList = <RequestDetails>[];
   RequestDetails? _selectedRequest;

@@ -16,11 +16,13 @@ class RequestsInspector extends StatelessWidget {
     bool enabled = true,
     bool hideInspectorBanner = false,
     ShowInspectorOn showInspectorOn = ShowInspectorOn.Both,
+    bool defaultTreeViewEnabled = true,
     required Widget child,
     GlobalKey<NavigatorState>? navigatorKey,
   }) : _enabled = enabled,
        _hideInspectorBanner = hideInspectorBanner,
        _showInspectorOn = showInspectorOn,
+       _defaultTreeViewEnabled = defaultTreeViewEnabled,
        _child = child,
        _navigatorKey = navigatorKey;
 
@@ -28,6 +30,7 @@ class RequestsInspector extends StatelessWidget {
   final bool _enabled;
   final bool _hideInspectorBanner;
   final ShowInspectorOn _showInspectorOn;
+  final bool _defaultTreeViewEnabled;
   final Widget _child;
 
   final GlobalKey<NavigatorState>? _navigatorKey;
@@ -36,21 +39,23 @@ class RequestsInspector extends StatelessWidget {
   Widget build(BuildContext context) {
     var widget = _enabled
         ? ChangeNotifierProvider(
-            create: (context) => InspectorController(
-              enabled: _enabled,
-              showInspectorOn: _isSupportShaking()
-                  ? _showInspectorOn
-                  : ShowInspectorOn.LongPress,
-              onStoppingRequest: (requestDetails) => _showRequestEditorDialog(
-                context,
-                requestDetails: requestDetails,
-              ),
-              onStoppingResponse: (responseDetails) =>
-                  _showResponseEditorDialog(
-                context,
-                responseDetails: responseDetails,
-              ),
-            ),
+            create: (context) =>
+               InspectorController(
+                enabled: _enabled,
+                showInspectorOn: _isSupportShaking()
+                    ? _showInspectorOn
+                    : ShowInspectorOn.LongPress,
+                defaultTreeViewEnabled: _defaultTreeViewEnabled,
+                onStoppingRequest: (requestDetails) => _showRequestEditorDialog(
+                  context,
+                  requestDetails: requestDetails,
+                ),
+                onStoppingResponse: (responseDetails) =>
+                    _showResponseEditorDialog(
+                  context,
+                  responseDetails: responseDetails,
+                ),
+              ),  
             lazy: false,
             builder: (context, _) {
               return WillPopScope(
