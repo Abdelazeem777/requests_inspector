@@ -181,6 +181,20 @@ class JsonTreeView extends StatelessWidget {
               ),
           ],
         ),
+        contextMenuBuilder: (context, editableTextState) {
+          return AdaptiveTextSelectionToolbar.buttonItems(
+            anchors: editableTextState.contextMenuAnchors,
+            buttonItems: <ContextMenuButtonItem>[
+              ContextMenuButtonItem(
+                onPressed: () {
+                  editableTextState.copySelection(SelectionChangedCause.toolbar);
+                  editableTextState.hideToolbar();
+                },
+                type: ContextMenuButtonType.copy,
+              ),
+            ],
+          );
+        },
       ),
     );
   }
