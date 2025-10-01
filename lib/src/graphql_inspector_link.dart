@@ -26,10 +26,9 @@ class GraphQLInspectorLink extends Link {
     Request request,
     NextLink? forward,
   ) async* {
-    await for (final entry
-        in link
-            .request(request, forward)
-            .map((event) => MapEntry(DateTime.now(), event))) {
+    await for (final entry in link
+        .request(request, forward)
+        .map((event) => MapEntry(DateTime.now(), event))) {
       final sentTime = entry.key;
       final response = entry.value;
       final responseContext = response.context.entry<HttpLinkResponseContext>();

@@ -6,7 +6,7 @@ class JsonTreeView extends StatelessWidget {
   final bool _isDarkMode;
 
   const JsonTreeView(this.data, {super.key, required bool isDarkMode})
-    : _isDarkMode = isDarkMode;
+      : _isDarkMode = isDarkMode;
 
   @override
   Widget build(BuildContext context) {
@@ -137,9 +137,8 @@ class JsonTreeView extends StatelessWidget {
       valueColor = _isDarkMode ? Colors.blue.shade300 : Colors.blue.shade700;
     } else if (value is bool) {
       formattedValue = value.toString();
-      valueColor = _isDarkMode
-          ? Colors.orange.shade300
-          : Colors.orange.shade700;
+      valueColor =
+          _isDarkMode ? Colors.orange.shade300 : Colors.orange.shade700;
     } else if (value == null) {
       formattedValue = 'null';
       valueColor = _isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600;
@@ -187,7 +186,8 @@ class JsonTreeView extends StatelessWidget {
             buttonItems: <ContextMenuButtonItem>[
               ContextMenuButtonItem(
                 onPressed: () {
-                  editableTextState.copySelection(SelectionChangedCause.toolbar);
+                  editableTextState
+                      .copySelection(SelectionChangedCause.toolbar);
                   editableTextState.hideToolbar();
                 },
                 type: ContextMenuButtonType.copy,
@@ -249,9 +249,8 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
   @override
   Widget build(BuildContext context) {
     final textColor = widget.isDarkMode ? Colors.white : Colors.black87;
-    final secondaryTextColor = widget.isDarkMode
-        ? Colors.grey.shade400
-        : Colors.grey.shade600;
+    final secondaryTextColor =
+        widget.isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600;
 
     final bool hasTitleString =
         widget.titleString != null && widget.titleString!.isNotEmpty;

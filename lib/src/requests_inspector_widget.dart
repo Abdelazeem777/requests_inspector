@@ -18,11 +18,11 @@ class RequestsInspector extends StatelessWidget {
     ShowInspectorOn showInspectorOn = ShowInspectorOn.Both,
     required Widget child,
     GlobalKey<NavigatorState>? navigatorKey,
-  }) : _enabled = enabled,
-       _hideInspectorBanner = hideInspectorBanner,
-       _showInspectorOn = showInspectorOn,
-       _child = child,
-       _navigatorKey = navigatorKey;
+  })  : _enabled = enabled,
+        _hideInspectorBanner = hideInspectorBanner,
+        _showInspectorOn = showInspectorOn,
+        _child = child,
+        _navigatorKey = navigatorKey;
 
   ///Require hot restart for showing its change
   final bool _enabled;

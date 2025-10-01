@@ -90,8 +90,7 @@ class CurlCommandGenerator {
 
   void _addRequestBody(StringBuffer curlCommand) {
     if (details.requestBody != null) {
-      String contentType =
-          details.headers?['content-type'] ??
+      String contentType = details.headers?['content-type'] ??
           details.headers?['Content-Type'] ??
           '';
       if (contentType.contains('application/x-www-form-urlencoded')) {

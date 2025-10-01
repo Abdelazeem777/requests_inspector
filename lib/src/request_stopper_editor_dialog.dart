@@ -6,7 +6,7 @@ import 'shared_widgets/inspector_dialog_text_field.dart';
 
 class RequestStopperEditorDialog extends StatefulWidget {
   const RequestStopperEditorDialog({super.key, RequestDetails? requestDetails})
-    : _requestDetails = requestDetails;
+      : _requestDetails = requestDetails;
 
   final RequestDetails? _requestDetails;
 
@@ -116,11 +116,11 @@ class _RequestStopperEditorDialogState
             text: JsonPrettyConverter().convert(_newRequestDetails?.headers),
             onChanged: (value) =>
                 _newRequestDetails = _newRequestDetails?.copyWith(
-                  headers: JsonPrettyConverter().deconvertFrom(
-                    value,
-                    _newRequestDetails?.headers.runtimeType.toString(),
-                  ),
-                ),
+              headers: JsonPrettyConverter().deconvertFrom(
+                value,
+                _newRequestDetails?.headers.runtimeType.toString(),
+              ),
+            ),
           ),
           const SizedBox(height: 16.0),
           const Text('Query Parameters: '),
@@ -131,11 +131,11 @@ class _RequestStopperEditorDialogState
             ),
             onChanged: (value) =>
                 _newRequestDetails = _newRequestDetails?.copyWith(
-                  queryParameters: JsonPrettyConverter().deconvertFrom(
-                    value,
-                    _newRequestDetails?.queryParameters.runtimeType.toString(),
-                  ),
-                ),
+              queryParameters: JsonPrettyConverter().deconvertFrom(
+                value,
+                _newRequestDetails?.queryParameters.runtimeType.toString(),
+              ),
+            ),
           ),
           const SizedBox(height: 16.0),
           const Text('Request Body: '),
@@ -146,11 +146,11 @@ class _RequestStopperEditorDialogState
             ),
             onChanged: (value) =>
                 _newRequestDetails = _newRequestDetails?.copyWith(
-                  requestBody: JsonPrettyConverter().deconvertFrom(
-                    value,
-                    _newRequestDetails?.requestBody.runtimeType.toString(),
-                  ),
-                ),
+              requestBody: JsonPrettyConverter().deconvertFrom(
+                value,
+                _newRequestDetails?.requestBody.runtimeType.toString(),
+              ),
+            ),
           ),
           const SizedBox(height: 8.0),
         ],

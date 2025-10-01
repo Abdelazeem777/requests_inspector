@@ -10,10 +10,10 @@ class RequestItemWidget extends StatelessWidget {
     required bool isSelected,
     required bool isDarkMode,
     required void Function(BuildContext context, RequestDetails request) onTap,
-  }) : _request = request,
-       _isSelected = isSelected,
-       _isDarkMode = isDarkMode,
-       _onTap = onTap;
+  })  : _request = request,
+        _isSelected = isSelected,
+        _isDarkMode = isDarkMode,
+        _onTap = onTap;
 
   final RequestDetails _request;
   final bool _isSelected;
