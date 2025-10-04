@@ -8,7 +8,7 @@ import '../enums/share_type_enum.dart';
 
 class Inspector extends StatelessWidget {
   const Inspector({super.key, GlobalKey<NavigatorState>? navigatorKey})
-    : _navigatorKey = navigatorKey;
+      : _navigatorKey = navigatorKey;
 
   final GlobalKey<NavigatorState>? _navigatorKey;
 
@@ -230,9 +230,8 @@ class Inspector extends StatelessWidget {
                         activeTrackColor: Colors.grey[700],
                         inactiveThumbColor: Colors.white,
                         inactiveTrackColor: Colors.grey[700],
-                        onChanged: (value) =>
-                            InspectorController().responseStopperEnabled =
-                                value,
+                        onChanged: (value) => InspectorController()
+                            .responseStopperEnabled = value,
                       ),
                     ),
                   ],
@@ -399,9 +398,8 @@ class Inspector extends StatelessWidget {
                 final selectedRequest = InspectorController().selectedRequest!;
                 final isHttp = _isHttp(selectedRequest);
 
-                final shareType = isHttp
-                    ? await _showDialogShareType(context)
-                    : null;
+                final shareType =
+                    isHttp ? await _showDialogShareType(context) : null;
 
                 if (shareType == null) return;
 

@@ -89,9 +89,9 @@ class InspectorController extends ChangeNotifier {
   RequestDetails? get selectedRequest => _selectedRequest;
 
   bool get _allowShaking => [
-    ShowInspectorOn.Shaking,
-    ShowInspectorOn.Both,
-  ].contains(_showInspectorOn);
+        ShowInspectorOn.Shaking,
+        ShowInspectorOn.Both,
+      ].contains(_showInspectorOn);
 
   set selectedTab(int value) {
     if (_selectedTab == value) return;
@@ -180,7 +180,7 @@ class InspectorController extends ChangeNotifier {
       final normalLogContent = _formatMap(requestMap);
 
       requestShareContent =
-      '================[cURL Command]=================\n$curlContent\n\n==================[Normal Log]===================\n$normalLogContent';
+          '================[cURL Command]=================\n$curlContent\n\n==================[Normal Log]===================\n$normalLogContent';
     }
 
     Share.share(

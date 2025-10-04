@@ -77,7 +77,8 @@ class RequestDetailsPage extends StatelessWidget {
               _buildExpandableSection(
                 context: context,
                 txtCopy: JsonPrettyConverter().convert(request.requestBody),
-                title: 'Request Body${request.requestBody is FormData ? " (Form Data)" : ""}',
+                title:
+                    'Request Body${request.requestBody is FormData ? " (Form Data)" : ""}',
                 children: _buildDataBlock(
                   request.requestBody,
                   isTreeView: isTreeView,
@@ -144,8 +145,7 @@ class RequestDetailsPage extends StatelessWidget {
             title: Row(
               children: [
                 Expanded(
-                  child:
-                      titleWidget ??
+                  child: titleWidget ??
                       Text(
                         title ?? '',
                         style: theme.textTheme.titleMedium?.copyWith(
@@ -201,14 +201,17 @@ class RequestDetailsPage extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(6.0),
-      child: SelectableText(text, style: const TextStyle(fontSize: 16.0),
-          contextMenuBuilder: (context, editableTextState) {
+      child: SelectableText(
+        text,
+        style: const TextStyle(fontSize: 16.0),
+        contextMenuBuilder: (context, editableTextState) {
           return AdaptiveTextSelectionToolbar.buttonItems(
             anchors: editableTextState.contextMenuAnchors,
             buttonItems: <ContextMenuButtonItem>[
               ContextMenuButtonItem(
                 onPressed: () {
-                  editableTextState.copySelection(SelectionChangedCause.toolbar);
+                  editableTextState
+                      .copySelection(SelectionChangedCause.toolbar);
                   editableTextState.hideToolbar();
                 },
                 type: ContextMenuButtonType.copy,

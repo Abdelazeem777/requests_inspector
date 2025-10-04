@@ -38,7 +38,6 @@ class _MyAppState extends State<MyApp> {
       }),
     );
     /*for restful apis Interceptor example use => fetchPostsUsingInterceptor() */
-    ;
     // fetchPostsGraphQlUsingGraphQLFlutterInterceptor() /*for graph ql Interceptor example */;
     super.initState();
   }
@@ -127,8 +126,8 @@ Future<List<Post>> fetchPostsUsingInterceptor() async {
       // Headers added to bypass CloudFlare protection
       headers: {
         'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-            '(KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+                '(KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
         'Accept': 'application/json, text/plain, */*',
         'Accept-Language': 'en-US,en;q=0.9',
       },

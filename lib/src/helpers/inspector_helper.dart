@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 
 class InspectorHelper {
   static String extractTimeText(DateTime sentTime) {
-    var sentTimeText = sentTime
-        .toIso8601String()
-        .split('T')
-        .last
-        .substring(0, 8);
+    var sentTimeText =
+        sentTime.toIso8601String().split('T').last.substring(0, 8);
     sentTimeText = _replaceLastSeparatorWithDot(sentTimeText);
     return sentTimeText;
   }

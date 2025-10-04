@@ -137,12 +137,13 @@ class RequestsInspectorInterceptor extends Interceptor {
   RequestOptions _copyRequestToNewOptions(
     RequestOptions options,
     RequestDetails requestDetails,
-  ) => options.copyWith(
-    method: requestDetails.requestMethod.name,
-    headers: requestDetails.headers,
-    queryParameters: requestDetails.queryParameters,
-    data: requestDetails.requestBody,
-    path: requestDetails.url,
-    extra: {...options.extra, 'startTime': DateTime.now()},
-  );
+  ) =>
+      options.copyWith(
+        method: requestDetails.requestMethod.name,
+        headers: requestDetails.headers,
+        queryParameters: requestDetails.queryParameters,
+        data: requestDetails.requestBody,
+        path: requestDetails.url,
+        extra: {...options.extra, 'startTime': DateTime.now()},
+      );
 }

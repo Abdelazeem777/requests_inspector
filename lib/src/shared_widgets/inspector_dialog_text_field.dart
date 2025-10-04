@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class InspectorDialogTextField extends StatelessWidget {
   const InspectorDialogTextField({
-    Key? key,
+    super.key,
     required this.text,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   final String text;
   final ValueChanged<String> onChanged;

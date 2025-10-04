@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class RunAgainButton extends StatefulWidget {
   const RunAgainButton({
-    Key? key,
+    super.key,
     required this.onTap,
     required this.isDarkMode, // Pass isDarkMode directly
-  }) : super(key: key);
+  });
 
   final Future<void> Function() onTap;
   final bool isDarkMode; // New parameter

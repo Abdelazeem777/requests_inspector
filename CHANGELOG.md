@@ -1,3 +1,11 @@
+## 5.1.0
+
+- **FormData Inspection Support**: Now you can inspect FormData requests with proper formatting and display, thanks to [Mostafa Alazhariy](https://github.com/MAlazhariy).
+- **Cloudflare Protection Fix**: Bypass Cloudflare protection errors in example app by adding browser-like headers, thanks to [mostafaelzahry](https://github.com/mostafaelzahry).
+- **Fix Context Menu Issue**: Added custom `contextMenuBuilder` to all `SelectableText` widgets to prevent context menu conflicts and improve text selection behavior, thanks to [Nourhan Sabrii](https://github.com/NourSabry).
+- **Upgrade Dependencies**: Upgraded `gql` package to latest stable version `1.0.0`.
+- **Code Quality Improvements**: Major code refactoring with clean up formatting and improved readability across multiple files.
+
 ## 5.0.3
 
 - Add status code and headers input fields in `Responses Stopper` Dialog.
