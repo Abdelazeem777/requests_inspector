@@ -21,12 +21,14 @@ class InspectorController extends ChangeNotifier {
     ShowInspectorOn showInspectorOn = ShowInspectorOn.Shaking,
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
+    bool defaultTreeViewEnabled = true,
   }) =>
       _singleton ??= InspectorController._internal(
         enabled: enabled,
         showInspectorOn: showInspectorOn,
         onStoppingRequest: onStoppingRequest,
         onStoppingResponse: onStoppingResponse,
+        defaultTreeViewEnabled: defaultTreeViewEnabled,
       );
 
   InspectorController._internal({
@@ -34,9 +36,11 @@ class InspectorController extends ChangeNotifier {
     required ShowInspectorOn showInspectorOn,
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
+    required bool defaultTreeViewEnabled,
   })  : _enabled = enabled,
         _showInspectorOn = showInspectorOn,
         _onStoppingRequest = onStoppingRequest,
+        _isTreeView = defaultTreeViewEnabled,
         _onStoppingResponse = onStoppingResponse {
     if (_enabled && _allowShaking)
       _shakeDetector = ShakeDetector.autoStart(
