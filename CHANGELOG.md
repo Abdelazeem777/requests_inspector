@@ -1,3 +1,14 @@
+## 5.1.1
+
+- Add `defaultTreeViewEnabled` parameter to `RequestsInspector` widget to control the initial state of the JSON tree view.
+
+```dart
+RequestsInspector(
+  defaultTreeViewEnabled: false,
+  child: MyApp(),
+);
+```
+
 ## 5.1.0
 
 - **FormData Inspection Support**: Now you can inspect FormData requests with proper formatting and display, thanks to [Mostafa Alazhariy](https://github.com/MAlazhariy).

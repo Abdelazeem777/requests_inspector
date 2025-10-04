@@ -220,7 +220,7 @@ OR, you can just pass `ShowInspectorOn.Both` to open the `Inspector` with `Shaki
 void main() {
   runApp(const RequestsInspector(
     enabled: true,
-    showInspectorOn: ShowInspectorOn.Both
+    showInspectorOn: ShowInspectorOn.Both,
     child: MyApp(),
   ));
 }
