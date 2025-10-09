@@ -12,6 +12,7 @@ class RequestDetails {
   final dynamic headers;
   final dynamic queryParameters;
   final dynamic requestBody;
+  final dynamic requestVariables;
   final dynamic responseBody;
   late final DateTime sentTime;
   final DateTime? receivedTime;
@@ -24,6 +25,7 @@ class RequestDetails {
     this.headers,
     this.queryParameters,
     this.requestBody,
+    this.requestVariables,
     this.responseBody,
     DateTime? sentTime,
     this.receivedTime,
@@ -55,6 +57,7 @@ class RequestDetails {
     headers,
     queryParameters,
     requestBody,
+    requestVariables,
     responseBody,
     DateTime? sentTime,
     DateTime? receivedTime,
@@ -67,6 +70,7 @@ class RequestDetails {
       headers: headers ?? this.headers,
       queryParameters: queryParameters ?? this.queryParameters,
       requestBody: requestBody ?? this.requestBody,
+      requestVariables: requestVariables ?? this.requestVariables,
       responseBody: responseBody ?? this.responseBody,
       sentTime: sentTime ?? this.sentTime,
       receivedTime: receivedTime ?? this.receivedTime,
@@ -75,7 +79,7 @@ class RequestDetails {
 
   @override
   String toString() {
-    return 'RequestDetails(requestName: $requestName, requestMethod: $requestMethod, url: $url, statusCode: $statusCode, headers: $headers, queryParameters: $queryParameters, requestBody: $requestBody, responseBody: $responseBody, sentTime: $sentTime, receivedTime: $receivedTime)';
+    return 'RequestDetails(requestName: $requestName, requestMethod: $requestMethod, url: $url, statusCode: $statusCode, headers: $headers, queryParameters: $queryParameters, requestBody: $requestBody, requestVariables: $requestVariables, responseBody: $responseBody, sentTime: $sentTime, receivedTime: $receivedTime)';
   }
 
   @override
@@ -90,6 +94,7 @@ class RequestDetails {
         other.headers == headers &&
         other.queryParameters == queryParameters &&
         other.requestBody == requestBody &&
+        other.requestVariables == requestVariables &&
         other.responseBody == responseBody &&
         other.sentTime == sentTime &&
         other.receivedTime == receivedTime;
@@ -104,6 +109,7 @@ class RequestDetails {
         headers.hashCode ^
         queryParameters.hashCode ^
         requestBody.hashCode ^
+        requestVariables.hashCode ^
         responseBody.hashCode ^
         sentTime.hashCode ^
         receivedTime.hashCode;
@@ -118,6 +124,7 @@ class RequestDetails {
       'headers': headers,
       'queryParameters': queryParameters,
       'requestBody': requestBody,
+      'requestVariables': requestVariables,
       'responseBody': responseBody,
       'sentTime': sentTime.toIso8601String(),
       'receivedTime': receivedTime?.toIso8601String(),
@@ -135,6 +142,7 @@ class RequestDetails {
       headers: map['headers'] as dynamic,
       queryParameters: map['queryParameters'] as dynamic,
       requestBody: map['requestBody'] as dynamic,
+      requestVariables: map['requestVariables'] as dynamic,
       responseBody: map['responseBody'] as dynamic,
       sentTime: DateTime.parse(map['sentTime']),
       receivedTime: map['receivedTime'] != null
