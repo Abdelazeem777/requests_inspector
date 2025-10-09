@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:requests_inspector/requests_inspector.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:graphql/client.dart';
+import 'package:requests_inspector/requests_inspector.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -31,7 +32,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    fetchPostsUsingInterceptor().then(
+    fetchPostsGraphQlUsingGraphQLFlutterInterceptor().then(
       (value) => setState(() {
         posts = value;
         isLoading = false;
@@ -155,15 +156,20 @@ Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
     cache: GraphQLCache(),
     link: GraphQLInspectorLink(HttpLink('https://graphqlzero.almansi.me/api')),
   );
-  const query = r'''query {
-    post(id: 1) {
+  const variables = {'id': 1};
+  const query = r'''query GetPost($id: ID!) {
+    post(id: $id) {
       id
       title
       body
     }
-    }''';
+  }
+''';
 
-  final options = QueryOptions(document: gql(query));
+  final options = QueryOptions(
+    document: gql(query),
+    variables: variables,
+  );
   final result = await client.query(options);
   if (result.hasException) {
     log(result.exception.toString());
