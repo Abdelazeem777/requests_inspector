@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'package:graphql/client.dart';
+
 import 'package:gql/language.dart';
+import 'package:graphql/client.dart';
 
 import '../requests_inspector.dart';
 
@@ -39,6 +40,8 @@ class GraphQLInspectorLink extends Link {
           requestBody: printNode(
             request.operation.document,
           ).replaceAll('\n', '').replaceAll('__typename', ''),
+          graphqlRequestVars:
+              request.variables.isEmpty ? null : request.variables,
           headers: responseContext?.headers,
           url: link.uri.toString(),
           responseBody: response.response,
@@ -64,6 +67,7 @@ class GraphQLInspectorLink extends Link {
           requestBody: printNode(
             request.operation.document,
           ).replaceAll('\n', '').replaceAll('__typename', ''),
+          graphqlRequestVars: request.variables,
           url: link.url,
           responseBody: response.response,
           statusCode: 200,
