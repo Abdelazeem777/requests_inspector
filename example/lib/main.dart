@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
-    fetchPostsGraphQlUsingGraphQLFlutterInterceptor().then(
+    fetchPostsUsingInterceptor().then(
       (value) => setState(() {
         posts = value;
         isLoading = false;
@@ -152,6 +152,34 @@ Future<List<Post>> fetchPostsUsingInterceptor() async {
 }
 
 Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
+  final client = GraphQLClient(
+    cache: GraphQLCache(),
+    link: GraphQLInspectorLink(HttpLink('https://graphqlzero.almansi.me/api')),
+  );
+  const query = r'''query {
+    post(id: 1) {
+      id
+      title
+      body
+    }
+  }
+''';
+
+  final options = QueryOptions(
+    document: gql(query),
+  );
+  final result = await client.query(options);
+  if (result.hasException) {
+    log(result.exception.toString());
+  } else {
+    log(result.data.toString());
+  }
+  var post = Post.fromMap(result.data?['post']);
+  return [post];
+}
+
+Future<List<Post>>
+    fetchPostsGraphQlWithVariablesUsingGraphQLFlutterInterceptor() async {
   final client = GraphQLClient(
     cache: GraphQLCache(),
     link: GraphQLInspectorLink(HttpLink('https://graphqlzero.almansi.me/api')),
