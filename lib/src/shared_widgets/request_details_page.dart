@@ -85,14 +85,14 @@ class RequestDetailsPage extends StatelessWidget {
                   isDarkMode: isDarkMode,
                 ),
               ),
-            if (request.requestVariables != null)
+            if (request.graphqlRequestVars != null)
               _buildExpandableSection(
                 context: context,
                 txtCopy:
-                    JsonPrettyConverter().convert(request.requestVariables),
-                title: 'Request Variables',
+                    JsonPrettyConverter().convert(request.graphqlRequestVars),
+                title: 'GraphQL Request Vars',
                 children: _buildDataBlock(
-                  request.requestVariables,
+                  request.graphqlRequestVars,
                   isTreeView: isTreeView,
                   isDarkMode: isDarkMode,
                 ),

@@ -40,7 +40,7 @@ class GraphQLInspectorLink extends Link {
           requestBody: printNode(
             request.operation.document,
           ).replaceAll('\n', '').replaceAll('__typename', ''),
-          requestVariables:
+          graphqlRequestVars:
               request.variables.isEmpty ? null : request.variables,
           headers: responseContext?.headers,
           url: link.uri.toString(),
@@ -67,7 +67,7 @@ class GraphQLInspectorLink extends Link {
           requestBody: printNode(
             request.operation.document,
           ).replaceAll('\n', '').replaceAll('__typename', ''),
-          requestVariables: request.variables,
+          graphqlRequestVars: request.variables,
           url: link.url,
           responseBody: response.response,
           statusCode: 200,
