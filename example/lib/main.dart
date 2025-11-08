@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:requests_inspector/requests_inspector.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:graphql/client.dart';
+import 'package:requests_inspector/requests_inspector.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -161,9 +162,42 @@ Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
       title
       body
     }
-    }''';
+  }
+''';
 
-  final options = QueryOptions(document: gql(query));
+  final options = QueryOptions(
+    document: gql(query),
+  );
+  final result = await client.query(options);
+  if (result.hasException) {
+    log(result.exception.toString());
+  } else {
+    log(result.data.toString());
+  }
+  var post = Post.fromMap(result.data?['post']);
+  return [post];
+}
+
+Future<List<Post>>
+    fetchPostsGraphQlWithVariablesUsingGraphQLFlutterInterceptor() async {
+  final client = GraphQLClient(
+    cache: GraphQLCache(),
+    link: GraphQLInspectorLink(HttpLink('https://graphqlzero.almansi.me/api')),
+  );
+  const variables = {'id': 1};
+  const query = r'''query GetPost($id: ID!) {
+    post(id: $id) {
+      id
+      title
+      body
+    }
+  }
+''';
+
+  final options = QueryOptions(
+    document: gql(query),
+    variables: variables,
+  );
   final result = await client.query(options);
   if (result.hasException) {
     log(result.exception.toString());
