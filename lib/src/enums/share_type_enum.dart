@@ -1,1 +1,1 @@
-enum ShareType { NormalLog, CurlCommand, Both }
+enum ShareType { NormalLog, CurlCommand, Both, Har, HarFile }
