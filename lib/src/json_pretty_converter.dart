@@ -14,15 +14,23 @@ class JsonPrettyConverter {
 
   static late final JsonEncoder _encoder;
 
-  String convert(text) {
-    // text = dummyData;
-    late final String prettyprint;
+  dynamic convert(text) {
+    late final dynamic prettyprint;
+
     if (text is Map || text is String || text is List)
       prettyprint = _convertToPrettyJsonFromMapOrJson(text);
     else if (text is FormData)
       prettyprint = 'FormData:\n${_convertToPrettyFromFormData(text)}';
     else if (text == null)
       prettyprint = '';
+    else if (text is bool)
+      prettyprint = text;
+    else if (text is num)
+      prettyprint = text;
+    else if (text is double)
+      prettyprint = text;
+    else if (text is int)
+      prettyprint = text;
     else
       prettyprint = text.toString();
     return prettyprint;
