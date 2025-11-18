@@ -1,3 +1,7 @@
+## 5.2.0
+
+- Add support for sharing HAR files.
+
 ## 5.1.1
 
 - Add `defaultTreeViewEnabled` parameter to `RequestsInspector` widget to control the initial state of the JSON tree view.
