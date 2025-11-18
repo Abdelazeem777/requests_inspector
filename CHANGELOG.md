@@ -1,3 +1,8 @@
+## 5.2.1
+
+- Enhance json pretty converter `convert` method to handle additional data types including bool, num, and null.
+- Update README.md file with the new HAR file support.
+
 ## 5.2.0
 
 - Add support for sharing HAR files.
