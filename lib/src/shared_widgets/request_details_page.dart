@@ -250,9 +250,27 @@ class RequestDetailsPage extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(6.0),
-      child: SelectableText(prettyprint),
+      child: SelectableText(
+        prettyprint,
+        contextMenuBuilder: (context, editableTextState) {
+          return AdaptiveTextSelectionToolbar.buttonItems(
+            anchors: editableTextState.contextMenuAnchors,
+            buttonItems: <ContextMenuButtonItem>[
+              ContextMenuButtonItem(
+                onPressed: () {
+                  editableTextState.copySelection(SelectionChangedCause.toolbar);
+                  editableTextState.hideToolbar();
+                },
+                type: ContextMenuButtonType.copy,
+              ),
+            ],
+          );
+        },
+      ),
+      
     );
   }
+  
 
   Widget _buildRequestNameAndStatus({
     required RequestMethod method,
