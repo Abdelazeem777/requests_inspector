@@ -270,7 +270,8 @@ class RequestDetailsPage extends StatelessWidget {
             buttonItems: <ContextMenuButtonItem>[
               ContextMenuButtonItem(
                 onPressed: () {
-                  editableTextState.copySelection(SelectionChangedCause.toolbar);
+                  editableTextState
+                      .copySelection(SelectionChangedCause.toolbar);
                   editableTextState.hideToolbar();
                 },
                 type: ContextMenuButtonType.copy,
@@ -279,10 +280,8 @@ class RequestDetailsPage extends StatelessWidget {
           );
         },
       ),
-      
     );
   }
-  
 
   Widget _buildRequestNameAndStatus({
     required RequestMethod method,
