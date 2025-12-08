@@ -252,7 +252,11 @@ class RequestDetailsPage extends StatelessWidget {
 
     return [
       isTreeView
-          ? JsonTreeView(data, isDarkMode: isDarkMode)
+          ? JsonTreeView(
+              data,
+              isDarkMode: isDarkMode,
+              initiallyExpanded: InspectorController().initiallyExpanded,
+            )
           : _buildSelectableText(data),
     ];
   }

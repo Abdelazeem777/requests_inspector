@@ -4,9 +4,15 @@ import 'package:flutter/material.dart';
 class JsonTreeView extends StatelessWidget {
   final dynamic data;
   final bool _isDarkMode;
+  final bool _initiallyExpanded;
 
-  const JsonTreeView(this.data, {super.key, required bool isDarkMode})
-      : _isDarkMode = isDarkMode;
+  const JsonTreeView(
+    this.data, {
+    super.key,
+    required bool isDarkMode,
+    bool initiallyExpanded = true,
+  })  : _isDarkMode = isDarkMode,
+        _initiallyExpanded = initiallyExpanded;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +61,7 @@ class JsonTreeView extends StatelessWidget {
       ],
       collapsedCount: map.length,
       isObject: true,
-      initiallyExpanded: true,
+      initiallyExpanded: _initiallyExpanded,
       isDarkMode: _isDarkMode,
     );
   }
@@ -77,7 +83,7 @@ class JsonTreeView extends StatelessWidget {
       ],
       collapsedCount: list.length,
       isObject: false,
-      initiallyExpanded: true,
+      initiallyExpanded: _initiallyExpanded,
       isDarkMode: _isDarkMode,
     );
   }
@@ -117,7 +123,7 @@ class JsonTreeView extends StatelessWidget {
       ],
       collapsedCount: length,
       isObject: true,
-      initiallyExpanded: true,
+      initiallyExpanded: _initiallyExpanded,
       isDarkMode: _isDarkMode,
     );
   }

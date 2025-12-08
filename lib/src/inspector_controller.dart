@@ -24,6 +24,7 @@ class InspectorController extends ChangeNotifier {
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
     bool defaultTreeViewEnabled = true,
+    bool initiallyExpanded = true,
   }) =>
       _singleton ??= InspectorController._internal(
         enabled: enabled,
@@ -31,6 +32,7 @@ class InspectorController extends ChangeNotifier {
         onStoppingRequest: onStoppingRequest,
         onStoppingResponse: onStoppingResponse,
         defaultTreeViewEnabled: defaultTreeViewEnabled,
+        initiallyExpanded: initiallyExpanded,
       );
 
   InspectorController._internal({
@@ -39,10 +41,12 @@ class InspectorController extends ChangeNotifier {
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
     required bool defaultTreeViewEnabled,
+    required bool initiallyExpanded,
   })  : _enabled = enabled,
         _showInspectorOn = showInspectorOn,
         _onStoppingRequest = onStoppingRequest,
         _isTreeView = defaultTreeViewEnabled,
+        _initiallyExpanded = initiallyExpanded,
         _onStoppingResponse = onStoppingResponse {
     if (_enabled && _allowShaking)
       _shakeDetector = ShakeDetector.autoStart(
@@ -72,6 +76,7 @@ class InspectorController extends ChangeNotifier {
   bool _responseStopperEnabled = false;
   bool _isDarkMode = true;
   bool _isTreeView = true;
+  late final bool _initiallyExpanded;
 
   final _requestsList = <RequestDetails>[];
   RequestDetails? _selectedRequest;
@@ -85,6 +90,8 @@ class InspectorController extends ChangeNotifier {
   bool get isDarkMode => _isDarkMode;
 
   bool get isTreeView => _isTreeView;
+
+  bool get initiallyExpanded => _initiallyExpanded;
 
   List<RequestDetails> get requestsList => _requestsList;
 
