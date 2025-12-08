@@ -45,7 +45,21 @@ class Inspector extends StatelessWidget {
         color: isDarkMode ? Colors.white : Colors.black87,
       ),
 
-      title: const Text('Inspector 🕵️'),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text('Inspector 🕵️'),
+          if (InspectorController().appVersionText != null)
+            Text(
+              InspectorController().appVersionText!,
+              style: TextStyle(
+                fontSize: 12,
+                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              ),
+            ),
+        ],
+      ),
 
       leading: IconButton(
         // Use method from controller (doesn't require listening)

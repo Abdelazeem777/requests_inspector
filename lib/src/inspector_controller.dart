@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:requests_inspector/src/shake.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -24,6 +25,8 @@ class InspectorController extends ChangeNotifier {
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
     bool defaultTreeViewEnabled = true,
+    bool showAppVersion = false,
+    String? appVersion,
   }) =>
       _singleton ??= InspectorController._internal(
         enabled: enabled,
@@ -31,6 +34,8 @@ class InspectorController extends ChangeNotifier {
         onStoppingRequest: onStoppingRequest,
         onStoppingResponse: onStoppingResponse,
         defaultTreeViewEnabled: defaultTreeViewEnabled,
+        showAppVersion: showAppVersion,
+        appVersion: appVersion,
       );
 
   InspectorController._internal({
@@ -39,16 +44,30 @@ class InspectorController extends ChangeNotifier {
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
     required bool defaultTreeViewEnabled,
+    required bool showAppVersion,
+    String? appVersion,
   })  : _enabled = enabled,
         _showInspectorOn = showInspectorOn,
         _onStoppingRequest = onStoppingRequest,
         _isTreeView = defaultTreeViewEnabled,
         _onStoppingResponse = onStoppingResponse {
-    if (_enabled && _allowShaking)
+    if (_enabled && _allowShaking) {
       _shakeDetector = ShakeDetector.autoStart(
         onPhoneShake: showInspector,
         minimumShakeCount: 3,
       );
+    }
+    if (appVersion != null) {
+      _appVersionText = appVersion;
+    } else if (showAppVersion) {
+      _fetchAppVersion();
+    }
+  }
+
+  Future<void> _fetchAppVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    _appVersionText = 'App v${info.version}';
+    notifyListeners();
   }
 
   static InspectorController? _singleton;
@@ -72,6 +91,7 @@ class InspectorController extends ChangeNotifier {
   bool _responseStopperEnabled = false;
   bool _isDarkMode = true;
   bool _isTreeView = true;
+  String? _appVersionText;
 
   final _requestsList = <RequestDetails>[];
   RequestDetails? _selectedRequest;
@@ -85,6 +105,8 @@ class InspectorController extends ChangeNotifier {
   bool get isDarkMode => _isDarkMode;
 
   bool get isTreeView => _isTreeView;
+
+  String? get appVersionText => _appVersionText;
 
   List<RequestDetails> get requestsList => _requestsList;
 
