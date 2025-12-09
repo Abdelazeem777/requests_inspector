@@ -76,7 +76,7 @@ class InspectorController extends ChangeNotifier {
   bool _responseStopperEnabled = false;
   bool _isDarkMode = true;
   bool _isTreeView = true;
-  late final bool _initiallyExpanded;
+  bool _initiallyExpanded;
 
   final _requestsList = <RequestDetails>[];
   RequestDetails? _selectedRequest;
@@ -272,6 +272,11 @@ class InspectorController extends ChangeNotifier {
 
   void toggleInspectorJsonView() {
     _isTreeView = !_isTreeView;
+    notifyListeners();
+  }
+
+  void toggleInitiallyExpanded() {
+    _initiallyExpanded = !_initiallyExpanded;
     notifyListeners();
   }
 }

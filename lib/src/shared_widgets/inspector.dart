@@ -169,6 +169,39 @@ class Inspector extends StatelessWidget {
             ),
           ),
         ),
+        // JSON Expanded Toggle
+        PopupMenuItem(
+          padding: EdgeInsets.zero,
+          child: InkWell(
+            onTap: InspectorController().toggleInitiallyExpanded,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 8.0,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('JSON Expanded'),
+                  Selector<InspectorController, bool>(
+                    selector: (_, controller) => controller.initiallyExpanded,
+                    builder: (context, initiallyExpanded, __) {
+                      return Switch(
+                        value: initiallyExpanded,
+                        activeColor: Colors.green,
+                        activeTrackColor: Colors.grey[700],
+                        inactiveThumbColor: Colors.white,
+                        inactiveTrackColor: Colors.grey[700],
+                        onChanged: (value) =>
+                            InspectorController().toggleInitiallyExpanded(),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
         if (showStopperDialogsAllowed())
           PopupMenuItem(
             padding: EdgeInsets.zero,
