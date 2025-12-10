@@ -173,7 +173,7 @@ class Inspector extends StatelessWidget {
         PopupMenuItem(
           padding: EdgeInsets.zero,
           child: InkWell(
-            onTap: InspectorController().toggleInitiallyExpanded,
+            onTap: InspectorController().toggleExpandChildren,
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 16.0,
@@ -182,18 +182,18 @@ class Inspector extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('JSON Expanded'),
+                  const Text('Expand Children'),
                   Selector<InspectorController, bool>(
-                    selector: (_, controller) => controller.initiallyExpanded,
-                    builder: (context, initiallyExpanded, __) {
+                    selector: (_, controller) => controller.expandChildren,
+                    builder: (context, expandChildren, __) {
                       return Switch(
-                        value: initiallyExpanded,
+                        value: expandChildren,
                         activeColor: Colors.green,
                         activeTrackColor: Colors.grey[700],
                         inactiveThumbColor: Colors.white,
                         inactiveTrackColor: Colors.grey[700],
                         onChanged: (value) =>
-                            InspectorController().toggleInitiallyExpanded(),
+                            InspectorController().toggleExpandChildren(),
                       );
                     },
                   ),

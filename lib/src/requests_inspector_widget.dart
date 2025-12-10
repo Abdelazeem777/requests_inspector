@@ -19,22 +19,21 @@ class RequestsInspector extends StatelessWidget {
     required Widget child,
     bool defaultTreeViewEnabled = true,
     GlobalKey<NavigatorState>? navigatorKey,
-    bool initiallyExpanded = true,
+    bool expandChildren = true,
   })  : _enabled = enabled,
         _hideInspectorBanner = hideInspectorBanner,
         _showInspectorOn = showInspectorOn,
         _child = child,
         _navigatorKey = navigatorKey,
         _defaultTreeViewEnabled = defaultTreeViewEnabled,
-        _initiallyExpanded = initiallyExpanded;
+        _expandChildren = expandChildren;
 
-  ///Require hot restart for showing its change
   final bool _enabled;
   final bool _hideInspectorBanner;
   final ShowInspectorOn _showInspectorOn;
   final Widget _child;
   final bool _defaultTreeViewEnabled;
-  final bool _initiallyExpanded;
+  final bool _expandChildren;
 
   final GlobalKey<NavigatorState>? _navigatorKey;
 
@@ -48,7 +47,7 @@ class RequestsInspector extends StatelessWidget {
                   ? _showInspectorOn
                   : ShowInspectorOn.LongPress,
               defaultTreeViewEnabled: _defaultTreeViewEnabled,
-              initiallyExpanded: _initiallyExpanded,
+              expandChildren: _expandChildren,
               onStoppingRequest: (requestDetails) => _showRequestEditorDialog(
                 context,
                 requestDetails: requestDetails,

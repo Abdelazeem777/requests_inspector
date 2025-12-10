@@ -24,7 +24,7 @@ class InspectorController extends ChangeNotifier {
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
     bool defaultTreeViewEnabled = true,
-    bool initiallyExpanded = true,
+    bool expandChildren = true,
   }) =>
       _singleton ??= InspectorController._internal(
         enabled: enabled,
@@ -32,7 +32,7 @@ class InspectorController extends ChangeNotifier {
         onStoppingRequest: onStoppingRequest,
         onStoppingResponse: onStoppingResponse,
         defaultTreeViewEnabled: defaultTreeViewEnabled,
-        initiallyExpanded: initiallyExpanded,
+        expandChildren: expandChildren,
       );
 
   InspectorController._internal({
@@ -41,12 +41,12 @@ class InspectorController extends ChangeNotifier {
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
     required bool defaultTreeViewEnabled,
-    required bool initiallyExpanded,
+    required bool expandChildren,
   })  : _enabled = enabled,
         _showInspectorOn = showInspectorOn,
         _onStoppingRequest = onStoppingRequest,
         _isTreeView = defaultTreeViewEnabled,
-        _initiallyExpanded = initiallyExpanded,
+        _expandChildren = expandChildren,
         _onStoppingResponse = onStoppingResponse {
     if (_enabled && _allowShaking)
       _shakeDetector = ShakeDetector.autoStart(
@@ -76,7 +76,7 @@ class InspectorController extends ChangeNotifier {
   bool _responseStopperEnabled = false;
   bool _isDarkMode = true;
   bool _isTreeView = true;
-  bool _initiallyExpanded;
+  bool _expandChildren;
 
   final _requestsList = <RequestDetails>[];
   RequestDetails? _selectedRequest;
@@ -91,7 +91,7 @@ class InspectorController extends ChangeNotifier {
 
   bool get isTreeView => _isTreeView;
 
-  bool get initiallyExpanded => _initiallyExpanded;
+  bool get expandChildren => _expandChildren;
 
   List<RequestDetails> get requestsList => _requestsList;
 
@@ -275,8 +275,8 @@ class InspectorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleInitiallyExpanded() {
-    _initiallyExpanded = !_initiallyExpanded;
+  void toggleExpandChildren() {
+    _expandChildren = !_expandChildren;
     notifyListeners();
   }
 }

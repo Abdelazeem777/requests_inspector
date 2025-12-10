@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 class JsonTreeView extends StatelessWidget {
   final dynamic data;
   final bool _isDarkMode;
-  final bool _initiallyExpanded;
+  final bool _expandChildren;
 
   const JsonTreeView(
     this.data, {
     super.key,
     required bool isDarkMode,
-    bool initiallyExpanded = true,
+    bool expandChildren = true,
   })  : _isDarkMode = isDarkMode,
-        _initiallyExpanded = initiallyExpanded;
+        _expandChildren = expandChildren;
 
   @override
   Widget build(BuildContext context) {
@@ -20,19 +20,19 @@ class JsonTreeView extends StatelessWidget {
       scrollDirection: Axis.vertical,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: _buildNode(context, data),
+        child: _buildNode(context, data, isRoot: true),
       ),
     );
   }
 
-  Widget _buildNode(BuildContext context, dynamic node, {String? keyName}) {
+  Widget _buildNode(BuildContext context, dynamic node, {String? keyName, bool isRoot = false}) {
     Widget content;
     if (node is Map<String, dynamic>) {
-      content = _buildMapNode(context, node, keyName);
+      content = _buildMapNode(context, node, keyName, isRoot: isRoot);
     } else if (node is List) {
-      content = _buildListNode(context, node, keyName);
+      content = _buildListNode(context, node, keyName, isRoot: isRoot);
     } else if (node is FormData) {
-      content = _buildFormDataNode(context, node, keyName);
+      content = _buildFormDataNode(context, node, keyName, isRoot: isRoot);
     } else {
       content = _buildLeafNode(context, keyName, node);
     }
@@ -43,8 +43,9 @@ class JsonTreeView extends StatelessWidget {
   Widget _buildMapNode(
     BuildContext context,
     Map<String, dynamic> map,
-    String? keyName,
-  ) {
+    String? keyName, {
+    bool isRoot = false,
+  }) {
     final isEmpty = map.isEmpty;
 
     if (isEmpty) {
@@ -61,12 +62,12 @@ class JsonTreeView extends StatelessWidget {
       ],
       collapsedCount: map.length,
       isObject: true,
-      initiallyExpanded: _initiallyExpanded,
+      initiallyExpanded: isRoot || _expandChildren,
       isDarkMode: _isDarkMode,
     );
   }
 
-  Widget _buildListNode(BuildContext context, List list, String? keyName) {
+  Widget _buildListNode(BuildContext context, List list, String? keyName, {bool isRoot = false}) {
     final isEmpty = list.isEmpty;
 
     if (isEmpty) {
@@ -83,17 +84,17 @@ class JsonTreeView extends StatelessWidget {
       ],
       collapsedCount: list.length,
       isObject: false,
-      initiallyExpanded: _initiallyExpanded,
+      initiallyExpanded: isRoot || _expandChildren,
       isDarkMode: _isDarkMode,
     );
   }
 
-  // FormData
   Widget _buildFormDataNode(
     BuildContext context,
     FormData formData,
-    String? keyName,
-  ) {
+    String? keyName, {
+    bool isRoot = false,
+  }) {
     final length = formData.fields.length + formData.files.length;
     final isEmpty = length == 0;
 
@@ -104,16 +105,12 @@ class JsonTreeView extends StatelessWidget {
     return _CustomExpansionTile(
       titleString: keyName != null ? '"$keyName" : ' : '',
       children: [
-        // fields
         ...formData.fields.map((e) {
           return _buildNode(context, e.value, keyName: e.key);
         }),
-        // files
         ...formData.files.map((e) {
           final sizeInMb = e.value.length ~/ 1024;
           final fileSizeString = '${sizeInMb.toStringAsFixed(1)} kb';
-          // final fileType = e.value.contentType?.type;
-          // final fileTypeString = fileType == null ? '' : "$fileType ";
           final nodeValue = "($fileSizeString) - ${e.value.filename}";
 
           return _buildNode(context, nodeValue, keyName: e.key);
@@ -123,7 +120,7 @@ class JsonTreeView extends StatelessWidget {
       ],
       collapsedCount: length,
       isObject: true,
-      initiallyExpanded: _initiallyExpanded,
+      initiallyExpanded: isRoot || _expandChildren,
       isDarkMode: _isDarkMode,
     );
   }
