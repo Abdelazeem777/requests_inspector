@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:requests_inspector/src/debouncer.dart';
 import 'package:requests_inspector/src/shake.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -9,6 +10,7 @@ import 'curl_command_generator.dart';
 import 'har_generator.dart';
 import 'json_pretty_converter.dart';
 import 'enums/share_type_enum.dart';
+import 'requests_filter.dart';
 
 typedef StoppingRequestCallback = Future<RequestDetails?> Function(
     RequestDetails requestDetails);
@@ -44,11 +46,12 @@ class InspectorController extends ChangeNotifier {
         _onStoppingRequest = onStoppingRequest,
         _isTreeView = defaultTreeViewEnabled,
         _onStoppingResponse = onStoppingResponse {
-    if (_enabled && _allowShaking)
+    if (_enabled && _allowShaking) {
       _shakeDetector = ShakeDetector.autoStart(
         onPhoneShake: showInspector,
         minimumShakeCount: 3,
       );
+    }
   }
 
   static InspectorController? _singleton;
@@ -76,6 +79,13 @@ class InspectorController extends ChangeNotifier {
   final _requestsList = <RequestDetails>[];
   RequestDetails? _selectedRequest;
 
+  // Search & Filters state
+  String _searchUrlQuery = '';
+  RequestMethod? _filterRequestMethod;
+  int? _filterStatusCode;
+  final searchDebouncer = Debouncer(milliseconds: 500);
+  // ------------------------------
+
   int get selectedTab => _selectedTab;
 
   bool get requestStopperEnabled => _requestStopperEnabled;
@@ -89,6 +99,43 @@ class InspectorController extends ChangeNotifier {
   List<RequestDetails> get requestsList => _requestsList;
 
   RequestDetails? get selectedRequest => _selectedRequest;
+
+  String get searchUrlQuery => _searchUrlQuery;
+
+  RequestMethod? get filterRequestMethod => _filterRequestMethod;
+
+  int? get filterStatusCode => _filterStatusCode;
+
+  bool get areAnyFiltersApplied =>
+      searchUrlQuery.trim().isNotEmpty ||
+      filterRequestMethod != null ||
+      filterStatusCode != null;
+
+  // Computed filtered + searched list
+  List<RequestDetails> get filteredRequestsList {
+    Iterable<RequestDetails> list = [..._requestsList];
+
+    // Build filters list
+    final filters = <RequestFilter>[];
+    if (_filterRequestMethod != null) {
+      filters.add(RequestMethodFilter(_filterRequestMethod!));
+    }
+
+    if (_filterStatusCode != null) {
+      filters.add(RequestStatusCodeFilter(_filterStatusCode!));
+    }
+
+    if (_searchUrlQuery.trim().isNotEmpty) {
+      filters.add(RequestUrlFilter(_searchUrlQuery));
+    }
+
+    // Apply filters
+    for (final f in filters) {
+      list = list.where(f.requestFilter);
+    }
+
+    return list.toList(growable: false);
+  }
 
   bool get _allowShaking => [
         ShowInspectorOn.Shaking,
@@ -117,6 +164,37 @@ class InspectorController extends ChangeNotifier {
     if (_selectedRequest == value && _selectedTab == 1) return;
     _selectedRequest = value;
     _selectedTab = 1;
+    notifyListeners();
+  }
+
+  // setters for search & filters
+  void setSearchQuery(String value) {
+    if (_searchUrlQuery == value) return;
+    _searchUrlQuery = value;
+    notifyListeners();
+  }
+
+  void setRequestMethodFilter(RequestMethod? method) {
+    if (_filterRequestMethod == method) return;
+    _filterRequestMethod = method;
+    notifyListeners();
+  }
+
+  void setStatusCodeFilter(int? statusCode) {
+    if (_filterStatusCode == statusCode) return;
+    _filterStatusCode = statusCode;
+    notifyListeners();
+  }
+
+  void clearFilters() {
+    _filterRequestMethod = null;
+    _filterStatusCode = null;
+    notifyListeners();
+  }
+
+  void clearSearch() {
+    if (_searchUrlQuery.isEmpty) return;
+    _searchUrlQuery = '';
     notifyListeners();
   }
 
@@ -224,6 +302,7 @@ class InspectorController extends ChangeNotifier {
   @override
   void dispose() {
     if (_allowShaking) _shakeDetector.stopListening();
+    searchDebouncer.cancel();
     _singleton = null;
     super.dispose();
   }
