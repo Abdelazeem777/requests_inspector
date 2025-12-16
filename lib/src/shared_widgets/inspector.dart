@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:requests_inspector/src/filters_dialog.dart';
 import 'package:requests_inspector/src/shared_widgets/request_details_page.dart';
 import 'package:requests_inspector/src/shared_widgets/request_item.dart';
 import 'package:requests_inspector/src/shared_widgets/run_again_widget.dart';
+import 'package:requests_inspector/src/stopper_filters_dialog.dart';
 import '../../requests_inspector.dart';
 import '../enums/share_type_enum.dart';
 
@@ -50,13 +52,20 @@ class Inspector extends StatelessWidget {
 
       leading: IconButton(
         // Use method from controller (doesn't require listening)
-        onPressed: InspectorController().hideInspector,
+        onPressed: () {
+          closeKeyboard();
+          InspectorController().hideInspector();
+        },
         icon: const Icon(Icons.close), // Icon color handled by iconTheme
       ),
 
       // Build action buttons, separating logic for better readability
       actions: _buildActions(isDarkMode),
     );
+  }
+
+  void closeKeyboard() {
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   List<Widget> _buildActions(bool isDarkMode) {
@@ -186,7 +195,27 @@ class Inspector extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    Selector<InspectorController, bool>(
+                      selector: (_, controller) => controller.isDarkMode,
+                      builder: (context, isDarkMode, __) => IconButton(
+                        onPressed: () {
+                          showDialog<void>(
+                            context: context,
+                            builder: (context) => StopperFiltersDialog(
+                              isDarkMode: isDarkMode,
+                              stopperType: StopperType.request,
+                            ),
+                          );
+                        },
+                        icon: Icon(
+                          Icons.filter_list,
+                          color: isDarkMode ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
                     const Text('Requests Stopper'),
+                    Spacer(),
                     Selector<InspectorController, bool>(
                       selector: (_, inspectorController) =>
                           inspectorController.requestStopperEnabled,
@@ -219,9 +248,29 @@ class Inspector extends StatelessWidget {
                   vertical: 8.0,
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
+                    Selector<InspectorController, bool>(
+                      selector: (_, controller) => controller.isDarkMode,
+                      builder: (context, isDarkMode, __) => IconButton(
+                        onPressed: () {
+                          showDialog<void>(
+                            context: context,
+                            builder: (context) => StopperFiltersDialog(
+                              isDarkMode: isDarkMode,
+                              stopperType: StopperType.response,
+                            ),
+                          );
+                        },
+                        icon: Icon(
+                          Icons.filter_list,
+                          color: isDarkMode ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
                     const Text('Responses Stopper'),
+                    Spacer(),
                     Selector<InspectorController, bool>(
                       selector: (_, inspectorController) =>
                           inspectorController.responseStopperEnabled,

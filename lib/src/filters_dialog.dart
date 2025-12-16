@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:requests_inspector/src/enums/requests_methods.dart';
 import 'package:requests_inspector/src/inspector_controller.dart';
 
@@ -84,6 +85,10 @@ class _FiltersDialogState extends State<FiltersDialog> {
                 border: OutlineInputBorder(),
                 isDense: true,
               ),
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(3),
+              ],
               keyboardType: TextInputType.number,
             ),
           ],
