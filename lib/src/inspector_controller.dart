@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:requests_inspector/src/shake.dart';
@@ -5,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../requests_inspector.dart';
 import 'curl_command_generator.dart';
+import 'har_generator.dart';
 import 'json_pretty_converter.dart';
 import 'enums/share_type_enum.dart';
 
@@ -172,6 +174,36 @@ class InspectorController extends ChangeNotifier {
     } else if (shareType == ShareType.NormalLog) {
       final requestMap = _selectedRequest!.toMap();
       requestShareContent = _formatMap(requestMap);
+    } else if (shareType == ShareType.Har) {
+      final curlCommandGenerator = CurlCommandGenerator(_selectedRequest!);
+      final curlContent = curlCommandGenerator.generate();
+
+      final harGenerator = HarGenerator();
+      requestShareContent = harGenerator.generate(
+        request: _selectedRequest!,
+        curlCommand: curlContent,
+      );
+    } else if (shareType == ShareType.HarFile) {
+      final curlCommandGenerator = CurlCommandGenerator(_selectedRequest!);
+      final curlContent = curlCommandGenerator.generate();
+
+      final harGenerator = HarGenerator();
+      final harJson = harGenerator.generate(
+        request: _selectedRequest!,
+        curlCommand: curlContent,
+      );
+
+      final file = XFile.fromData(
+        utf8.encode(harJson),
+        name: 'request.har',
+        mimeType: 'application/json',
+      );
+
+      Share.shareXFiles(
+        [file],
+        sharePositionOrigin: sharePositionOrigin,
+      );
+      return;
     } else {
       final curlCommandGenerator = CurlCommandGenerator(_selectedRequest!);
       final curlContent = curlCommandGenerator.generate();

@@ -398,10 +398,15 @@ class Inspector extends StatelessWidget {
                 final selectedRequest = InspectorController().selectedRequest!;
                 final isHttp = _isHttp(selectedRequest);
 
-                final shareType =
+                var shareType =
                     isHttp ? await _showDialogShareType(context) : null;
 
                 if (shareType == null) return;
+
+                if (shareType == ShareType.Har) {
+                  shareType = await _showHarFormatDialog(context);
+                  if (shareType == null) return;
+                }
 
                 InspectorController().shareSelectedRequest(
                   sharePositionOrigin: box == null
@@ -427,10 +432,8 @@ class Inspector extends StatelessWidget {
     return showDialog<ShareType?>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Normal Log or cURL command? 🤔'),
-        content: const Text(
-          'The cURL command is more useful for exporting to Postman or run it again from terminal',
-        ),
+        title: const Text('Share as Normal Log, cURL or HAR? 🤔'),
+        content: const Text('Choose your preferred share format'),
         actions: [
           TextButton(
             child: const Text(
@@ -449,6 +452,30 @@ class Inspector extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.of(context).pop(ShareType.Both),
             child: const Text('Both', style: TextStyle(color: Colors.red)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(ShareType.Har),
+            child: const Text('HAR'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<ShareType?> _showHarFormatDialog(BuildContext context) {
+    return showDialog<ShareType?>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('HAR format'),
+        content: const Text('Do you want the HAR as text or as a .har file?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(ShareType.Har),
+            child: const Text('HAR text copy'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(ShareType.HarFile),
+            child: const Text('HAR file (.har)'),
           ),
         ],
       ),

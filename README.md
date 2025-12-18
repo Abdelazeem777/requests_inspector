@@ -14,7 +14,7 @@ A Flutter package for **logging** API requests (**Http Requests** & **GraphQL**)
 
 1.  Log your `Http request`, `GraphQL` and `WebSockets`.
 2.  Intercept your requests and responses for testing.
-3.  Share request details as json or as `cURL` to re-run it again (ex. `Postman`).
+3.  Share request details as json, `cURL`, or `HAR` file to re-run it again (ex. `Postman`).
 
 And more and more
 
@@ -26,12 +26,20 @@ And more and more
 
 <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/mobile_list.jpg" width ="280" /> <img src = "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/mobile_request.jpg" width ="280" />
 
-Also you can share the request details as (**Log** or **cURL** command) with your team to help them debug the API requests.
+Also you can share the request details as (**Log**, **cURL** command, or **HAR** file) with your team to help them debug the API requests.
 
 **From Inspector to Postman 🧡 🎉️**
 Now you can extract `cURL` command from the **inspector** to send the request again from your terminal or [Postman](https://www.postman.com/) 💪💪
 
 <img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/curl_share_request.gif" width="600"/>
+
+**HAR File Support 📦 🎉️**
+You can now share requests as **HAR (HTTP Archive)** files! HAR files are a standard format that can be imported into various tools like [Postman](https://www.postman.com/), [Proxyman](https://proxyman.com/), or any HAR-compatible tool for debugging and analysis. You can share HAR files in two formats:
+
+- **HAR text**: Copy the HAR content as text
+- **HAR file (.har)**: Share as a downloadable `.har` file
+
+The HAR format includes complete request/response details, headers, timing information, and more, making it perfect for comprehensive API debugging and sharing with your team.
 
 ---
 

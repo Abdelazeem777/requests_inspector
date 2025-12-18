@@ -19,12 +19,12 @@ class RequestsInspector extends StatelessWidget {
     required Widget child,
     bool defaultTreeViewEnabled = true,
     GlobalKey<NavigatorState>? navigatorKey,
-  }) : _enabled = enabled,
-       _hideInspectorBanner = hideInspectorBanner,
-       _showInspectorOn = showInspectorOn,
-       _child = child,
-       _navigatorKey = navigatorKey,
-      _defaultTreeViewEnabled = defaultTreeViewEnabled;
+  })  : _enabled = enabled,
+        _hideInspectorBanner = hideInspectorBanner,
+        _showInspectorOn = showInspectorOn,
+        _child = child,
+        _navigatorKey = navigatorKey,
+        _defaultTreeViewEnabled = defaultTreeViewEnabled;
 
   ///Require hot restart for showing its change
   final bool _enabled;

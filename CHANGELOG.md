@@ -1,3 +1,17 @@
+## 5.2.2
+
+- Fix Selectable text at normal view (#55), thanks to [Nourhan Sabrii](https://github.com/NourSabry).
+- Upgrade `share_plus` to `^12.0.1` to fix iOS crash when `sharePositionOrigin` is missing.
+
+## 5.2.1
+
+- Enhance json pretty converter `convert` method to handle additional data types including bool, num, and null.
+- Update README.md file with the new HAR file support.
+
+## 5.2.0
+
+- Add support for sharing HAR files.
+
 ## 5.1.1
 
 - Add `defaultTreeViewEnabled` parameter to `RequestsInspector` widget to control the initial state of the JSON tree view.

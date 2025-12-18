@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:requests_inspector/requests_inspector.dart';
 import 'package:requests_inspector/src/json_pretty_converter.dart';
 
@@ -81,6 +81,18 @@ class RequestDetailsPage extends StatelessWidget {
                     'Request Body${request.requestBody is FormData ? " (Form Data)" : ""}',
                 children: _buildDataBlock(
                   request.requestBody,
+                  isTreeView: isTreeView,
+                  isDarkMode: isDarkMode,
+                ),
+              ),
+            if (request.graphqlRequestVars != null)
+              _buildExpandableSection(
+                context: context,
+                txtCopy:
+                    JsonPrettyConverter().convert(request.graphqlRequestVars),
+                title: 'GraphQL Request Vars',
+                children: _buildDataBlock(
+                  request.graphqlRequestVars,
                   isTreeView: isTreeView,
                   isDarkMode: isDarkMode,
                 ),
@@ -258,7 +270,8 @@ class RequestDetailsPage extends StatelessWidget {
             buttonItems: <ContextMenuButtonItem>[
               ContextMenuButtonItem(
                 onPressed: () {
-                  editableTextState.copySelection(SelectionChangedCause.toolbar);
+                  editableTextState
+                      .copySelection(SelectionChangedCause.toolbar);
                   editableTextState.hideToolbar();
                 },
                 type: ContextMenuButtonType.copy,
@@ -267,7 +280,6 @@ class RequestDetailsPage extends StatelessWidget {
           );
         },
       ),
-      
     );
   }
   
