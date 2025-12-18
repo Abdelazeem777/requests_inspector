@@ -7,6 +7,32 @@ import 'package:requests_inspector/src/json_pretty_converter.dart';
 
 import '../helpers/inspector_helper.dart';
 import '../json_tree_view_widget.dart';
+import 'highlighted_text.dart';
+import 'search_widget.dart';
+
+class _SearchState {
+  final bool isTreeView;
+  final bool isDarkMode;
+  final String searchQuery;
+
+  _SearchState({
+    required this.isTreeView,
+    required this.isDarkMode,
+    required this.searchQuery,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _SearchState &&
+          runtimeType == other.runtimeType &&
+          isTreeView == other.isTreeView &&
+          isDarkMode == other.isDarkMode &&
+          searchQuery == other.searchQuery;
+
+  @override
+  int get hashCode => isTreeView.hashCode ^ isDarkMode.hashCode ^ searchQuery.hashCode;
+}
 
 class RequestDetailsPage extends StatelessWidget {
   const RequestDetailsPage({super.key});
@@ -17,22 +43,37 @@ class RequestDetailsPage extends StatelessWidget {
       child: Selector<InspectorController, RequestDetails?>(
         selector: (_, inspectorController) =>
             inspectorController.selectedRequest,
-        shouldRebuild: (previous, next) => true, // Still good for list changes
+        shouldRebuild: (previous, next) => true,
         builder: (context, selectedRequest, _) => selectedRequest == null
             ? const Center(
                 child: Text('Please select a request first to view details'),
-              ) // Added const
-            : _buildRequestDetails(context, selectedRequest),
+              )
+            : Column(
+                children: [
+                  Selector<InspectorController, bool>(
+                    selector: (_, controller) => controller.isDarkMode,
+                    builder: (context, isDarkMode, _) => SearchWidget(
+                      isDarkMode: isDarkMode,
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildRequestDetails(context, selectedRequest),
+                  ),
+                ],
+              ),
       ),
     );
   }
 
   Widget _buildRequestDetails(BuildContext context, RequestDetails request) {
-    return Selector<InspectorController, bool>(
-      selector: (_, inspectorController) => inspectorController.isTreeView,
-      builder: (context, isTreeView, _) => Selector<InspectorController, bool>(
-        selector: (_, inspectorController) => inspectorController.isDarkMode,
-        builder: (context, isDarkMode, _) => ListView(
+    return Selector<InspectorController, _SearchState>(
+      selector: (_, controller) => _SearchState(
+        isTreeView: controller.isTreeView,
+        isDarkMode: controller.isDarkMode,
+        searchQuery: controller.searchQuery,
+      ),
+      builder: (context, state, _) {
+        return ListView(
           padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 96.0),
           children: [
             _buildExpandableSection(
@@ -48,6 +89,8 @@ class RequestDetailsPage extends StatelessWidget {
                   request.sentTime,
                   request.receivedTime,
                   request.url,
+                  searchQuery: state.searchQuery,
+                  isDarkMode: state.isDarkMode,
                 ),
               ],
             ),
@@ -58,8 +101,9 @@ class RequestDetailsPage extends StatelessWidget {
                 title: 'Headers',
                 children: _buildDataBlock(
                   request.headers,
-                  isTreeView: isTreeView,
-                  isDarkMode: isDarkMode,
+                  isTreeView: state.isTreeView,
+                  isDarkMode: state.isDarkMode,
+                  searchQuery: state.searchQuery,
                 ),
               ),
             if (request.queryParameters != null)
@@ -69,8 +113,9 @@ class RequestDetailsPage extends StatelessWidget {
                 title: 'Query Parameters',
                 children: _buildDataBlock(
                   request.queryParameters,
-                  isTreeView: isTreeView,
-                  isDarkMode: isDarkMode,
+                  isTreeView: state.isTreeView,
+                  isDarkMode: state.isDarkMode,
+                  searchQuery: state.searchQuery,
                 ),
               ),
             if (request.requestBody != null)
@@ -81,8 +126,9 @@ class RequestDetailsPage extends StatelessWidget {
                     'Request Body${request.requestBody is FormData ? " (Form Data)" : ""}',
                 children: _buildDataBlock(
                   request.requestBody,
-                  isTreeView: isTreeView,
-                  isDarkMode: isDarkMode,
+                  isTreeView: state.isTreeView,
+                  isDarkMode: state.isDarkMode,
+                  searchQuery: state.searchQuery,
                 ),
               ),
             if (request.graphqlRequestVars != null)
@@ -93,8 +139,9 @@ class RequestDetailsPage extends StatelessWidget {
                 title: 'GraphQL Request Vars',
                 children: _buildDataBlock(
                   request.graphqlRequestVars,
-                  isTreeView: isTreeView,
-                  isDarkMode: isDarkMode,
+                  isTreeView: state.isTreeView,
+                  isDarkMode: state.isDarkMode,
+                  searchQuery: state.searchQuery,
                 ),
               ),
             if (request.responseBody != null)
@@ -104,13 +151,14 @@ class RequestDetailsPage extends StatelessWidget {
                 title: 'Response Body',
                 children: _buildDataBlock(
                   request.responseBody,
-                  isTreeView: isTreeView,
-                  isDarkMode: isDarkMode,
+                  isTreeView: state.isTreeView,
+                  isDarkMode: state.isDarkMode,
+                  searchQuery: state.searchQuery,
                 ),
               ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -195,8 +243,10 @@ class RequestDetailsPage extends StatelessWidget {
   Widget _buildRequestSentTimeAndDuration(
     DateTime sentTime,
     DateTime? receivedTime,
-    String url,
-  ) {
+    String url, {
+    required String searchQuery,
+    required bool isDarkMode,
+  }) {
     final sentTimeText = InspectorHelper.extractTimeText(sentTime);
     var text = 'Sent at: $sentTimeText';
 
@@ -213,72 +263,56 @@ class RequestDetailsPage extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(6.0),
-      child: SelectableText(
-        text,
+      child: HighlightedText(
+        text: text,
+        searchQuery: searchQuery,
+        isDarkMode: isDarkMode,
         style: const TextStyle(fontSize: 16.0),
-        contextMenuBuilder: (context, editableTextState) {
-          return AdaptiveTextSelectionToolbar.buttonItems(
-            anchors: editableTextState.contextMenuAnchors,
-            buttonItems: <ContextMenuButtonItem>[
-              ContextMenuButtonItem(
-                onPressed: () {
-                  editableTextState
-                      .copySelection(SelectionChangedCause.toolbar);
-                  editableTextState.hideToolbar();
-                },
-                type: ContextMenuButtonType.copy,
-              ),
-            ],
-          );
-        },
       ),
     );
   }
 
-  /// A generic function to build a content block based on provided data.
-  /// It handles null/empty checks and switches between JsonTreeView and SelectableText
-  /// based on the InspectorController's isTreeView state.
   List<Widget> _buildDataBlock(
     dynamic data, {
     required bool isTreeView,
     required bool isDarkMode,
+    required String searchQuery,
   }) {
     if (data == null) return [];
 
-    // Check for empty collections or strings
     if ((data is Map || data is String || data is List) && data.isEmpty) {
       return [];
     }
 
     return [
       isTreeView
-          ? JsonTreeView(data, isDarkMode: isDarkMode)
-          : _buildSelectableText(data),
+          ? JsonTreeView(
+              data,
+              isDarkMode: isDarkMode,
+              searchQuery: searchQuery,
+            )
+          : _buildSelectableText(
+              data,
+              searchQuery: searchQuery,
+              isDarkMode: isDarkMode,
+            ),
     ];
   }
 
-  Widget _buildSelectableText(text) {
+  Widget _buildSelectableText(
+    text, {
+    required String searchQuery,
+    required bool isDarkMode,
+  }) {
     final prettyprint = JsonPrettyConverter().convert(text);
+    
 
     return Padding(
       padding: const EdgeInsets.all(6.0),
-      child: SelectableText(
-        prettyprint,
-        contextMenuBuilder: (context, editableTextState) {
-          return AdaptiveTextSelectionToolbar.buttonItems(
-            anchors: editableTextState.contextMenuAnchors,
-            buttonItems: <ContextMenuButtonItem>[
-              ContextMenuButtonItem(
-                onPressed: () {
-                  editableTextState
-                      .copySelection(SelectionChangedCause.toolbar);
-                  editableTextState.hideToolbar();
-                },
-                type: ContextMenuButtonType.copy,
-              ),
-            ],
-          );
-        },
+      child: HighlightedText(
+        text: prettyprint,
+        searchQuery: searchQuery,
+        isDarkMode: isDarkMode,
       ),
     );
   }
@@ -308,4 +342,5 @@ class RequestDetailsPage extends StatelessWidget {
       ],
     );
   }
+
 }
