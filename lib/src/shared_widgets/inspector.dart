@@ -65,6 +65,12 @@ class Inspector extends StatelessWidget {
         builder: (context, selectedTab, _) {
           return Row(
             children: [
+              if (selectedTab == 1)
+                IconButton(
+                  onPressed: InspectorController().toggleSearchVisibility,
+                  icon: const Icon(Icons.search),
+                  tooltip: 'Search',
+                ),
               selectedTab == 0
                   ? TextButton(
                       onPressed: () => _showAreYouSureDialog(

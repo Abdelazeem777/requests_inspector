@@ -1,12 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'shared_widgets/highlighted_text.dart';
 
 class JsonTreeView extends StatelessWidget {
   final dynamic data;
   final bool _isDarkMode;
+  final String searchQuery;
 
-  const JsonTreeView(this.data, {super.key, required bool isDarkMode})
-      : _isDarkMode = isDarkMode;
+  const JsonTreeView(
+    this.data, {
+    super.key,
+    required bool isDarkMode,
+    this.searchQuery = '',
+  }) : _isDarkMode = isDarkMode;
 
   @override
   Widget build(BuildContext context) {
@@ -123,81 +129,25 @@ class JsonTreeView extends StatelessWidget {
   }
 
   Widget _buildLeafNode(BuildContext context, String? key, dynamic value) {
-    String formattedValue;
-    Color valueColor;
+    final formattedValue = (value is String && value != '{}' && value != '[]') ? '"$value"' : '$value';
 
-    if (value is String && (value == '{}' || value == '[]')) {
-      formattedValue = value;
-      valueColor = _isDarkMode ? Colors.white : Colors.black87;
-    } else if (value is String) {
-      formattedValue = '"$value"';
-      valueColor = _isDarkMode ? Colors.green.shade300 : Colors.green.shade700;
-    } else if (value is num) {
-      formattedValue = value.toString();
-      valueColor = _isDarkMode ? Colors.blue.shade300 : Colors.blue.shade700;
-    } else if (value is bool) {
-      formattedValue = value.toString();
-      valueColor =
-          _isDarkMode ? Colors.orange.shade300 : Colors.orange.shade700;
-    } else if (value == null) {
-      formattedValue = 'null';
-      valueColor = _isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600;
-    } else {
-      formattedValue = value.toString();
-      valueColor = _isDarkMode ? Colors.white : Colors.black87;
-    }
+    final fullText = '${key != null ? '"$key" : ' : ''}$formattedValue${key != null ? ',' : ''}';
 
     return Padding(
       padding: const EdgeInsets.only(left: 12.0),
-      child: SelectableText.rich(
-        TextSpan(
-          children: [
-            if (key != null) ...[
-              TextSpan(
-                text: '"$key" : ',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: _isDarkMode ? Colors.white : Colors.black87,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-            TextSpan(
-              text: formattedValue,
-              style: TextStyle(
-                fontSize: 14,
-                color: valueColor,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            if (key != null)
-              TextSpan(
-                text: ',',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: _isDarkMode ? Colors.white : Colors.black87,
-                ),
-              ),
-          ],
+      child: HighlightedText(
+        text: fullText,
+        searchQuery: searchQuery,
+        isDarkMode: _isDarkMode,
+        style: TextStyle(
+          fontSize: 14,
+          color: _isDarkMode ? Colors.white : Colors.black87,
+          fontWeight: FontWeight.w500,
         ),
-        contextMenuBuilder: (context, editableTextState) {
-          return AdaptiveTextSelectionToolbar.buttonItems(
-            anchors: editableTextState.contextMenuAnchors,
-            buttonItems: <ContextMenuButtonItem>[
-              ContextMenuButtonItem(
-                onPressed: () {
-                  editableTextState
-                      .copySelection(SelectionChangedCause.toolbar);
-                  editableTextState.hideToolbar();
-                },
-                type: ContextMenuButtonType.copy,
-              ),
-            ],
-          );
-        },
       ),
     );
   }
+
 
   Widget _buildClosingBracket(BuildContext context, String bracket) {
     return Padding(
