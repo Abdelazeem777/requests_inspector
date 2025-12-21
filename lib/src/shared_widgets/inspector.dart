@@ -528,6 +528,7 @@ class Inspector extends StatelessWidget {
             onFiltersTap: () {
               _showFiltersDialog(context, isDarkMode);
             },
+            isDarkMode: isDarkMode,
           );
         },
       ),
@@ -546,10 +547,12 @@ class _SearchField extends StatefulWidget {
   const _SearchField({
     required this.searchQuery,
     required this.onFiltersTap,
+    required this.isDarkMode,
   });
 
   final String searchQuery;
   final void Function() onFiltersTap;
+  final bool isDarkMode;
 
   @override
   State<_SearchField> createState() => __SearchFieldState();
@@ -570,6 +573,8 @@ class __SearchFieldState extends State<_SearchField> {
       controller: _controller,
       decoration: InputDecoration(
         hintText: 'Search by URL',
+        fillColor: widget.isDarkMode ? Colors.black : Colors.white,
+        filled: true,
         prefixIcon: const Icon(Icons.search),
         suffixIcon: Row(
           mainAxisSize: MainAxisSize.min,
