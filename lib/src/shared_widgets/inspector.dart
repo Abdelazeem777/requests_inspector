@@ -555,37 +555,10 @@ class Inspector extends StatelessWidget {
       child: Selector<InspectorController, String>(
         selector: (_, c) => c.searchUrlQuery,
         builder: (context, searchQuery, _) {
-          return TextField(
-            decoration: InputDecoration(
-              hintText: 'Search by URL',
-              prefixIcon: const Icon(Icons.search),
-              suffixIcon: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (searchQuery.isNotEmpty)
-                    IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () => InspectorController().clearSearch(),
-                    ),
-                  Selector<InspectorController, bool>(
-                    selector: (_, c) => c.areAnyFiltersApplied,
-                    builder: (context, areAnyFiltersApplied, _) => IconButton(
-                      icon: Icon(
-                        Icons.filter_list,
-                        color: areAnyFiltersApplied ? Colors.orange : null,
-                      ),
-                      onPressed: () => _showFiltersDialog(context, isDarkMode),
-                    ),
-                  ),
-                ],
-              ),
-              border: const OutlineInputBorder(),
-              isDense: true,
-            ),
-            onChanged: (value) {
-              InspectorController().searchDebouncer.run(() {
-                InspectorController().setSearchQuery(value);
-              });
+          return _SearchField(
+            searchQuery: searchQuery,
+            onFiltersTap: () {
+              _showFiltersDialog(context, isDarkMode);
             },
           );
         },
@@ -597,6 +570,70 @@ class Inspector extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (context) => FiltersDialog(isDarkMode: isDarkMode),
+    );
+  }
+}
+
+class _SearchField extends StatefulWidget {
+  const _SearchField({
+    required this.searchQuery,
+    required this.onFiltersTap,
+  });
+
+  final String searchQuery;
+  final void Function() onFiltersTap;
+
+  @override
+  State<_SearchField> createState() => __SearchFieldState();
+}
+
+class __SearchFieldState extends State<_SearchField> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: _controller,
+      decoration: InputDecoration(
+        hintText: 'Search by URL',
+        prefixIcon: const Icon(Icons.search),
+        suffixIcon: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (widget.searchQuery.isNotEmpty)
+              IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: () {
+                  InspectorController().clearSearch();
+                  _controller.clear();
+                },
+              ),
+            Selector<InspectorController, bool>(
+              selector: (_, c) => c.areAnyFiltersApplied,
+              builder: (context, areAnyFiltersApplied, _) => IconButton(
+                icon: Icon(
+                  Icons.filter_list,
+                  color: areAnyFiltersApplied ? Colors.orange : null,
+                ),
+                onPressed: widget.onFiltersTap,
+              ),
+            ),
+          ],
+        ),
+        border: const OutlineInputBorder(),
+        isDense: true,
+      ),
+      onChanged: (value) {
+        InspectorController().searchDebouncer.run(() {
+          InspectorController().setSearchQuery(value);
+        });
+      },
     );
   }
 }
