@@ -24,7 +24,8 @@ class InspectorController extends ChangeNotifier {
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
     bool defaultTreeViewEnabled = true,
-    bool expandChildren = true,
+    bool defaultExpandChildren = true,
+    bool defaultIsDarkMode = true,
   }) =>
       _singleton ??= InspectorController._internal(
         enabled: enabled,
@@ -32,7 +33,8 @@ class InspectorController extends ChangeNotifier {
         onStoppingRequest: onStoppingRequest,
         onStoppingResponse: onStoppingResponse,
         defaultTreeViewEnabled: defaultTreeViewEnabled,
-        expandChildren: expandChildren,
+        defaultExpandChildren: defaultExpandChildren,
+        defaultIsDarkMode: defaultIsDarkMode,
       );
 
   InspectorController._internal({
@@ -41,12 +43,14 @@ class InspectorController extends ChangeNotifier {
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
     required bool defaultTreeViewEnabled,
-    required bool expandChildren,
+    required bool defaultExpandChildren,
+    required bool defaultIsDarkMode,
   })  : _enabled = enabled,
         _showInspectorOn = showInspectorOn,
         _onStoppingRequest = onStoppingRequest,
         _isTreeView = defaultTreeViewEnabled,
-        _expandChildren = expandChildren,
+        _expandChildren = defaultExpandChildren,
+        _isDarkMode = defaultIsDarkMode,
         _onStoppingResponse = onStoppingResponse {
     if (_enabled && _allowShaking)
       _shakeDetector = ShakeDetector.autoStart(
@@ -74,8 +78,8 @@ class InspectorController extends ChangeNotifier {
   int _selectedTab = 0;
   bool _requestStopperEnabled = false;
   bool _responseStopperEnabled = false;
-  bool _isDarkMode = true;
-  bool _isTreeView = true;
+  bool _isDarkMode;
+  bool _isTreeView;
   bool _expandChildren;
 
   final _requestsList = <RequestDetails>[];

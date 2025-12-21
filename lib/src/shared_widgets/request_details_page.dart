@@ -32,83 +32,95 @@ class RequestDetailsPage extends StatelessWidget {
       selector: (_, inspectorController) => inspectorController.isTreeView,
       builder: (context, isTreeView, _) => Selector<InspectorController, bool>(
         selector: (_, inspectorController) => inspectorController.isDarkMode,
-        builder: (context, isDarkMode, _) => ListView(
-          padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 96.0),
-          children: [
-            _buildExpandableSection(
-              context: context,
-              txtCopy: JsonPrettyConverter().convert(request.url),
-              titleWidget: _buildRequestNameAndStatus(
-                method: request.requestMethod,
-                requestName: request.requestName,
-                statusCode: request.statusCode,
-              ),
-              children: [
-                _buildRequestSentTimeAndDuration(
-                  request.sentTime,
-                  request.receivedTime,
-                  request.url,
-                ),
-              ],
-            ),
-            if (request.headers != null)
+        builder: (context, isDarkMode, _) =>
+            Selector<InspectorController, bool>(
+          selector: (_, inspectorController) =>
+              inspectorController.expandChildren,
+          builder: (context, expandChildren, _) => ListView(
+            padding:
+                const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 96.0),
+            children: [
               _buildExpandableSection(
                 context: context,
-                txtCopy: JsonPrettyConverter().convert(request.headers),
-                title: 'Headers',
-                children: _buildDataBlock(
-                  request.headers,
-                  isTreeView: isTreeView,
-                  isDarkMode: isDarkMode,
+                txtCopy: JsonPrettyConverter().convert(request.url),
+                titleWidget: _buildRequestNameAndStatus(
+                  method: request.requestMethod,
+                  requestName: request.requestName,
+                  statusCode: request.statusCode,
                 ),
+                children: [
+                  _buildRequestSentTimeAndDuration(
+                    request.sentTime,
+                    request.receivedTime,
+                    request.url,
+                  ),
+                ],
               ),
-            if (request.queryParameters != null)
-              _buildExpandableSection(
-                context: context,
-                txtCopy: JsonPrettyConverter().convert(request.queryParameters),
-                title: 'Query Parameters',
-                children: _buildDataBlock(
-                  request.queryParameters,
-                  isTreeView: isTreeView,
-                  isDarkMode: isDarkMode,
+              if (request.headers != null)
+                _buildExpandableSection(
+                  context: context,
+                  txtCopy: JsonPrettyConverter().convert(request.headers),
+                  title: 'Headers',
+                  children: _buildDataBlock(
+                    request.headers,
+                    isTreeView: isTreeView,
+                    isDarkMode: isDarkMode,
+                    expandChildren: expandChildren,
+                  ),
                 ),
-              ),
-            if (request.requestBody != null)
-              _buildExpandableSection(
-                context: context,
-                txtCopy: JsonPrettyConverter().convert(request.requestBody),
-                title:
-                    'Request Body${request.requestBody is FormData ? " (Form Data)" : ""}',
-                children: _buildDataBlock(
-                  request.requestBody,
-                  isTreeView: isTreeView,
-                  isDarkMode: isDarkMode,
+              if (request.queryParameters != null)
+                _buildExpandableSection(
+                  context: context,
+                  txtCopy:
+                      JsonPrettyConverter().convert(request.queryParameters),
+                  title: 'Query Parameters',
+                  children: _buildDataBlock(
+                    request.queryParameters,
+                    isTreeView: isTreeView,
+                    isDarkMode: isDarkMode,
+                    expandChildren: expandChildren,
+                  ),
                 ),
-              ),
-            if (request.graphqlRequestVars != null)
-              _buildExpandableSection(
-                context: context,
-                txtCopy:
-                    JsonPrettyConverter().convert(request.graphqlRequestVars),
-                title: 'GraphQL Request Vars',
-                children: _buildDataBlock(
-                  request.graphqlRequestVars,
-                  isTreeView: isTreeView,
-                  isDarkMode: isDarkMode,
+              if (request.requestBody != null)
+                _buildExpandableSection(
+                  context: context,
+                  txtCopy: JsonPrettyConverter().convert(request.requestBody),
+                  title:
+                      'Request Body${request.requestBody is FormData ? " (Form Data)" : ""}',
+                  children: _buildDataBlock(
+                    request.requestBody,
+                    isTreeView: isTreeView,
+                    isDarkMode: isDarkMode,
+                    expandChildren: expandChildren,
+                  ),
                 ),
-              ),
-            if (request.responseBody != null)
-              _buildExpandableSection(
-                context: context,
-                txtCopy: JsonPrettyConverter().convert(request.responseBody),
-                title: 'Response Body',
-                children: _buildDataBlock(
-                  request.responseBody,
-                  isTreeView: isTreeView,
-                  isDarkMode: isDarkMode,
+              if (request.graphqlRequestVars != null)
+                _buildExpandableSection(
+                  context: context,
+                  txtCopy:
+                      JsonPrettyConverter().convert(request.graphqlRequestVars),
+                  title: 'GraphQL Request Vars',
+                  children: _buildDataBlock(
+                    request.graphqlRequestVars,
+                    isTreeView: isTreeView,
+                    isDarkMode: isDarkMode,
+                    expandChildren: expandChildren,
+                  ),
                 ),
-              ),
-          ],
+              if (request.responseBody != null)
+                _buildExpandableSection(
+                  context: context,
+                  txtCopy: JsonPrettyConverter().convert(request.responseBody),
+                  title: 'Response Body',
+                  children: _buildDataBlock(
+                    request.responseBody,
+                    isTreeView: isTreeView,
+                    isDarkMode: isDarkMode,
+                    expandChildren: expandChildren,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -242,6 +254,7 @@ class RequestDetailsPage extends StatelessWidget {
     dynamic data, {
     required bool isTreeView,
     required bool isDarkMode,
+    required bool expandChildren,
   }) {
     if (data == null) return [];
 
@@ -255,7 +268,7 @@ class RequestDetailsPage extends StatelessWidget {
           ? JsonTreeView(
               data,
               isDarkMode: isDarkMode,
-              expandChildren: InspectorController().expandChildren,
+              expandChildren: expandChildren,
             )
           : _buildSelectableText(data),
     ];

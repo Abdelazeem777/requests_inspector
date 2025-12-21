@@ -25,7 +25,8 @@ class JsonTreeView extends StatelessWidget {
     );
   }
 
-  Widget _buildNode(BuildContext context, dynamic node, {String? keyName, bool isRoot = false}) {
+  Widget _buildNode(BuildContext context, dynamic node,
+      {String? keyName, bool isRoot = false}) {
     Widget content;
     if (node is Map<String, dynamic>) {
       content = _buildMapNode(context, node, keyName, isRoot: isRoot);
@@ -67,7 +68,8 @@ class JsonTreeView extends StatelessWidget {
     );
   }
 
-  Widget _buildListNode(BuildContext context, List list, String? keyName, {bool isRoot = false}) {
+  Widget _buildListNode(BuildContext context, List list, String? keyName,
+      {bool isRoot = false}) {
     final isEmpty = list.isEmpty;
 
     if (isEmpty) {
@@ -115,7 +117,6 @@ class JsonTreeView extends StatelessWidget {
 
           return _buildNode(context, nodeValue, keyName: e.key);
         }),
-
         _buildClosingBracket(context, '} ,'),
       ],
       collapsedCount: length,
@@ -247,6 +248,14 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
   void initState() {
     super.initState();
     _expanded = widget.initiallyExpanded;
+  }
+
+  @override
+  void didUpdateWidget(_CustomExpansionTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initiallyExpanded != widget.initiallyExpanded) {
+      setState(() => _expanded = widget.initiallyExpanded);
+    }
   }
 
   @override
