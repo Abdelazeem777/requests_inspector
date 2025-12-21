@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:requests_inspector/src/filters_dialog.dart';
+import 'package:requests_inspector/src/shared_widgets/inspector_option_switch.dart';
 import 'package:requests_inspector/src/shared_widgets/request_details_page.dart';
 import 'package:requests_inspector/src/shared_widgets/request_item.dart';
 import 'package:requests_inspector/src/shared_widgets/run_again_widget.dart';
@@ -130,12 +131,8 @@ class Inspector extends StatelessWidget {
                   Selector<InspectorController, bool>(
                     selector: (_, controller) => controller.isDarkMode,
                     builder: (context, isDarkMode, __) {
-                      return Switch(
+                      return InspectorOptionSwitch(
                         value: isDarkMode,
-                        activeColor: Colors.green,
-                        activeTrackColor: Colors.grey[700],
-                        inactiveThumbColor: Colors.white,
-                        inactiveTrackColor: Colors.grey[700],
                         onChanged: (value) =>
                             InspectorController().toggleInspectorTheme(),
                       );
@@ -163,12 +160,8 @@ class Inspector extends StatelessWidget {
                   Selector<InspectorController, bool>(
                     selector: (_, controller) => controller.isTreeView,
                     builder: (context, isTreeView, __) {
-                      return Switch(
+                      return InspectorOptionSwitch(
                         value: isTreeView,
-                        activeColor: Colors.green,
-                        activeTrackColor: Colors.grey[700],
-                        inactiveThumbColor: Colors.white,
-                        inactiveTrackColor: Colors.grey[700],
                         onChanged: (value) =>
                             InspectorController().toggleInspectorJsonView(),
                       );
@@ -179,116 +172,91 @@ class Inspector extends StatelessWidget {
             ),
           ),
         ),
-        if (showStopperDialogsAllowed())
+        if (showStopperDialogsAllowed()) ...[
           PopupMenuItem(
             padding: EdgeInsets.zero,
             // Remove default padding for InkWell to fill
-            child: InkWell(
-              onTap: () => InspectorController().requestStopperEnabled =
-                  !InspectorController().requestStopperEnabled,
-              child: Padding(
-                // Add padding back for content
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Selector<InspectorController, bool>(
-                      selector: (_, controller) => controller.isDarkMode,
-                      builder: (context, isDarkMode, __) => IconButton(
-                        onPressed: () {
-                          showDialog<void>(
-                            context: context,
-                            builder: (context) => StopperFiltersDialog(
-                              isDarkMode: isDarkMode,
-                              stopperType: StopperType.request,
-                            ),
-                          );
-                        },
-                        icon: Icon(
-                          Icons.filter_list,
-                          color: isDarkMode ? Colors.white : Colors.black,
+            child: Selector<InspectorController, bool>(
+              selector: (_, controller) => controller.isDarkMode,
+              builder: (context, isDarkMode, __) => InkWell(
+                onTap: () {
+                  showDialog<void>(
+                    context: context,
+                    builder: (context) => StopperFiltersDialog(
+                      isDarkMode: isDarkMode,
+                      stopperType: StopperType.request,
+                    ),
+                  );
+                },
+                child: Selector<InspectorController, bool>(
+                  selector: (_, inspectorController) =>
+                      inspectorController.requestStopperEnabled,
+                  builder: (context, requestStopperEnabled, _) => Padding(
+                    // Add padding back for content
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Requests Stopper'),
+                        InspectorOptionSwitch(
+                          value: requestStopperEnabled,
+                          onChanged: (value) {
+                            InspectorController().requestStopperEnabled = value;
+                          },
                         ),
-                      ),
+                      ],
                     ),
-                    SizedBox(width: 12),
-                    const Text('Requests Stopper'),
-                    Spacer(),
-                    Selector<InspectorController, bool>(
-                      selector: (_, inspectorController) =>
-                          inspectorController.requestStopperEnabled,
-                      builder: (context, requestStopperEnabled, _) => Switch(
-                        value: requestStopperEnabled,
-                        activeColor: Colors.green,
-                        activeTrackColor: Colors.grey[700],
-                        inactiveThumbColor: Colors.white,
-                        inactiveTrackColor: Colors.grey[700],
-                        onChanged: (value) =>
-                            InspectorController().requestStopperEnabled = value,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        if (showStopperDialogsAllowed())
           PopupMenuItem(
             padding: EdgeInsets.zero,
             // Remove default padding for InkWell to fill
-            child: InkWell(
-              onTap: () => InspectorController().responseStopperEnabled =
-                  !InspectorController().responseStopperEnabled,
-              child: Padding(
-                // Add padding back for content
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Selector<InspectorController, bool>(
-                      selector: (_, controller) => controller.isDarkMode,
-                      builder: (context, isDarkMode, __) => IconButton(
-                        onPressed: () {
-                          showDialog<void>(
-                            context: context,
-                            builder: (context) => StopperFiltersDialog(
-                              isDarkMode: isDarkMode,
-                              stopperType: StopperType.response,
-                            ),
-                          );
-                        },
-                        icon: Icon(
-                          Icons.filter_list,
-                          color: isDarkMode ? Colors.white : Colors.black,
+            child: Selector<InspectorController, bool>(
+              selector: (_, controller) => controller.isDarkMode,
+              builder: (context, isDarkMode, __) => InkWell(
+                onTap: () {
+                  showDialog<void>(
+                    context: context,
+                    builder: (context) => StopperFiltersDialog(
+                      isDarkMode: isDarkMode,
+                      stopperType: StopperType.response,
+                    ),
+                  );
+                },
+                child: Selector<InspectorController, bool>(
+                  selector: (_, inspectorController) =>
+                      inspectorController.responseStopperEnabled,
+                  builder: (context, responseStopperEnabled, _) => Padding(
+                    // Add padding back for content
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Responses Stopper'),
+                        InspectorOptionSwitch(
+                          value: responseStopperEnabled,
+                          onChanged: (value) {
+                            InspectorController().responseStopperEnabled =
+                                value;
+                          },
                         ),
-                      ),
+                      ],
                     ),
-                    SizedBox(width: 12),
-                    const Text('Responses Stopper'),
-                    Spacer(),
-                    Selector<InspectorController, bool>(
-                      selector: (_, inspectorController) =>
-                          inspectorController.responseStopperEnabled,
-                      builder: (context, responseStopperEnabled, _) => Switch(
-                        value: responseStopperEnabled,
-                        activeColor: Colors.green,
-                        activeTrackColor: Colors.grey[700],
-                        inactiveThumbColor: Colors.white,
-                        inactiveTrackColor: Colors.grey[700],
-                        onChanged: (value) => InspectorController()
-                            .responseStopperEnabled = value,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
+        ],
       ],
     );
   }
@@ -555,38 +523,12 @@ class Inspector extends StatelessWidget {
       child: Selector<InspectorController, String>(
         selector: (_, c) => c.searchUrlQuery,
         builder: (context, searchQuery, _) {
-          return TextField(
-            decoration: InputDecoration(
-              hintText: 'Search by URL',
-              prefixIcon: const Icon(Icons.search),
-              suffixIcon: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (searchQuery.isNotEmpty)
-                    IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () => InspectorController().clearSearch(),
-                    ),
-                  Selector<InspectorController, bool>(
-                    selector: (_, c) => c.areAnyFiltersApplied,
-                    builder: (context, areAnyFiltersApplied, _) => IconButton(
-                      icon: Icon(
-                        Icons.filter_list,
-                        color: areAnyFiltersApplied ? Colors.orange : null,
-                      ),
-                      onPressed: () => _showFiltersDialog(context, isDarkMode),
-                    ),
-                  ),
-                ],
-              ),
-              border: const OutlineInputBorder(),
-              isDense: true,
-            ),
-            onChanged: (value) {
-              InspectorController().searchDebouncer.run(() {
-                InspectorController().setSearchQuery(value);
-              });
+          return _SearchField(
+            searchQuery: searchQuery,
+            onFiltersTap: () {
+              _showFiltersDialog(context, isDarkMode);
             },
+            isDarkMode: isDarkMode,
           );
         },
       ),
@@ -597,6 +539,74 @@ class Inspector extends StatelessWidget {
     showDialog<void>(
       context: context,
       builder: (context) => FiltersDialog(isDarkMode: isDarkMode),
+    );
+  }
+}
+
+class _SearchField extends StatefulWidget {
+  const _SearchField({
+    required this.searchQuery,
+    required this.onFiltersTap,
+    required this.isDarkMode,
+  });
+
+  final String searchQuery;
+  final void Function() onFiltersTap;
+  final bool isDarkMode;
+
+  @override
+  State<_SearchField> createState() => __SearchFieldState();
+}
+
+class __SearchFieldState extends State<_SearchField> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: _controller,
+      decoration: InputDecoration(
+        hintText: 'Search by URL',
+        fillColor: widget.isDarkMode ? Colors.black : Colors.white,
+        filled: true,
+        prefixIcon: const Icon(Icons.search),
+        suffixIcon: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (widget.searchQuery.isNotEmpty)
+              IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: () {
+                  InspectorController().clearSearch();
+                  _controller.clear();
+                },
+              ),
+            Selector<InspectorController, bool>(
+              selector: (_, c) => c.areAnyFiltersApplied,
+              builder: (context, areAnyFiltersApplied, _) => IconButton(
+                icon: Icon(
+                  Icons.filter_list,
+                  color: areAnyFiltersApplied ? Colors.orange : null,
+                ),
+                onPressed: widget.onFiltersTap,
+              ),
+            ),
+          ],
+        ),
+        border: const OutlineInputBorder(),
+        isDense: true,
+      ),
+      onChanged: (value) {
+        InspectorController().searchDebouncer.run(() {
+          InspectorController().setSearchQuery(value);
+        });
+      },
     );
   }
 }

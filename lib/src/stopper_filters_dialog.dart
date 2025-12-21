@@ -151,6 +151,7 @@ class _StopperFiltersDialogState extends State<StopperFiltersDialog> {
             if (widget.stopperType == StopperType.request) {
               c.setRequestStopperFilterMethod(_selectedMethod);
               c.setRequestStopperFilterUrl(_urlController.text);
+              c.requestStopperEnabled = true;
             } else {
               c.setResponseStopperFilterUrl(_urlController.text);
               int? status;
@@ -158,6 +159,7 @@ class _StopperFiltersDialogState extends State<StopperFiltersDialog> {
                 status = int.tryParse(_statusCodeController.text.trim());
               }
               c.setResponseStopperFilterStatusCode(status);
+              c.responseStopperEnabled = true;
             }
             Navigator.of(context).pop();
           },
