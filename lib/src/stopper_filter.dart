@@ -27,7 +27,7 @@ class RequestStopperFilter implements StopperFilter {
     // If URL filter is set, check it
     if (urlPattern != null &&
         urlPattern!.trim().isNotEmpty &&
-        !details.url.toLowerCase().contains(urlPattern!.toLowerCase())) {
+        !details.url.toLowerCase().contains(urlPattern!.trim().toLowerCase())) {
       return false;
     }
 
@@ -56,7 +56,7 @@ class ResponseStopperFilter implements StopperFilter {
     // If URL filter is set, check it
     if (urlPattern != null &&
         urlPattern!.trim().isNotEmpty &&
-        !details.url.toLowerCase().contains(urlPattern!.toLowerCase())) {
+        !details.url.toLowerCase().contains(urlPattern!.trim().toLowerCase())) {
       return false;
     }
 

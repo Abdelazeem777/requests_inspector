@@ -12,9 +12,7 @@ class RequestMethodFilter implements RequestFilter {
 
   @override
   bool Function(RequestDetails requestDetails) get requestFilter =>
-      (requestDetails) {
-        return requestDetails.requestMethod == requestMethod;
-      };
+      (requestDetails) => requestDetails.requestMethod == requestMethod;
 }
 
 class RequestUrlFilter implements RequestFilter {
@@ -24,11 +22,10 @@ class RequestUrlFilter implements RequestFilter {
 
   @override
   bool Function(RequestDetails requestDetails) get requestFilter =>
-      (requestDetails) {
-        return requestDetails.url
-            .trimAndConvertToLowerCase()
-            .contains(url.trimAndConvertToLowerCase());
-      };
+      (requestDetails) => requestDetails.url
+          .trim()
+          .toLowerCase()
+          .contains(url.trim().toLowerCase());
 }
 
 class RequestStatusCodeFilter implements RequestFilter {
@@ -38,13 +35,5 @@ class RequestStatusCodeFilter implements RequestFilter {
 
   @override
   bool Function(RequestDetails requestDetails) get requestFilter =>
-      (requestDetails) {
-        return requestDetails.statusCode == statusCode;
-      };
-}
-
-extension _TrimAndConvertToLowerCase on String {
-  String trimAndConvertToLowerCase() {
-    return trim().toLowerCase();
-  }
+      (requestDetails) => requestDetails.statusCode == statusCode;
 }

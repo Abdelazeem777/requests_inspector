@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:requests_inspector/src/debouncer.dart';
 import 'package:requests_inspector/src/shake.dart';
 import 'package:requests_inspector/src/stopper_filter.dart';
 import 'package:share_plus/share_plus.dart';
@@ -55,12 +54,11 @@ class InspectorController extends ChangeNotifier {
         _expandChildren = defaultExpandChildren,
         _isDarkMode = defaultIsDarkMode,
         _onStoppingResponse = onStoppingResponse {
-    if (_enabled && _allowShaking) {
+    if (_enabled && _allowShaking)
       _shakeDetector = ShakeDetector.autoStart(
         onPhoneShake: showInspector,
         minimumShakeCount: 3,
       );
-    }
   }
 
   static InspectorController? _singleton;
@@ -93,10 +91,11 @@ class InspectorController extends ChangeNotifier {
   String _searchUrlQuery = '';
   RequestMethod? _filterRequestMethod;
   int? _filterStatusCode;
-  final searchDebouncer = Debouncer(milliseconds: 500);
+
   // ------------------------------
 
   // Stoppers Filter State
+  /// TODO: Would be better if we used the [RequestStopperFilter] and [ResponseStopperFilter] classes instead of these separate fields.
   RequestMethod? _requestStopperFilterMethod;
   String? _requestStopperFilterUrl;
   int? _responseStopperFilterStatusCode;
@@ -149,24 +148,16 @@ class InspectorController extends ChangeNotifier {
   List<RequestDetails> get filteredRequestsList {
     Iterable<RequestDetails> list = [..._requestsList];
 
-    // Build filters list
-    final filters = <RequestFilter>[];
-    if (_filterRequestMethod != null) {
-      filters.add(RequestMethodFilter(_filterRequestMethod!));
-    }
+    if (_filterRequestMethod != null)
+      list =
+          list.where(RequestMethodFilter(_filterRequestMethod!).requestFilter);
 
-    if (_filterStatusCode != null) {
-      filters.add(RequestStatusCodeFilter(_filterStatusCode!));
-    }
+    if (_filterStatusCode != null)
+      list =
+          list.where(RequestStatusCodeFilter(_filterStatusCode!).requestFilter);
 
-    if (_searchUrlQuery.trim().isNotEmpty) {
-      filters.add(RequestUrlFilter(_searchUrlQuery));
-    }
-
-    // Apply filters
-    for (final f in filters) {
-      list = list.where(f.requestFilter);
-    }
+    if (_searchUrlQuery.trim().isNotEmpty)
+      list = list.where(RequestUrlFilter(_searchUrlQuery).requestFilter);
 
     return list.toList(growable: false);
   }
@@ -202,7 +193,7 @@ class InspectorController extends ChangeNotifier {
   }
 
   // setters for search & filters
-  void setSearchQuery(String value) {
+  void searchForRequests(String value) {
     if (_searchUrlQuery == value) return;
     _searchUrlQuery = value;
     notifyListeners();
@@ -396,7 +387,6 @@ class InspectorController extends ChangeNotifier {
   @override
   void dispose() {
     if (_allowShaking) _shakeDetector.stopListening();
-    searchDebouncer.cancel();
     _singleton = null;
     super.dispose();
   }
