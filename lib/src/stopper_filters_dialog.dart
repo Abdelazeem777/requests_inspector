@@ -19,14 +19,18 @@ class StopperFiltersDialog extends StatefulWidget {
 enum StopperType { request, response }
 
 class _StopperFiltersDialogState extends State<StopperFiltersDialog> {
-  final TextEditingController _urlController = TextEditingController();
-  final TextEditingController _statusCodeController = TextEditingController();
+  late final TextEditingController _urlController;
+  late final TextEditingController _statusCodeController;
   RequestMethod? _selectedMethod;
 
   @override
   void initState() {
     super.initState();
+
     final controller = InspectorController();
+    _urlController = TextEditingController();
+    _statusCodeController = TextEditingController();
+
     if (widget.stopperType == StopperType.request) {
       _selectedMethod = controller.requestStopperFilterMethod;
       _urlController.text = controller.requestStopperFilterUrl ?? '';
@@ -41,6 +45,7 @@ class _StopperFiltersDialogState extends State<StopperFiltersDialog> {
   void dispose() {
     _urlController.dispose();
     _statusCodeController.dispose();
+
     super.dispose();
   }
 
