@@ -5,6 +5,10 @@
 
 Special thanks to [Hamid Montazeri](https://github.com/hamidhandid) for this amazing contribution that makes the inspector much more powerful and user-friendly! 🎉
 
+- Add Expand/Collapse json objects switch button for the JSON Tree View.
+
+Special thanks to [MohamedGawdat](https://github.com/MohamedGawdat) for this amazing contribution! 🎉
+
 ## 5.2.2
 
 - Fix Selectable text at normal view (#55), thanks to [Nourhan Sabrii](https://github.com/NourSabry).
