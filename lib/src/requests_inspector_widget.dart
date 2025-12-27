@@ -104,6 +104,10 @@ class RequestsInspector extends StatelessWidget {
     required RequestDetails requestDetails,
   }) {
     if (_navigatorKey?.currentContext == null) return Future.value(null);
+    if (!InspectorController().shouldStopRequest(requestDetails)) {
+      return Future.value(null);
+    }
+
     return showDialog<RequestDetails?>(
       context: _navigatorKey!.currentContext!,
       builder: (context) =>
@@ -116,6 +120,9 @@ class RequestsInspector extends StatelessWidget {
     required ResponseDetails responseDetails,
   }) {
     if (_navigatorKey?.currentContext == null) return Future.value(null);
+    if (!InspectorController().shouldStopResponse(responseDetails)) {
+      return Future.value(null);
+    }
 
     return showDialog<ResponseDetails>(
       context: _navigatorKey!.currentContext!,
