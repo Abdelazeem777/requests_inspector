@@ -1,17 +1,22 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'shared_widgets/highlighted_text.dart';
+import 'helpers/search_helper.dart';
+import 'inspector_controller.dart';
+import 'package:provider/provider.dart';
 
 class JsonTreeView extends StatelessWidget {
   final dynamic data;
   final bool _isDarkMode;
   final String searchQuery;
+  final int matchIndexOffset;
 
   const JsonTreeView(
     this.data, {
     super.key,
     required bool isDarkMode,
     this.searchQuery = '',
+    this.matchIndexOffset = 0,
   }) : _isDarkMode = isDarkMode;
 
   @override
@@ -20,118 +25,180 @@ class JsonTreeView extends StatelessWidget {
       scrollDirection: Axis.vertical,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: _buildNode(context, data),
+        child: _buildNode(context, data, currentOffset: matchIndexOffset),
       ),
     );
   }
 
-  Widget _buildNode(BuildContext context, dynamic node, {String? keyName}) {
-    Widget content;
+  Widget _buildNode(BuildContext context, dynamic node,
+      {String? keyName, required int currentOffset}) {
     if (node is Map<String, dynamic>) {
-      content = _buildMapNode(context, node, keyName);
+      return _buildMapNode(context, node, keyName, currentOffset);
     } else if (node is List) {
-      content = _buildListNode(context, node, keyName);
+      return _buildListNode(context, node, keyName, currentOffset);
     } else if (node is FormData) {
-      content = _buildFormDataNode(context, node, keyName);
+      return _buildFormDataNode(context, node, keyName, currentOffset);
     } else {
-      content = _buildLeafNode(context, keyName, node);
+      return _buildLeafNode(context, keyName, node, currentOffset);
     }
-
-    return content;
   }
 
   Widget _buildMapNode(
     BuildContext context,
     Map<String, dynamic> map,
     String? keyName,
+    int currentOffset,
   ) {
-    final isEmpty = map.isEmpty;
-
-    if (isEmpty) {
-      return _buildLeafNode(context, keyName, '{}');
+    if (map.isEmpty) {
+      return _buildLeafNode(context, keyName, '{}', currentOffset);
     }
+
+    final children = <Widget>[];
+    var offset = currentOffset;
+
+    for (final entry in map.entries) {
+      children.add(_buildNode(context, entry.value,
+          keyName: entry.key, currentOffset: offset));
+      offset += _countMatchesInNode(entry.value, entry.key);
+    }
+
+    children.add(_buildClosingBracket(context, '} ,'));
+
+    final totalMatches = _countMatchesInNode(map, keyName);
 
     return _CustomExpansionTile(
       titleString: keyName != null ? '"$keyName" : ' : '',
-      children: [
-        ...map.entries.map((e) {
-          return _buildNode(context, e.value, keyName: e.key);
-        }),
-        _buildClosingBracket(context, '} ,'),
-      ],
+      children: children,
       collapsedCount: map.length,
       isObject: true,
       initiallyExpanded: true,
       isDarkMode: _isDarkMode,
+      matchIndexOffset: currentOffset,
+      totalMatches: totalMatches,
     );
   }
 
-  Widget _buildListNode(BuildContext context, List list, String? keyName) {
-    final isEmpty = list.isEmpty;
-
-    if (isEmpty) {
-      return _buildLeafNode(context, keyName, '[]');
+  Widget _buildListNode(
+      BuildContext context, List list, String? keyName, int currentOffset) {
+    if (list.isEmpty) {
+      return _buildLeafNode(context, keyName, '[]', currentOffset);
     }
+
+    final children = <Widget>[];
+    var offset = currentOffset;
+
+    for (final item in list) {
+      children.add(_buildNode(context, item, currentOffset: offset));
+      offset += _countMatchesInNode(item, null);
+    }
+
+    children.add(_buildClosingBracket(context, '] ,'));
+
+    final totalMatches = _countMatchesInNode(list, keyName);
 
     return _CustomExpansionTile(
       titleString: keyName != null ? '"$keyName" : ' : '',
-      children: [
-        ...list.asMap().entries.map((e) {
-          return _buildNode(context, e.value, keyName: null);
-        }),
-        _buildClosingBracket(context, '] ,'),
-      ],
+      children: children,
       collapsedCount: list.length,
       isObject: false,
       initiallyExpanded: true,
       isDarkMode: _isDarkMode,
+      matchIndexOffset: currentOffset,
+      totalMatches: totalMatches,
     );
   }
 
-  // FormData
   Widget _buildFormDataNode(
     BuildContext context,
     FormData formData,
     String? keyName,
+    int currentOffset,
   ) {
     final length = formData.fields.length + formData.files.length;
-    final isEmpty = length == 0;
-
-    if (isEmpty) {
-      return _buildLeafNode(context, keyName, '{}');
+    if (length == 0) {
+      return _buildLeafNode(context, keyName, '{}', currentOffset);
     }
+
+    final children = <Widget>[];
+    var offset = currentOffset;
+
+    for (final field in formData.fields) {
+      children.add(_buildNode(context, field.value,
+          keyName: field.key, currentOffset: offset));
+      offset += _countMatchesInNode(field.value, field.key);
+    }
+
+    for (final file in formData.files) {
+      final sizeInMb = file.value.length ~/ 1024;
+      final fileSizeString = '${sizeInMb.toStringAsFixed(1)} kb';
+      final nodeValue = "($fileSizeString) - ${file.value.filename}";
+      children.add(_buildNode(context, nodeValue,
+          keyName: file.key, currentOffset: offset));
+      offset += _countMatchesInNode(nodeValue, file.key);
+    }
+
+    children.add(_buildClosingBracket(context, '} ,'));
+
+    final totalMatches = _countMatchesInNode(formData, keyName);
 
     return _CustomExpansionTile(
       titleString: keyName != null ? '"$keyName" : ' : '',
-      children: [
-        // fields
-        ...formData.fields.map((e) {
-          return _buildNode(context, e.value, keyName: e.key);
-        }),
-        // files
-        ...formData.files.map((e) {
-          final sizeInMb = e.value.length ~/ 1024;
-          final fileSizeString = '${sizeInMb.toStringAsFixed(1)} kb';
-          // final fileType = e.value.contentType?.type;
-          // final fileTypeString = fileType == null ? '' : "$fileType ";
-          final nodeValue = "($fileSizeString) - ${e.value.filename}";
-
-          return _buildNode(context, nodeValue, keyName: e.key);
-        }),
-
-        _buildClosingBracket(context, '} ,'),
-      ],
+      children: children,
       collapsedCount: length,
       isObject: true,
       initiallyExpanded: true,
       isDarkMode: _isDarkMode,
+      matchIndexOffset: currentOffset,
+      totalMatches: totalMatches,
     );
   }
 
-  Widget _buildLeafNode(BuildContext context, String? key, dynamic value) {
-    final formattedValue = (value is String && value != '{}' && value != '[]') ? '"$value"' : '$value';
+  int _countMatchesInNode(dynamic node, String? key) {
+    if (searchQuery.isEmpty) return 0;
 
-    final fullText = '${key != null ? '"$key" : ' : ''}$formattedValue${key != null ? ',' : ''}';
+    if (node is Map<String, dynamic>) {
+      var count = 0;
+      for (final entry in node.entries) {
+        count += _countMatchesInNode(entry.value, entry.key);
+      }
+      return count;
+    } else if (node is List) {
+      var count = 0;
+      for (final item in node) {
+        count += _countMatchesInNode(item, null);
+      }
+      return count;
+    } else if (node is FormData) {
+      var count = 0;
+      for (final field in node.fields) {
+        count += _countMatchesInNode(field.value, field.key);
+      }
+      for (final file in node.files) {
+        final sizeInMb = file.value.length ~/ 1024;
+        final fileSizeString = '${sizeInMb.toStringAsFixed(1)} kb';
+        final nodeValue = "($fileSizeString) - ${file.value.filename}";
+        count += _countMatchesInNode(nodeValue, file.key);
+      }
+      return count;
+    } else {
+      final formattedValue = (node is String && node != '{}' && node != '[]')
+          ? '"$node"'
+          : '$node';
+      final fullText =
+          '${key != null ? '"$key" : ' : ''}$formattedValue${key != null ? ',' : ''}';
+      return SearchHelper.findMatches(text: fullText, query: searchQuery)
+          .length;
+    }
+  }
+
+  Widget _buildLeafNode(
+      BuildContext context, String? key, dynamic value, int currentOffset) {
+    final formattedValue = (value is String && value != '{}' && value != '[]')
+        ? '"$value"'
+        : '$value';
+
+    final fullText =
+        '${key != null ? '"$key" : ' : ''}$formattedValue${key != null ? ',' : ''}';
 
     return Padding(
       padding: const EdgeInsets.only(left: 12.0),
@@ -139,6 +206,7 @@ class JsonTreeView extends StatelessWidget {
         text: fullText,
         searchQuery: searchQuery,
         isDarkMode: _isDarkMode,
+        matchIndexOffset: currentOffset,
         style: TextStyle(
           fontSize: 14,
           color: _isDarkMode ? Colors.white : Colors.black87,
@@ -147,7 +215,6 @@ class JsonTreeView extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildClosingBracket(BuildContext context, String bracket) {
     return Padding(
@@ -173,6 +240,9 @@ class _CustomExpansionTile extends StatefulWidget {
   final bool isObject;
   final bool isDarkMode;
 
+  final int matchIndexOffset;
+  final int totalMatches;
+
   const _CustomExpansionTile({
     required this.titleString,
     required this.children,
@@ -180,6 +250,8 @@ class _CustomExpansionTile extends StatefulWidget {
     this.collapsedCount,
     this.isObject = false,
     required this.isDarkMode,
+    this.matchIndexOffset = 0,
+    this.totalMatches = 0,
   });
 
   @override
@@ -205,103 +277,121 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
     final bool hasTitleString =
         widget.titleString != null && widget.titleString!.isNotEmpty;
 
-    return Padding(
-      padding: const EdgeInsets.only(left: 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          InkWell(
-            onTap: () {
+    return Selector<InspectorController, int>(
+      selector: (_, controller) => controller.currentMatchIndex,
+      builder: (context, currentMatchIndex, _) {
+        final isActive = currentMatchIndex >= widget.matchIndexOffset &&
+            currentMatchIndex < widget.matchIndexOffset + widget.totalMatches;
+
+        if (isActive && !_expanded) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
               setState(() {
-                _expanded = !_expanded;
+                _expanded = true;
               });
-            },
-            borderRadius: BorderRadius.circular(4),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AnimatedRotation(
-                    turns: _expanded ? 0.25 : 0,
-                    duration: const Duration(milliseconds: 200),
-                    child: Icon(
-                      Icons.arrow_right,
-                      size: 16,
-                      color: secondaryTextColor,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Flexible(
-                    fit: FlexFit.loose,
-                    child: Text.rich(
-                      TextSpan(
-                        children: [
-                          if (hasTitleString)
-                            TextSpan(
-                              text: widget.titleString,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                                color: textColor,
-                              ),
-                            ),
-                          if (_expanded)
-                            TextSpan(
-                              text: widget.isObject ? '{' : '[',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 14,
-                                color: textColor,
-                              ),
-                            )
-                          else
-                            TextSpan(
-                              children: [
+            }
+          });
+        }
+
+        return Padding(
+          padding: const EdgeInsets.only(left: 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    _expanded = !_expanded;
+                  });
+                },
+                borderRadius: BorderRadius.circular(4),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AnimatedRotation(
+                        turns: _expanded ? 0.25 : 0,
+                        duration: const Duration(milliseconds: 200),
+                        child: Icon(
+                          Icons.arrow_right,
+                          size: 16,
+                          color: secondaryTextColor,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        fit: FlexFit.loose,
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              if (hasTitleString)
+                                TextSpan(
+                                  text: widget.titleString,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                    color: textColor,
+                                  ),
+                                ),
+                              if (_expanded)
                                 TextSpan(
                                   text: widget.isObject ? '{' : '[',
                                   style: TextStyle(
+                                    fontWeight: FontWeight.w500,
                                     fontSize: 14,
                                     color: textColor,
-                                    fontWeight: FontWeight.w500,
                                   ),
-                                ),
-                                if (widget.collapsedCount != null)
-                                  TextSpan(
-                                    text: widget.collapsedCount.toString(),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: secondaryTextColor,
-                                    ),
-                                  ),
+                                )
+                              else
                                 TextSpan(
-                                  text: widget.isObject ? '} ,' : '] ,',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: textColor,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                  children: [
+                                    TextSpan(
+                                      text: widget.isObject ? '{' : '[',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: textColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    if (widget.collapsedCount != null)
+                                      TextSpan(
+                                        text: widget.collapsedCount.toString(),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: secondaryTextColor,
+                                        ),
+                                      ),
+                                    TextSpan(
+                                      text: widget.isObject ? '} ,' : '] ,',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: textColor,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                        ],
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+              if (_expanded)
+                Padding(
+                  padding: const EdgeInsets.only(left: 12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: widget.children,
+                  ),
+                ),
+            ],
           ),
-          if (_expanded)
-            Padding(
-              padding: const EdgeInsets.only(left: 12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: widget.children,
-              ),
-            ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

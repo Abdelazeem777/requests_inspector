@@ -80,6 +80,7 @@ class InspectorController extends ChangeNotifier {
   bool _isSearchVisible = false;
   String _searchQuery = '';
   int _totalMatches = 0;
+  int _currentMatchIndex = -1;
 
   int get selectedTab => _selectedTab;
 
@@ -100,6 +101,8 @@ class InspectorController extends ChangeNotifier {
   String get searchQuery => _searchQuery;
 
   int get totalMatches => _totalMatches;
+
+  int get currentMatchIndex => _currentMatchIndex;
 
   bool get _allowShaking => [
         ShowInspectorOn.Shaking,
@@ -302,6 +305,19 @@ class InspectorController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void nextMatch() {
+    if (_totalMatches == 0) return;
+    _currentMatchIndex = (_currentMatchIndex + 1) % _totalMatches;
+    notifyListeners();
+  }
+
+  void previousMatch() {
+    if (_totalMatches == 0) return;
+    _currentMatchIndex =
+        (_currentMatchIndex - 1 + _totalMatches) % _totalMatches;
+    notifyListeners();
+  }
+
   void _updateTotalMatches() {
     if (_searchQuery.isEmpty || _selectedRequest == null) {
       _totalMatches = 0;
@@ -319,6 +335,7 @@ class InspectorController extends ChangeNotifier {
       index = text.indexOf(query, index + query.length);
     }
     _totalMatches = count;
+    _currentMatchIndex = count > 0 ? 0 : -1;
   }
 
   String _extractAllText(RequestDetails request) {
@@ -329,8 +346,10 @@ class InspectorController extends ChangeNotifier {
     var text = 'Sent at: $sentTimeText';
 
     if (request.receivedTime != null) {
-      final receivedTimeText = InspectorHelper.extractTimeText(request.receivedTime!);
-      final durationText = InspectorHelper.calculateDuration(request.sentTime, request.receivedTime!);
+      final receivedTimeText =
+          InspectorHelper.extractTimeText(request.receivedTime!);
+      final durationText = InspectorHelper.calculateDuration(
+          request.sentTime, request.receivedTime!);
       text += '\nReceived at: $receivedTimeText\nDuration: $durationText';
     }
 

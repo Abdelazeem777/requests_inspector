@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:requests_inspector/src/inspector_controller.dart';
 
@@ -23,14 +24,15 @@ class _SearchWidgetState extends State<SearchWidget> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
-      
+
       final controller = InspectorController();
       controller.addListener(_onControllerChanged);
     });
   }
 
   void _onControllerChanged() {
-    if (!InspectorController().isSearchVisible && _textController.text.isNotEmpty) {
+    if (!InspectorController().isSearchVisible &&
+        _textController.text.isNotEmpty) {
       _textController.clear();
     }
   }
@@ -45,7 +47,8 @@ class _SearchWidgetState extends State<SearchWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = widget.isDarkMode ? Colors.grey[850] : Colors.grey[200];
+    final backgroundColor =
+        widget.isDarkMode ? Colors.grey[850] : Colors.grey[200];
     final borderColor = widget.isDarkMode ? Colors.grey[700] : Colors.grey[400];
     final textColor = widget.isDarkMode ? Colors.white : Colors.black87;
     final iconColor = widget.isDarkMode ? Colors.grey[400] : Colors.grey[600];
@@ -74,11 +77,12 @@ class _SearchWidgetState extends State<SearchWidget> {
             mainAxisSize: MainAxisSize.min,
             children: [
               SizedBox(
-                width: 180, 
+                width: 180,
                 child: TextField(
                   controller: _textController,
                   focusNode: _focusNode,
                   style: TextStyle(color: textColor, fontSize: 14),
+                  cursorColor: textColor,
                   decoration: InputDecoration(
                     hintText: 'Search...',
                     hintStyle: TextStyle(color: iconColor, fontSize: 14),
@@ -88,25 +92,61 @@ class _SearchWidgetState extends State<SearchWidget> {
                       horizontal: 6.0,
                       vertical: 6.0,
                     ),
-                    suffix: Selector<InspectorController, int>(
-                      selector: (_, controller) => controller.totalMatches,
-                      builder: (context, total, _) {
-                        if (total == 0) return const SizedBox.shrink();
-                        return Text(
-                          '$total matches',
-                          style: TextStyle(
-                            color: iconColor,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      },
-                    ),
                   ),
                   onChanged: (value) {
                     InspectorController().updateSearchQuery(value);
                   },
+                  onSubmitted: (_) {
+                    final isShiftPressed =
+                        HardwareKeyboard.instance.isShiftPressed;
+                    if (isShiftPressed) {
+                      InspectorController().previousMatch();
+                    } else {
+                      InspectorController().nextMatch();
+                    }
+                    _focusNode.requestFocus();
+                  },
                 ),
+              ),
+              Selector<InspectorController, InspectorController>(
+                selector: (_, controller) => controller,
+                builder: (context, controller, _) {
+                  final current = controller.currentMatchIndex;
+                  final total = controller.totalMatches;
+                  if (total <= 0) return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Text(
+                      '${current + 1} / $total',
+                      style: TextStyle(
+                        color: iconColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.keyboard_arrow_up, size: 18, color: iconColor),
+                onPressed: InspectorController().previousMatch,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(
+                  minWidth: 24,
+                  minHeight: 24,
+                ),
+                tooltip: 'Previous match',
+              ),
+              IconButton(
+                icon:
+                    Icon(Icons.keyboard_arrow_down, size: 18, color: iconColor),
+                onPressed: InspectorController().nextMatch,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(
+                  minWidth: 24,
+                  minHeight: 24,
+                ),
+                tooltip: 'Next match',
               ),
               IconButton(
                 icon: Icon(Icons.close, size: 16, color: iconColor),
