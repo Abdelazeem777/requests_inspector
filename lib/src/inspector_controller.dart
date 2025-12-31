@@ -9,6 +9,7 @@ import '../requests_inspector.dart';
 import 'curl_command_generator.dart';
 import 'har_generator.dart';
 import 'json_pretty_converter.dart';
+import 'helpers/inspector_helper.dart';
 import 'enums/share_type_enum.dart';
 import 'requests_filter.dart';
 
@@ -87,6 +88,11 @@ class InspectorController extends ChangeNotifier {
   final _requestsList = <RequestDetails>[];
   RequestDetails? _selectedRequest;
 
+  bool _isSearchVisible = false;
+  String _searchQuery = '';
+  int _totalMatches = 0;
+  int _currentMatchIndex = -1;
+
   // Search & Filters state
   String _searchUrlQuery = '';
   RequestMethod? _filterRequestMethod;
@@ -132,6 +138,14 @@ class InspectorController extends ChangeNotifier {
   List<RequestDetails> get requestsList => _requestsList;
 
   RequestDetails? get selectedRequest => _selectedRequest;
+
+  bool get isSearchVisible => _isSearchVisible;
+
+  String get searchQuery => _searchQuery;
+
+  int get totalMatches => _totalMatches;
+
+  int get currentMatchIndex => _currentMatchIndex;
 
   String get searchUrlQuery => _searchUrlQuery;
 
@@ -189,6 +203,7 @@ class InspectorController extends ChangeNotifier {
     if (_selectedRequest == value && _selectedTab == 1) return;
     _selectedRequest = value;
     _selectedTab = 1;
+    _updateTotalMatches();
     notifyListeners();
   }
 
@@ -429,6 +444,96 @@ class InspectorController extends ChangeNotifier {
   void toggleInspectorJsonView() {
     _isTreeView = !_isTreeView;
     notifyListeners();
+  }
+
+  void toggleSearchVisibility() {
+    _isSearchVisible = !_isSearchVisible;
+    if (!_isSearchVisible) {
+      _searchQuery = '';
+      _totalMatches = 0;
+    }
+    notifyListeners();
+  }
+
+  void updateMatchCount(int count) {
+    if (_totalMatches == count) return;
+    _totalMatches = count;
+    notifyListeners();
+  }
+
+  void updateSearchQuery(String query) {
+    if (_searchQuery == query) return;
+    _searchQuery = query;
+    _updateTotalMatches();
+    notifyListeners();
+  }
+
+  void nextMatch() {
+    if (_totalMatches == 0) return;
+    _currentMatchIndex = (_currentMatchIndex + 1) % _totalMatches;
+    notifyListeners();
+  }
+
+  void previousMatch() {
+    if (_totalMatches == 0) return;
+    _currentMatchIndex =
+        (_currentMatchIndex - 1 + _totalMatches) % _totalMatches;
+    notifyListeners();
+  }
+
+  void _updateTotalMatches() {
+    if (_searchQuery.isEmpty || _selectedRequest == null) {
+      _totalMatches = 0;
+      return;
+    }
+
+    final allText = _extractAllText(_selectedRequest!);
+    final query = _searchQuery.toLowerCase();
+    final text = allText.toLowerCase();
+
+    var count = 0;
+    var index = text.indexOf(query);
+    while (index != -1) {
+      count++;
+      index = text.indexOf(query, index + query.length);
+    }
+    _totalMatches = count;
+    _currentMatchIndex = count > 0 ? 0 : -1;
+  }
+
+  String _extractAllText(RequestDetails request) {
+    final converter = JsonPrettyConverter();
+    final parts = <String>[];
+
+    final sentTimeText = InspectorHelper.extractTimeText(request.sentTime);
+    var text = 'Sent at: $sentTimeText';
+
+    if (request.receivedTime != null) {
+      final receivedTimeText =
+          InspectorHelper.extractTimeText(request.receivedTime!);
+      final durationText = InspectorHelper.calculateDuration(
+          request.sentTime, request.receivedTime!);
+      text += '\nReceived at: $receivedTimeText\nDuration: $durationText';
+    }
+
+    text += '\n\nURL: ${request.url}';
+    parts.add(text);
+
+    if (request.headers != null) parts.add(converter.convert(request.headers));
+    if (request.queryParameters != null) {
+      parts.add(converter.convert(request.queryParameters));
+    }
+    if (request.requestBody != null) {
+      parts.add(converter.convert(request.requestBody));
+    }
+    if (request.graphqlRequestVars != null) {
+      parts.add(converter.convert(request.graphqlRequestVars));
+    }
+    if (request.responseBody != null) {
+      parts.add(converter.convert(request.responseBody));
+    }
+
+    return parts.join('\n');
   }
 
   void toggleExpandChildren() {
