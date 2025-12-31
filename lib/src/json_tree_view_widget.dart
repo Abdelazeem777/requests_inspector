@@ -193,25 +193,68 @@ class JsonTreeView extends StatelessWidget {
 
   Widget _buildLeafNode(
       BuildContext context, String? key, dynamic value, int currentOffset) {
-    final formattedValue = (value is String && value != '{}' && value != '[]')
-        ? '"$value"'
-        : '$value';
+    String formattedValue;
+    Color valueColor;
 
-    final fullText =
-        '${key != null ? '"$key" : ' : ''}$formattedValue${key != null ? ',' : ''}';
+    if (value is String && (value == '{}' || value == '[]')) {
+      formattedValue = value;
+      valueColor = _isDarkMode ? Colors.white : Colors.black87;
+    } else if (value is String) {
+      formattedValue = '"$value"';
+      valueColor = _isDarkMode ? Colors.green.shade300 : Colors.green.shade700;
+    } else if (value is num) {
+      formattedValue = value.toString();
+      valueColor = _isDarkMode ? Colors.blue.shade300 : Colors.blue.shade700;
+    } else if (value is bool) {
+      formattedValue = value.toString();
+      valueColor =
+          _isDarkMode ? Colors.orange.shade300 : Colors.orange.shade700;
+    } else if (value == null) {
+      formattedValue = 'null';
+      valueColor = _isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600;
+    } else {
+      formattedValue = value.toString();
+      valueColor = _isDarkMode ? Colors.white : Colors.black87;
+    }
 
-    return Padding(
-      padding: const EdgeInsets.only(left: 12.0),
-      child: HighlightedText(
-        text: fullText,
-        searchQuery: searchQuery,
-        isDarkMode: _isDarkMode,
-        matchIndexOffset: currentOffset,
+    final spans = <TextSpan>[];
+    if (key != null) {
+      spans.add(TextSpan(
+        text: '"$key" : ',
         style: TextStyle(
           fontSize: 14,
           color: _isDarkMode ? Colors.white : Colors.black87,
           fontWeight: FontWeight.w500,
         ),
+      ));
+    }
+
+    spans.add(TextSpan(
+      text: formattedValue,
+      style: TextStyle(
+        fontSize: 14,
+        color: valueColor,
+        fontWeight: FontWeight.w500,
+      ),
+    ));
+
+    if (key != null) {
+      spans.add(TextSpan(
+        text: ',',
+        style: TextStyle(
+          fontSize: 14,
+          color: _isDarkMode ? Colors.white : Colors.black87,
+        ),
+      ));
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 12.0),
+      child: HighlightedText(
+        spans: spans,
+        searchQuery: searchQuery,
+        isDarkMode: _isDarkMode,
+        matchIndexOffset: currentOffset,
       ),
     );
   }
@@ -225,7 +268,7 @@ class JsonTreeView extends StatelessWidget {
         style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w500,
-          color: _isDarkMode ? Colors.grey.shade400 : Colors.black87,
+          color: _isDarkMode ? Colors.white : Colors.black87,
         ),
       ),
     );
