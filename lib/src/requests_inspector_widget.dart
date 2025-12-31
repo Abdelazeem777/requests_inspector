@@ -19,20 +19,24 @@ class RequestsInspector extends StatelessWidget {
     required Widget child,
     bool defaultTreeViewEnabled = true,
     GlobalKey<NavigatorState>? navigatorKey,
+    bool defaultExpandChildren = true,
+    bool defaultIsDarkMode = true,
   })  : _enabled = enabled,
         _hideInspectorBanner = hideInspectorBanner,
         _showInspectorOn = showInspectorOn,
         _child = child,
         _navigatorKey = navigatorKey,
-        _defaultTreeViewEnabled = defaultTreeViewEnabled;
+        _defaultTreeViewEnabled = defaultTreeViewEnabled,
+        _defaultExpandChildren = defaultExpandChildren,
+        _defaultIsDarkMode = defaultIsDarkMode;
 
-  ///Require hot restart for showing its change
   final bool _enabled;
   final bool _hideInspectorBanner;
   final ShowInspectorOn _showInspectorOn;
   final Widget _child;
   final bool _defaultTreeViewEnabled;
-
+  final bool _defaultExpandChildren;
+  final bool _defaultIsDarkMode;
   final GlobalKey<NavigatorState>? _navigatorKey;
 
   @override
@@ -45,6 +49,8 @@ class RequestsInspector extends StatelessWidget {
                   ? _showInspectorOn
                   : ShowInspectorOn.LongPress,
               defaultTreeViewEnabled: _defaultTreeViewEnabled,
+              defaultExpandChildren: _defaultExpandChildren,
+              defaultIsDarkMode: _defaultIsDarkMode,
               onStoppingRequest: (requestDetails) => _showRequestEditorDialog(
                 context,
                 requestDetails: requestDetails,
@@ -98,6 +104,9 @@ class RequestsInspector extends StatelessWidget {
     required RequestDetails requestDetails,
   }) {
     if (_navigatorKey?.currentContext == null) return Future.value(null);
+    if (!InspectorController().shouldStopRequest(requestDetails))
+      return Future.value(null);
+
     return showDialog<RequestDetails?>(
       context: _navigatorKey!.currentContext!,
       builder: (context) =>
@@ -110,6 +119,8 @@ class RequestsInspector extends StatelessWidget {
     required ResponseDetails responseDetails,
   }) {
     if (_navigatorKey?.currentContext == null) return Future.value(null);
+    if (!InspectorController().shouldStopResponse(responseDetails))
+      return Future.value(null);
 
     return showDialog<ResponseDetails>(
       context: _navigatorKey!.currentContext!,

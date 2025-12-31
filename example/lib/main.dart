@@ -136,17 +136,14 @@ Future<List<Post>> fetchPostsUsingInterceptor() async {
   )..interceptors.add(RequestsInspectorInterceptor());
   final params = {'userId': 1};
 
-  /// Unnecessary FormData, but added for TESTING
-  final formData = await _getDummyFormData(dio);
-
   final response = await dio.get(
-    'https://jsonplaceholder.typicode.com/posts',
+    'https://dummyjson.com/posts',
     queryParameters: params,
     // The request does no need the body, but added for TESTING
-    data: formData,
   );
 
-  final posts = List.from(response.data).map((e) => Post.fromMap(e)).toList();
+  final posts =
+      List.from(response.data['posts']).map((e) => Post.fromMap(e)).toList();
 
   return posts;
 }
@@ -248,21 +245,18 @@ Future<List<int>?> _getFlutterImageBytes(final Dio dio) async {
 
 // Post model
 class Post {
-  final int userId;
   final int id;
   final String title;
   final String body;
 
   Post({
-    required this.userId,
     required this.id,
     required this.title,
     required this.body,
   });
 
-  Post copyWith({int? userId, int? id, String? title, String? body}) {
+  Post copyWith({int? id, String? title, String? body}) {
     return Post(
-      userId: userId ?? this.userId,
       id: id ?? this.id,
       title: title ?? this.title,
       body: body ?? this.body,
@@ -270,12 +264,11 @@ class Post {
   }
 
   Map<String, dynamic> toMap() {
-    return {'userId': userId, 'id': id, 'title': title, 'body': body};
+    return {'id': id, 'title': title, 'body': body};
   }
 
   factory Post.fromMap(Map<String, dynamic> map) {
     return Post(
-      userId: map['userId']?.toInt() ?? 0,
       id: int.tryParse(map['id'].toString()) ?? 0,
       title: map['title'] ?? '',
       body: map['body'] ?? '',
@@ -288,7 +281,7 @@ class Post {
 
   @override
   String toString() {
-    return 'Post(userId: $userId, id: $id, title: $title, body: $body)';
+    return 'Post(id: $id, title: $title, body: $body)';
   }
 
   @override
@@ -296,7 +289,6 @@ class Post {
     if (identical(this, other)) return true;
 
     return other is Post &&
-        other.userId == userId &&
         other.id == id &&
         other.title == title &&
         other.body == body;
@@ -304,7 +296,7 @@ class Post {
 
   @override
   int get hashCode {
-    return userId.hashCode ^ id.hashCode ^ title.hashCode ^ body.hashCode;
+    return id.hashCode ^ title.hashCode ^ body.hashCode;
   }
 }
 

@@ -32,7 +32,9 @@ class RequestsInspectorInterceptor extends Interceptor {
     final dateTime = DateTime.now();
 
     if (InspectorController().responseStopperEnabled) {
+      final url = _extractUrl(response.requestOptions).key;
       final oldResponseData = ResponseDetails(
+        url: url,
         statusCode: response.statusCode ?? 0,
         headers: response.headers.map,
         responseBody: response.data,

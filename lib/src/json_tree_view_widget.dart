@@ -10,6 +10,7 @@ class JsonTreeView extends StatelessWidget {
   final bool _isDarkMode;
   final String searchQuery;
   final int matchIndexOffset;
+  final bool _expandChildren;
 
   const JsonTreeView(
     this.data, {
@@ -17,7 +18,9 @@ class JsonTreeView extends StatelessWidget {
     required bool isDarkMode,
     this.searchQuery = '',
     this.matchIndexOffset = 0,
-  }) : _isDarkMode = isDarkMode;
+    bool expandChildren = true,
+  })  : _isDarkMode = isDarkMode,
+        _expandChildren = expandChildren;
 
   @override
   Widget build(BuildContext context) {
@@ -25,19 +28,47 @@ class JsonTreeView extends StatelessWidget {
       scrollDirection: Axis.vertical,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        child: _buildNode(context, data, currentOffset: matchIndexOffset),
+        child: _buildNode(
+          context,
+          data,
+          currentOffset: matchIndexOffset,
+          isRoot: true,
+        ),
       ),
     );
   }
 
-  Widget _buildNode(BuildContext context, dynamic node,
-      {String? keyName, required int currentOffset}) {
+  Widget _buildNode(
+    BuildContext context,
+    dynamic node, {
+    String? keyName,
+    required int currentOffset,
+    bool isRoot = false,
+  }) {
     if (node is Map<String, dynamic>) {
-      return _buildMapNode(context, node, keyName, currentOffset);
+      return _buildMapNode(
+        context,
+        node,
+        keyName,
+        currentOffset,
+        isRoot: isRoot,
+      );
     } else if (node is List) {
-      return _buildListNode(context, node, keyName, currentOffset);
+      return _buildListNode(
+        context,
+        node,
+        keyName,
+        currentOffset,
+        isRoot: isRoot,
+      );
     } else if (node is FormData) {
-      return _buildFormDataNode(context, node, keyName, currentOffset);
+      return _buildFormDataNode(
+        context,
+        node,
+        keyName,
+        currentOffset,
+        isRoot: isRoot,
+      );
     } else {
       return _buildLeafNode(context, keyName, node, currentOffset);
     }
@@ -47,8 +78,9 @@ class JsonTreeView extends StatelessWidget {
     BuildContext context,
     Map<String, dynamic> map,
     String? keyName,
-    int currentOffset,
-  ) {
+    int currentOffset, {
+    bool isRoot = false,
+  }) {
     if (map.isEmpty) {
       return _buildLeafNode(context, keyName, '{}', currentOffset);
     }
@@ -71,7 +103,7 @@ class JsonTreeView extends StatelessWidget {
       children: children,
       collapsedCount: map.length,
       isObject: true,
-      initiallyExpanded: true,
+      initiallyExpanded: isRoot || _expandChildren,
       isDarkMode: _isDarkMode,
       matchIndexOffset: currentOffset,
       totalMatches: totalMatches,
@@ -79,7 +111,12 @@ class JsonTreeView extends StatelessWidget {
   }
 
   Widget _buildListNode(
-      BuildContext context, List list, String? keyName, int currentOffset) {
+    BuildContext context,
+    List list,
+    String? keyName,
+    int currentOffset, {
+    bool isRoot = false,
+  }) {
     if (list.isEmpty) {
       return _buildLeafNode(context, keyName, '[]', currentOffset);
     }
@@ -101,7 +138,7 @@ class JsonTreeView extends StatelessWidget {
       children: children,
       collapsedCount: list.length,
       isObject: false,
-      initiallyExpanded: true,
+      initiallyExpanded: isRoot || _expandChildren,
       isDarkMode: _isDarkMode,
       matchIndexOffset: currentOffset,
       totalMatches: totalMatches,
@@ -112,8 +149,9 @@ class JsonTreeView extends StatelessWidget {
     BuildContext context,
     FormData formData,
     String? keyName,
-    int currentOffset,
-  ) {
+    int currentOffset, {
+    bool isRoot = false,
+  }) {
     final length = formData.fields.length + formData.files.length;
     if (length == 0) {
       return _buildLeafNode(context, keyName, '{}', currentOffset);
@@ -146,7 +184,7 @@ class JsonTreeView extends StatelessWidget {
       children: children,
       collapsedCount: length,
       isObject: true,
-      initiallyExpanded: true,
+      initiallyExpanded: isRoot || _expandChildren,
       isDarkMode: _isDarkMode,
       matchIndexOffset: currentOffset,
       totalMatches: totalMatches,
@@ -309,6 +347,14 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
   void initState() {
     super.initState();
     _expanded = widget.initiallyExpanded;
+  }
+
+  @override
+  void didUpdateWidget(_CustomExpansionTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initiallyExpanded != widget.initiallyExpanded) {
+      setState(() => _expanded = widget.initiallyExpanded);
+    }
   }
 
   @override

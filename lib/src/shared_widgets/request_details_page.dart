@@ -15,11 +15,13 @@ class _SearchState {
   final bool isTreeView;
   final bool isDarkMode;
   final String searchQuery;
+  final bool expandChildren;
 
   _SearchState({
     required this.isTreeView,
     required this.isDarkMode,
     required this.searchQuery,
+    required this.expandChildren,
   });
 
   @override
@@ -29,11 +31,15 @@ class _SearchState {
           runtimeType == other.runtimeType &&
           isTreeView == other.isTreeView &&
           isDarkMode == other.isDarkMode &&
-          searchQuery == other.searchQuery;
+          searchQuery == other.searchQuery &&
+          expandChildren == other.expandChildren;
 
   @override
   int get hashCode =>
-      isTreeView.hashCode ^ isDarkMode.hashCode ^ searchQuery.hashCode;
+      isTreeView.hashCode ^
+      isDarkMode.hashCode ^
+      searchQuery.hashCode ^
+      expandChildren.hashCode;
 }
 
 class RequestDetailsPage extends StatelessWidget {
@@ -74,6 +80,7 @@ class RequestDetailsPage extends StatelessWidget {
         isTreeView: controller.isTreeView,
         isDarkMode: controller.isDarkMode,
         searchQuery: controller.searchQuery,
+        expandChildren: controller.expandChildren,
       ),
       builder: (context, state, _) {
         final query = state.searchQuery;
@@ -198,6 +205,7 @@ class RequestDetailsPage extends StatelessWidget {
                       isDarkMode: state.isDarkMode,
                       searchQuery: query,
                       matchIndexOffset: headersOffset,
+                      expandChildren: state.expandChildren,
                     ),
                   ),
                 if (request.queryParameters != null)
@@ -212,6 +220,7 @@ class RequestDetailsPage extends StatelessWidget {
                       isDarkMode: state.isDarkMode,
                       searchQuery: query,
                       matchIndexOffset: queryParamsOffset,
+                      expandChildren: state.expandChildren,
                     ),
                   ),
                 if (request.requestBody != null)
@@ -227,6 +236,7 @@ class RequestDetailsPage extends StatelessWidget {
                       isDarkMode: state.isDarkMode,
                       searchQuery: query,
                       matchIndexOffset: requestBodyOffset,
+                      expandChildren: state.expandChildren,
                     ),
                   ),
                 if (request.graphqlRequestVars != null)
@@ -241,6 +251,7 @@ class RequestDetailsPage extends StatelessWidget {
                       isDarkMode: state.isDarkMode,
                       searchQuery: query,
                       matchIndexOffset: graphqlVarsOffset,
+                      expandChildren: state.expandChildren,
                     ),
                   ),
                 if (request.responseBody != null)
@@ -255,6 +266,7 @@ class RequestDetailsPage extends StatelessWidget {
                       isDarkMode: state.isDarkMode,
                       searchQuery: query,
                       matchIndexOffset: responseBodyOffset,
+                      expandChildren: state.expandChildren,
                     ),
                   ),
               ],
@@ -264,6 +276,8 @@ class RequestDetailsPage extends StatelessWidget {
       },
     );
   }
+
+  // ... (keeping other methods, updating _buildDataBlock below)
 
   Widget _buildExpandableSection({
     required BuildContext context,
@@ -384,6 +398,7 @@ class RequestDetailsPage extends StatelessWidget {
     required bool isDarkMode,
     required String searchQuery,
     required int matchIndexOffset,
+    required bool expandChildren,
   }) {
     if (data == null) return [];
 
@@ -398,6 +413,7 @@ class RequestDetailsPage extends StatelessWidget {
               isDarkMode: isDarkMode,
               searchQuery: searchQuery,
               matchIndexOffset: matchIndexOffset,
+              expandChildren: expandChildren,
             )
           : _buildSelectableText(
               data,
