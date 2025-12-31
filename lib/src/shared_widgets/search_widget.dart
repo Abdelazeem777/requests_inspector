@@ -56,7 +56,7 @@ class _SearchWidgetState extends State<SearchWidget> {
         if (!isVisible) return const SizedBox.shrink();
 
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
           child: TextField(
             controller: _textController,
             focusNode: _focusNode,
