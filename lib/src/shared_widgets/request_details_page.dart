@@ -425,21 +425,55 @@ class RequestDetailsPage extends StatelessWidget {
   }
 
   Widget _buildSelectableText(
-    text, {
+    dynamic text, {
     required String searchQuery,
     required bool isDarkMode,
     required int matchIndexOffset,
   }) {
     final prettyprint = JsonPrettyConverter().convert(text);
+    final lines = prettyprint.split('\n');
 
-    return Padding(
-      padding: const EdgeInsets.all(6.0),
-      child: HighlightedText(
-        text: prettyprint,
-        searchQuery: searchQuery,
-        isDarkMode: isDarkMode,
-        matchIndexOffset: matchIndexOffset,
-      ),
+    if (lines.isEmpty) return const SizedBox();
+
+    // If only one line, return as before (optimization)
+    if (lines.length == 1) {
+      return Padding(
+        padding: const EdgeInsets.all(6.0),
+        child: HighlightedText(
+          text: prettyprint,
+          searchQuery: searchQuery,
+          isDarkMode: isDarkMode,
+          matchIndexOffset: matchIndexOffset,
+        ),
+      );
+    }
+
+    // If multiple lines, build a specific widget for each line so we can scroll to them
+    final children = <Widget>[];
+    var currentOffset = matchIndexOffset;
+
+    for (final line in lines) {
+      final matchesCount =
+          SearchHelper.findMatches(text: line, query: searchQuery).length;
+
+      children.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 1.0),
+          child: HighlightedText(
+            text: line,
+            searchQuery: searchQuery,
+            isDarkMode: isDarkMode,
+            matchIndexOffset: currentOffset,
+          ),
+        ),
+      );
+
+      currentOffset += matchesCount;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: children,
     );
   }
 
