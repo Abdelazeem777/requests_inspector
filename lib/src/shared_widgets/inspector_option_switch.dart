@@ -14,7 +14,7 @@ class InspectorOptionSwitch extends StatelessWidget {
   Widget build(BuildContext context) {
     return Switch(
       value: value,
-      activeColor: Colors.green,
+      activeThumbColor: Colors.green,
       activeTrackColor: Colors.grey[700],
       inactiveThumbColor: Colors.white,
       inactiveTrackColor: Colors.grey[700],

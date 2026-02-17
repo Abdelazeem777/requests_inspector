@@ -14,12 +14,13 @@ class GraphQLInspectorLink extends Link {
   Stream<Response> request(Request request, [NextLink? forward]) {
     final link = _link;
 
-    if (link is HttpLink)
+    if (link is HttpLink) {
       return _handleHttpRequest(link, request, forward);
-    else if (link is WebSocketLink)
+    } else if (link is WebSocketLink) {
       return _handleWebSocketRequest(link, request, forward);
-    else
+    } else {
       return link.request(request, forward);
+    }
   }
 
   Stream<Response> _handleHttpRequest(
