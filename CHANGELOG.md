@@ -1,3 +1,20 @@
+## 5.4.0
+
+- Add Search feature on the request details page.
+
+Special thanks to [amirbahrawy](https://github.com/amirbahrawy) and [Nourhan Sabrii](https://github.com/NourSabry) for this amazing contribution! 🎉
+
+## 5.3.0
+
+- New Search and Filters for Requests List.
+- Add filters for Request and Response Stopper.
+
+Special thanks to [Hamid Montazeri](https://github.com/hamidhandid) for this amazing contribution that makes the inspector much more powerful and user-friendly! 🎉
+
+- Add Expand/Collapse json objects switch button for the JSON Tree View.
+
+Special thanks to [MohamedGawdat](https://github.com/MohamedGawdat) for this amazing contribution! 🎉
+
 ## 5.2.2
 
 - Fix Selectable text at normal view (#55), thanks to [Nourhan Sabrii](https://github.com/NourSabry).

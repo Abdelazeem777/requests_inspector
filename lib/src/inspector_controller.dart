@@ -2,13 +2,16 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:requests_inspector/src/shake.dart';
+import 'package:requests_inspector/src/stopper_filter.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../requests_inspector.dart';
 import 'curl_command_generator.dart';
 import 'har_generator.dart';
 import 'json_pretty_converter.dart';
+import 'helpers/inspector_helper.dart';
 import 'enums/share_type_enum.dart';
+import 'requests_filter.dart';
 
 typedef StoppingRequestCallback = Future<RequestDetails?> Function(
     RequestDetails requestDetails);
@@ -85,6 +88,41 @@ class InspectorController extends ChangeNotifier {
   final _requestsList = <RequestDetails>[];
   RequestDetails? _selectedRequest;
 
+  bool _isSearchVisible = false;
+  String _searchQuery = '';
+  int _totalMatches = 0;
+  int _currentMatchIndex = -1;
+
+  // Search & Filters state
+  String _searchUrlQuery = '';
+  RequestMethod? _filterRequestMethod;
+  int? _filterStatusCode;
+
+  // ------------------------------
+
+  // Stoppers Filter State
+  /// TODO: Would be better if we used the [RequestStopperFilter] and [ResponseStopperFilter] classes instead of these separate fields.
+  RequestMethod? _requestStopperFilterMethod;
+  String? _requestStopperFilterUrl;
+  int? _responseStopperFilterStatusCode;
+  String? _responseStopperFilterUrl;
+  // ------------------------------
+
+  RequestMethod? get requestStopperFilterMethod => _requestStopperFilterMethod;
+  String? get requestStopperFilterUrl => _requestStopperFilterUrl;
+  int? get responseStopperFilterStatusCode => _responseStopperFilterStatusCode;
+  String? get responseStopperFilterUrl => _responseStopperFilterUrl;
+
+  bool get hasRequestStopperFilters =>
+      _requestStopperFilterMethod != null ||
+      (_requestStopperFilterUrl != null &&
+          _requestStopperFilterUrl!.trim().isNotEmpty);
+
+  bool get hasResponseStopperFilters =>
+      _responseStopperFilterStatusCode != null ||
+      (_responseStopperFilterUrl != null &&
+          _responseStopperFilterUrl!.trim().isNotEmpty);
+
   int get selectedTab => _selectedTab;
 
   bool get requestStopperEnabled => _requestStopperEnabled;
@@ -100,6 +138,43 @@ class InspectorController extends ChangeNotifier {
   List<RequestDetails> get requestsList => _requestsList;
 
   RequestDetails? get selectedRequest => _selectedRequest;
+
+  bool get isSearchVisible => _isSearchVisible;
+
+  String get searchQuery => _searchQuery;
+
+  int get totalMatches => _totalMatches;
+
+  int get currentMatchIndex => _currentMatchIndex;
+
+  String get searchUrlQuery => _searchUrlQuery;
+
+  RequestMethod? get filterRequestMethod => _filterRequestMethod;
+
+  int? get filterStatusCode => _filterStatusCode;
+
+  bool get areAnyFiltersApplied =>
+      searchUrlQuery.trim().isNotEmpty ||
+      filterRequestMethod != null ||
+      filterStatusCode != null;
+
+  // Computed filtered + searched list
+  List<RequestDetails> get filteredRequestsList {
+    Iterable<RequestDetails> list = [..._requestsList];
+
+    if (_filterRequestMethod != null)
+      list =
+          list.where(RequestMethodFilter(_filterRequestMethod!).requestFilter);
+
+    if (_filterStatusCode != null)
+      list =
+          list.where(RequestStatusCodeFilter(_filterStatusCode!).requestFilter);
+
+    if (_searchUrlQuery.trim().isNotEmpty)
+      list = list.where(RequestUrlFilter(_searchUrlQuery).requestFilter);
+
+    return list.toList(growable: false);
+  }
 
   bool get _allowShaking => [
         ShowInspectorOn.Shaking,
@@ -128,7 +203,99 @@ class InspectorController extends ChangeNotifier {
     if (_selectedRequest == value && _selectedTab == 1) return;
     _selectedRequest = value;
     _selectedTab = 1;
+    _updateTotalMatches();
     notifyListeners();
+  }
+
+  // setters for search & filters
+  void searchForRequests(String value) {
+    if (_searchUrlQuery == value) return;
+    _searchUrlQuery = value;
+    notifyListeners();
+  }
+
+  void setRequestMethodFilter(RequestMethod? method) {
+    if (_filterRequestMethod == method) return;
+    _filterRequestMethod = method;
+    notifyListeners();
+  }
+
+  void setStatusCodeFilter(int? statusCode) {
+    if (_filterStatusCode == statusCode) return;
+    _filterStatusCode = statusCode;
+    notifyListeners();
+  }
+
+  void clearFilters() {
+    _filterRequestMethod = null;
+    _filterStatusCode = null;
+    notifyListeners();
+  }
+
+  void clearSearch() {
+    if (_searchUrlQuery.isEmpty) return;
+    _searchUrlQuery = '';
+    notifyListeners();
+  }
+
+  void setRequestStopperFilterMethod(RequestMethod? method) {
+    if (_requestStopperFilterMethod == method) return;
+    _requestStopperFilterMethod = method;
+    notifyListeners();
+  }
+
+  void setRequestStopperFilterUrl(String? url) {
+    url = url?.trim();
+    if (url != null && url.isEmpty) {
+      url = null;
+    }
+    if (_requestStopperFilterUrl == url) return;
+    _requestStopperFilterUrl = url;
+    notifyListeners();
+  }
+
+  void setResponseStopperFilterStatusCode(int? statusCode) {
+    if (_responseStopperFilterStatusCode == statusCode) return;
+    _responseStopperFilterStatusCode = statusCode;
+    notifyListeners();
+  }
+
+  void setResponseStopperFilterUrl(String? url) {
+    url = url?.trim();
+    if (url != null && url.isEmpty) {
+      url = null;
+    }
+    if (_responseStopperFilterUrl == url) return;
+    _responseStopperFilterUrl = url;
+    notifyListeners();
+  }
+
+  void clearRequestStopperFilters() {
+    _requestStopperFilterMethod = null;
+    _requestStopperFilterUrl = null;
+    notifyListeners();
+  }
+
+  void clearResponseStopperFilters() {
+    _responseStopperFilterStatusCode = null;
+    _responseStopperFilterUrl = null;
+    notifyListeners();
+  }
+
+  bool shouldStopRequest(RequestDetails requestDetails) {
+    final filter = RequestStopperFilter(
+      requestMethod: _requestStopperFilterMethod,
+      urlPattern: _requestStopperFilterUrl,
+    );
+    return filter.shouldStop(requestDetails);
+  }
+
+  bool shouldStopResponse(ResponseDetails responseDetails) {
+    final filter = ResponseStopperFilter(
+      statusCode: _responseStopperFilterStatusCode,
+      urlPattern: _responseStopperFilterUrl,
+    );
+    return filter.shouldStop(responseDetails);
   }
 
   void showInspector() => pageController.jumpToPage(1);
@@ -277,6 +444,96 @@ class InspectorController extends ChangeNotifier {
   void toggleInspectorJsonView() {
     _isTreeView = !_isTreeView;
     notifyListeners();
+  }
+
+  void toggleSearchVisibility() {
+    _isSearchVisible = !_isSearchVisible;
+    if (!_isSearchVisible) {
+      _searchQuery = '';
+      _totalMatches = 0;
+    }
+    notifyListeners();
+  }
+
+  void updateMatchCount(int count) {
+    if (_totalMatches == count) return;
+    _totalMatches = count;
+    notifyListeners();
+  }
+
+  void updateSearchQuery(String query) {
+    if (_searchQuery == query) return;
+    _searchQuery = query;
+    _updateTotalMatches();
+    notifyListeners();
+  }
+
+  void nextMatch() {
+    if (_totalMatches == 0) return;
+    _currentMatchIndex = (_currentMatchIndex + 1) % _totalMatches;
+    notifyListeners();
+  }
+
+  void previousMatch() {
+    if (_totalMatches == 0) return;
+    _currentMatchIndex =
+        (_currentMatchIndex - 1 + _totalMatches) % _totalMatches;
+    notifyListeners();
+  }
+
+  void _updateTotalMatches() {
+    if (_searchQuery.isEmpty || _selectedRequest == null) {
+      _totalMatches = 0;
+      return;
+    }
+
+    final allText = _extractAllText(_selectedRequest!);
+    final query = _searchQuery.toLowerCase();
+    final text = allText.toLowerCase();
+
+    var count = 0;
+    var index = text.indexOf(query);
+    while (index != -1) {
+      count++;
+      index = text.indexOf(query, index + query.length);
+    }
+    _totalMatches = count;
+    _currentMatchIndex = count > 0 ? 0 : -1;
+  }
+
+  String _extractAllText(RequestDetails request) {
+    final converter = JsonPrettyConverter();
+    final parts = <String>[];
+
+    final sentTimeText = InspectorHelper.extractTimeText(request.sentTime);
+    var text = 'Sent at: $sentTimeText';
+
+    if (request.receivedTime != null) {
+      final receivedTimeText =
+          InspectorHelper.extractTimeText(request.receivedTime!);
+      final durationText = InspectorHelper.calculateDuration(
+          request.sentTime, request.receivedTime!);
+      text += '\nReceived at: $receivedTimeText\nDuration: $durationText';
+    }
+
+    text += '\n\nURL: ${request.url}';
+    parts.add(text);
+
+    if (request.headers != null) parts.add(converter.convert(request.headers));
+    if (request.queryParameters != null) {
+      parts.add(converter.convert(request.queryParameters));
+    }
+    if (request.requestBody != null) {
+      parts.add(converter.convert(request.requestBody));
+    }
+    if (request.graphqlRequestVars != null) {
+      parts.add(converter.convert(request.graphqlRequestVars));
+    }
+    if (request.responseBody != null) {
+      parts.add(converter.convert(request.responseBody));
+    }
+
+    return parts.join('\n');
   }
 
   void toggleExpandChildren() {
