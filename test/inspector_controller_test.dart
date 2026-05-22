@@ -1,12 +1,18 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:requests_inspector/src/inspector_controller.dart';
+import 'package:requests_inspector/requests_inspector.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('InspectorController', () {
     late InspectorController inspectorController;
 
     setUp(() {
-      inspectorController = InspectorController(enabled: true);
+      inspectorController = InspectorController(
+        enabled: true,
+        showInspectorOn: ShowInspectorOn.Both,
+      );
+      inspectorController.clearAllRequests();
     });
 
     test('Initial values should be as expected', () {
@@ -16,14 +22,20 @@ void main() {
     });
 
     test('Should add new request', () {
-      var request = RequestDetails(url: 'http://example.com');
+      var request = RequestDetails(
+        url: 'http://example.com',
+        requestMethod: RequestMethod.GET,
+      );
       inspectorController.addNewRequest(request);
       expect(inspectorController.requestsList.length, 1);
       expect(inspectorController.requestsList.first.url, 'http://example.com');
     });
 
     test('Should clear all requests', () {
-      var request = RequestDetails(url: 'http://example.com');
+      var request = RequestDetails(
+        url: 'http://example.com',
+        requestMethod: RequestMethod.GET,
+      );
       inspectorController.addNewRequest(request);
       inspectorController.clearAllRequests();
       expect(inspectorController.requestsList, isEmpty);
@@ -38,8 +50,14 @@ void main() {
     });
 
     test('Search functionality works correctly', () {
-      var request1 = RequestDetails(url: 'http://test1.com');
-      var request2 = RequestDetails(url: 'http://test2.com');
+      var request1 = RequestDetails(
+        url: 'http://test1.com',
+        requestMethod: RequestMethod.GET,
+      );
+      var request2 = RequestDetails(
+        url: 'http://test2.com',
+        requestMethod: RequestMethod.GET,
+      );
       inspectorController.addNewRequest(request1);
       inspectorController.addNewRequest(request2);
       inspectorController.searchForRequests('test1');
