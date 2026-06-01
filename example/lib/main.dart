@@ -11,11 +11,7 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() {
   runApp(
-    RequestsInspector(
-      // Add your `navigatorKey` to enable `Stopper` feature
-      navigatorKey: navigatorKey,
-      child: const MyApp(),
-    ),
+    const MyApp(),
   );
 }
 
@@ -50,6 +46,14 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       title: 'Fetch Data Example',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: false),
+      builder: (context, child) {
+        // Add your `navigatorKey` to enable `Stopper` feature
+        return RequestsInspector(
+          enabled: true,
+          navigatorKey: navigatorKey,
+          child: child!,
+        );
+      },
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Fetch Data Example'),

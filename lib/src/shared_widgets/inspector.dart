@@ -23,13 +23,13 @@ class Inspector extends StatelessWidget {
     return Selector<InspectorController, bool>(
       selector: (_, controller) => controller.isDarkMode,
       builder: (context, isDarkMode, child) {
-        return MaterialApp(
-          theme: isDarkMode
+        return Theme(
+          data: isDarkMode
               ? ThemeData.dark().copyWith(
                   colorScheme: ColorScheme.dark(primary: Colors.grey[800]!),
                 )
               : ThemeData.light(),
-          home: Scaffold(
+          child: Scaffold(
             appBar: _buildAppBar(isDarkMode),
             body: _buildBody(isDarkMode: isDarkMode),
             floatingActionButton: _buildShareFloatingButton(),
@@ -55,7 +55,7 @@ class Inspector extends StatelessWidget {
         // Use method from controller (doesn't require listening)
         onPressed: () {
           _closeKeyboard();
-          InspectorController().hideInspector();
+          InspectorController().hideInspector(_navigatorKey!.currentContext!);
         },
         icon: const Icon(Icons.close), // Icon color handled by iconTheme
       ),

@@ -300,7 +300,7 @@ class InspectorController extends ChangeNotifier {
 
   void showInspector() => pageController.jumpToPage(1);
 
-  void hideInspector() => pageController.jumpToPage(0);
+  void hideInspector(BuildContext context) => Navigator.pop(context);
 
   void addNewRequest(RequestDetails request) {
     if (!_enabled) return;
