@@ -106,11 +106,15 @@ class InspectorController extends ChangeNotifier {
   String? _requestStopperFilterUrl;
   int? _responseStopperFilterStatusCode;
   String? _responseStopperFilterUrl;
+
   // ------------------------------
 
   RequestMethod? get requestStopperFilterMethod => _requestStopperFilterMethod;
+
   String? get requestStopperFilterUrl => _requestStopperFilterUrl;
+
   int? get responseStopperFilterStatusCode => _responseStopperFilterStatusCode;
+
   String? get responseStopperFilterUrl => _responseStopperFilterUrl;
 
   bool get hasRequestStopperFilters =>
@@ -377,10 +381,10 @@ class InspectorController extends ChangeNotifier {
         mimeType: 'application/json',
       );
 
-      Share.shareXFiles(
-        [file],
+      SharePlus.instance.share(ShareParams(
+        files: [file],
         sharePositionOrigin: sharePositionOrigin,
-      );
+      ));
       return;
     } else {
       final curlCommandGenerator = CurlCommandGenerator(_selectedRequest!);
@@ -392,11 +396,10 @@ class InspectorController extends ChangeNotifier {
       requestShareContent =
           '================[cURL Command]=================\n$curlContent\n\n==================[Normal Log]===================\n$normalLogContent';
     }
-
-    Share.share(
-      requestShareContent,
+    SharePlus.instance.share(ShareParams(
+      text: requestShareContent,
       sharePositionOrigin: sharePositionOrigin,
-    );
+    ));
   }
 
   @override

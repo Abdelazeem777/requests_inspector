@@ -81,7 +81,7 @@ class _StopperFiltersDialogState extends State<StopperFiltersDialog> {
                   border: OutlineInputBorder(),
                   isDense: true,
                 ),
-                value: _selectedMethod,
+                initialValue: _selectedMethod,
                 items: [
                   const DropdownMenuItem<RequestMethod?>(
                     value: null,

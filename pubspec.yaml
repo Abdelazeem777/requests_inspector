@@ -13,15 +13,15 @@ environment:
 
 dependencies:
   collection: ^1.19.1
-  connectivity_plus: ^6.1.4
+  connectivity_plus: ^6.1.5
   dio: ^5.8.0+1
   flutter:
     sdk: flutter
   gql: ^1.0.0+1
   graphql: ^5.2.1
-  graphql_flutter: ^5.2.0
+  graphql_flutter: ^5.2.1
   provider: ^6.1.5
-  sensors_plus: ^6.1.1
+  sensors_plus: ^7.0.0
   share_plus: ^12.0.1
 
 dev_dependencies:

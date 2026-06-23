@@ -11,7 +11,7 @@ class RunAgainButton extends StatefulWidget {
   final bool isDarkMode; // New parameter
 
   @override
-  _RunAgainButtonState createState() => _RunAgainButtonState();
+  State<RunAgainButton> createState() => _RunAgainButtonState();
 }
 
 class _RunAgainButtonState extends State<RunAgainButton> {
