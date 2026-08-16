@@ -1,3 +1,7 @@
+## 5.5.1
+
+- Upgrade `connectivity_plus` to `^7.3.1`.
+
 ## 5.5.0
 
 - Fix request details card background color rendering.
