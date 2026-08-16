@@ -1,3 +1,8 @@
+## 5.5.0
+
+- Fix request details card background color rendering.
+- Add unit tests for `InspectorController` and upgrade dependencies.
+
 ## 5.4.0
 
 - Add Search feature on the request details page.
