@@ -24,13 +24,13 @@ class JsonPrettyConverter {
     else if (text == null)
       prettyprint = '';
     else if (text is bool)
-      prettyprint = text;
+      prettyprint = text.toString();
     else if (text is num)
-      prettyprint = text;
+      prettyprint = text.toString();
     else if (text is double)
-      prettyprint = text;
+      prettyprint = text.toString();
     else if (text is int)
-      prettyprint = text;
+      prettyprint = text.toString();
     else
       prettyprint = text.toString();
     return prettyprint;
