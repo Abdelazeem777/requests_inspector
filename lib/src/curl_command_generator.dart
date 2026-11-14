@@ -16,11 +16,8 @@ class CurlCommandGenerator {
     // Adding Method Type
     _addMethodType(curlCommand);
 
-    // Adding URL
+    // Adding URL (with its query parameters)
     _addURL(curlCommand);
-
-    // Adding Query Parameters
-    _addQueryParameters(curlCommand);
 
     // Adding Headers
     _addHeaders(curlCommand);
@@ -56,36 +53,33 @@ class CurlCommandGenerator {
     }
   }
 
+  /// Quotes [value] as a single POSIX shell word: `'` becomes `'\''`.
+  static String _quote(String value) => "'${value.replaceAll("'", r"'\''")}'";
+
   void _addURL(StringBuffer curlCommand) {
-    curlCommand.write('"${details.url}');
+    curlCommand.write('${_quote('${details.url}${_queryString()}')} ');
   }
 
   void _addHeaders(StringBuffer curlCommand) {
     if (details.headers != null) {
       details.headers.forEach((key, value) {
         if (key == 'content-length') return;
-        curlCommand.write('-H "$key: $value" ');
+        curlCommand.write('-H ${_quote('$key: $value')} ');
       });
     }
   }
 
-  void _addQueryParameters(StringBuffer curlCommand) {
-    if (details.queryParameters != null && details.queryParameters.isNotEmpty) {
-      StringBuffer paramString = StringBuffer("?");
-      details.queryParameters.forEach((key, value) {
-        paramString.write(
-          "${Uri.encodeQueryComponent(key)}=${Uri.encodeQueryComponent(value.toString())}&",
-        );
-      });
-      String paramStringFinal = paramString.toString();
-      paramStringFinal = paramStringFinal.substring(
-        0,
-        paramStringFinal.length - 1,
-      ); // remove last &
-      curlCommand.write(paramStringFinal);
+  String _queryString() {
+    if (details.queryParameters == null || details.queryParameters.isEmpty) {
+      return '';
     }
-
-    curlCommand.write('" ');
+    final params = <String>[];
+    details.queryParameters.forEach((key, value) {
+      params.add(
+        "${Uri.encodeQueryComponent(key)}=${Uri.encodeQueryComponent(value.toString())}",
+      );
+    });
+    return '?${params.join('&')}';
   }
 
   void _addRequestBody(StringBuffer curlCommand) {
@@ -105,21 +99,24 @@ class CurlCommandGenerator {
           0,
           bodyString.length - 1,
         ); // Remove last &
-        curlCommand.write("-d '$bodyString' ");
+        curlCommand.write("-d ${_quote(bodyString)} ");
       } else if (contentType.contains('multipart/form-data')) {
         if (details.requestBody is FormData) {
           FormData formData = details.requestBody as FormData;
           for (var mapEntry in formData.fields) {
-            curlCommand.write("-F '${mapEntry.key}=${mapEntry.value}' ");
+            curlCommand
+                .write("-F ${_quote('${mapEntry.key}=${mapEntry.value}')} ");
           }
 
           for (var file in formData.files) {
             String fileName = file.value.filename ?? 'file';
-            curlCommand.write("-F '${file.key}=@$fileName' ");
+            curlCommand.write("-F ${_quote('${file.key}=@$fileName')} ");
           }
         }
       } else {
-        curlCommand.write("-d '${jsonEncode(details.requestBody)}' ");
+        final body = details.requestBody;
+        final bodyString = body is String ? body : jsonEncode(body);
+        curlCommand.write("-d ${_quote(bodyString)} ");
       }
     }
   }
