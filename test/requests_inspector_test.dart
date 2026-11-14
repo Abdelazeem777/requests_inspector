@@ -159,5 +159,22 @@ void main() {
         expect(find.text('Second page'), findsOneWidget);
       });
     });
+
+    knownBug(
+        'the inspector page is a second MaterialApp inside the same PageView; '
+        "the BlockSemantics of its route's ModalBarrier drops the semantics "
+        'of everything painted before it, i.e. the whole host app, so '
+        'VoiceOver/TalkBack and UI-automation tools (Maestro, Appium) cannot '
+        'see the wrapped app (requests_inspector_widget.dart:78). Wrapping '
+        'the Inspector page in Semantics(container: true) avoids it.', () {
+      testWidgets('keeps the host app visible to accessibility services',
+          (tester) async {
+        final semantics = tester.ensureSemantics();
+        await pumpInspectorApp(tester);
+
+        expect(find.bySemanticsLabel(hostAppText), findsOneWidget);
+        semantics.dispose();
+      });
+    });
   });
 }

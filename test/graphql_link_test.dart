@@ -149,7 +149,7 @@ void main() {
       },
       skip: 'Known bug: sentTime is taken in .map() when the response '
           'arrives, so every GraphQL request shows a ~0 ms duration '
-          '(graphql_inspector_link.dart:30). Not fixed by PR #70.',
+          '(graphql_inspector_link.dart:32). Not fixed by PR #70.',
     );
 
     test(
