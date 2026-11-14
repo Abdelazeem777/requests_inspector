@@ -206,31 +206,25 @@ void main() {
       expect(field.controller!.text, isEmpty);
     });
 
-    knownBug(
-        'SearchHelper returns overlapping matches and HighlightedText '
-        'duplicates the overlap, so "aaa" searched for "aa" renders "aaaa" '
-        'and the counter says 1 / 1 next to 2 highlights. Reported on PR #61.',
-        () {
-      testWidgets('keeps the text intact for overlapping matches',
-          (tester) async {
-        await showDetails(
-          tester,
-          RequestDetails(
-            requestMethod: RequestMethod.GET,
-            url: 'https://api.example.com/aaa',
-            sentTime: DateTime(2024),
-          ),
-        );
+    testWidgets('keeps the text intact for overlapping matches',
+        (tester) async {
+      await showDetails(
+        tester,
+        RequestDetails(
+          requestMethod: RequestMethod.GET,
+          url: 'https://api.example.com/aaa',
+          sentTime: DateTime(2024),
+        ),
+      );
 
-        await search(tester, 'aa');
+      await search(tester, 'aa');
 
-        expect(
-          selectableTexts(tester).first,
-          'Sent at: 00:00.00\n\nURL: https://api.example.com/aaa',
-        );
-        expect(highlightedSpans(tester), hasLength(1));
-        expect(find.text('1 / 1'), findsOneWidget);
-      });
+      expect(
+        selectableTexts(tester).first,
+        'Sent at: 00:00.00\n\nURL: https://api.example.com/aaa',
+      );
+      expect(highlightedSpans(tester), hasLength(1));
+      expect(find.text('1 / 1'), findsOneWidget);
     });
   });
 
