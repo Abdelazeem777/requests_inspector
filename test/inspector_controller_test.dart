@@ -10,6 +10,9 @@ void main() {
       inspectorController = InspectorController(enabled: true);
     });
 
+    // `dispose` also resets the singleton, so every test starts fresh.
+    tearDown(() => inspectorController.dispose());
+
     test('Initial values should be as expected', () {
       expect(inspectorController.isDarkMode, true);
       expect(inspectorController.isTreeView, true);
