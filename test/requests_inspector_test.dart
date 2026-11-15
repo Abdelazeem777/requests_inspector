@@ -158,6 +158,10 @@ void main() {
       await openInspector(tester);
       expect(find.bySemanticsLabel(RegExp('^Inspector')), findsOneWidget);
       expect(find.bySemanticsLabel('Clear All'), findsOneWidget);
+      expect(
+        tester.getSemantics(find.byIcon(Icons.close)),
+        containsSemantics(isButton: true, tooltip: 'Close inspector'),
+      );
       semantics.dispose();
     });
   });

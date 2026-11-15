@@ -52,6 +52,7 @@ class Inspector extends StatelessWidget {
       title: const Text('Inspector 🕵️'),
 
       leading: IconButton(
+        tooltip: 'Close inspector',
         // Use method from controller (doesn't require listening)
         onPressed: () {
           _closeKeyboard();

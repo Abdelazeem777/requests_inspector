@@ -56,7 +56,7 @@ class _MyAppState extends State<MyApp> {
           leading: InkWell(
             child: const Padding(
               padding: EdgeInsets.all(8.0),
-              child: Icon(Icons.refresh),
+              child: Icon(Icons.refresh, semanticLabel: 'Refresh'),
             ),
             onTap: () {
               setState(() => isLoading = true);

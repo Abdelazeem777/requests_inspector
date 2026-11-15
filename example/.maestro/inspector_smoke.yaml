@@ -3,9 +3,9 @@
 # request's details, go back to the list and close the inspector.
 # The example calls the real https://dummyjson.com/posts endpoint.
 #
-# While RequestsInspector wraps the app, the host app is hidden from the
-# accessibility tree (see the skipped "keeps the host app visible to
-# accessibility services" test), so host-app taps use screen positions.
+# Every step finds its element in the accessibility tree (no screen
+# positions), so the flow also checks that RequestsInspector keeps the host
+# app visible to accessibility services.
 appId: com.example.example
 name: Requests inspector smoke test
 ---
@@ -14,13 +14,13 @@ name: Requests inspector smoke test
 - waitForAnimationToEnd:
     timeout: 5000
 
-# A second request: the refresh icon at the start of the app bar.
-- tapOn:
-    point: "7%,10%"
+- assertVisible: "Fetch Data Example"
 
-# ShowInspectorOn.Both (the default): long press on any free space.
-- longPressOn:
-    point: "50%,60%"
+# A second request: the refresh icon at the start of the app bar.
+- tapOn: "Refresh"
+
+# ShowInspectorOn.Both (the default): long press anywhere on the host app.
+- longPressOn: "Fetch Data Example"
 - extendedWaitUntil:
     visible: "Inspector.*"
     timeout: 10000
@@ -50,15 +50,14 @@ name: Requests inspector smoke test
     text: "(?s)GET.*POSTS.*"
     index: 1
 
-# Close the inspector with the X in its app bar (it has no label).
-- tapOn:
-    point: "7%,10%"
+# Close the inspector with the X at the start of its app bar.
+- tapOn: "Close inspector"
 - waitForAnimationToEnd
 - assertNotVisible: "Clear All"
+- assertVisible: "Fetch Data Example"
 
 # It opens again with the same requests.
-- longPressOn:
-    point: "50%,60%"
+- longPressOn: "Fetch Data Example"
 - extendedWaitUntil:
     visible:
       text: "(?s)GET.*POSTS.*"
