@@ -105,76 +105,60 @@ void main() {
       expect(visibleInspectorTitle, findsOneWidget);
     });
 
-    testWidgets('does not open on long press with ShowInspectorOn.Shaking',
+    // flutter test runs on a desktop host, like web/desktop apps, where the
+    // accelerometer is not used. (The Android/iOS branch, where Shaking
+    // disables long press, can't be simulated: RequestsInspector checks
+    // dart:io's Platform.)
+    testWidgets('falls back to long press where shaking is not supported',
         (tester) async {
-      InspectorController(
-        enabled: true,
+      await pumpInspectorApp(
+        tester,
         showInspectorOn: ShowInspectorOn.Shaking,
       );
-      await pumpInspectorApp(tester, showInspectorOn: ShowInspectorOn.Shaking);
 
       await tester.longPress(find.text(hostAppText));
       await tester.pumpAndSettle();
 
+      expect(isInspectorShown, isTrue);
+    });
+
+    testWidgets('system back does not pop the host app behind the inspector',
+        (tester) async {
+      final navigatorKey = GlobalKey<NavigatorState>();
+      await pumpInspectorApp(tester, navigatorKey: navigatorKey);
+      navigatorKey.currentState!.push(MaterialPageRoute<void>(
+        builder: (_) => const Text('Second page'),
+      ));
+      await tester.pumpAndSettle();
+      await openInspector(tester);
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      // Back closes the inspector first...
       expect(isInspectorShown, isFalse);
+      expect(find.text('Second page'), findsOneWidget);
+
+      // ...and then reaches the host app again.
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Second page'), findsNothing);
+      expect(find.text(hostAppText).hitTestable(), findsOneWidget);
     });
 
-    knownBug(
-        'the controller falls back to LongPress on web/desktop, but the '
-        'GestureDetector checks the original ShowInspectorOn.Shaking, so the '
-        'inspector cannot be opened at all '
-        '(requests_inspector_widget.dart:70).', () {
-      testWidgets('falls back to long press where shaking is not supported',
-          (tester) async {
-        // flutter test runs on a desktop host, like web/desktop apps.
-        await pumpInspectorApp(
-          tester,
-          showInspectorOn: ShowInspectorOn.Shaking,
-        );
+    testWidgets('keeps the host app visible to accessibility services',
+        (tester) async {
+      final semantics = tester.ensureSemantics();
+      await pumpInspectorApp(tester);
 
-        await tester.longPress(find.text(hostAppText));
-        await tester.pumpAndSettle();
+      expect(find.bySemanticsLabel(hostAppText), findsOneWidget);
 
-        expect(isInspectorShown, isTrue);
-      });
-    });
-
-    knownBug(
-        'the WillPopScope sits above the host MaterialApp, so no route ever '
-        'consults it: Android back pops the host page hidden behind the '
-        'inspector (requests_inspector_widget.dart:66).', () {
-      testWidgets('system back does not pop the host app behind the inspector',
-          (tester) async {
-        final navigatorKey = GlobalKey<NavigatorState>();
-        await pumpInspectorApp(tester, navigatorKey: navigatorKey);
-        navigatorKey.currentState!.push(MaterialPageRoute<void>(
-          builder: (_) => const Text('Second page'),
-        ));
-        await tester.pumpAndSettle();
-        await openInspector(tester);
-
-        await tester.binding.handlePopRoute();
-        await tester.pumpAndSettle();
-
-        expect(find.text('Second page'), findsOneWidget);
-      });
-    });
-
-    knownBug(
-        'the inspector page is a second MaterialApp inside the same PageView; '
-        "the BlockSemantics of its route's ModalBarrier drops the semantics "
-        'of everything painted before it, i.e. the whole host app, so '
-        'VoiceOver/TalkBack and UI-automation tools (Maestro, Appium) cannot '
-        'see the wrapped app (requests_inspector_widget.dart:78). Wrapping '
-        'the Inspector page in Semantics(container: true) avoids it.', () {
-      testWidgets('keeps the host app visible to accessibility services',
-          (tester) async {
-        final semantics = tester.ensureSemantics();
-        await pumpInspectorApp(tester);
-
-        expect(find.bySemanticsLabel(hostAppText), findsOneWidget);
-        semantics.dispose();
-      });
+      // The inspector page stays accessible too.
+      await openInspector(tester);
+      expect(find.bySemanticsLabel(RegExp('^Inspector')), findsOneWidget);
+      expect(find.bySemanticsLabel('Clear All'), findsOneWidget);
+      semantics.dispose();
     });
   });
 }
