@@ -18,14 +18,13 @@ RequestDetails bare({
   dynamic headers,
   dynamic queryParameters,
   dynamic body,
-}) =>
-    sampleRequest(
-      requestMethod: method,
-      url: url,
-      headers: headers,
-      queryParameters: queryParameters,
-      requestBody: body,
-    );
+}) => sampleRequest(
+  requestMethod: method,
+  url: url,
+  headers: headers,
+  queryParameters: queryParameters,
+  requestBody: body,
+);
 
 void main() {
   group('CurlCommandGenerator', () {
@@ -61,10 +60,12 @@ void main() {
     });
 
     test('appends URL-encoded query parameters', () {
-      final args = curlArgs(bare(
-        url: 'https://api.example.com/search',
-        queryParameters: {'q': 'a b&c', 'page': 2},
-      ));
+      final args = curlArgs(
+        bare(
+          url: 'https://api.example.com/search',
+          queryParameters: {'q': 'a b&c', 'page': 2},
+        ),
+      );
 
       expect(args[3], 'https://api.example.com/search?q=a+b%26c&page=2');
       expect(
@@ -74,11 +75,15 @@ void main() {
     });
 
     test('adds every header except content-length', () {
-      final args = curlArgs(bare(headers: {
-        'accept': 'application/json',
-        'content-length': '42',
-        'x-request-id': 'abc',
-      }));
+      final args = curlArgs(
+        bare(
+          headers: {
+            'accept': 'application/json',
+            'content-length': '42',
+            'x-request-id': 'abc',
+          },
+        ),
+      );
 
       expect(
         args,
@@ -94,14 +99,16 @@ void main() {
 
     test('sends Map and List bodies as JSON', () {
       expect(
-        curlArgs(bare(
-          method: RequestMethod.POST,
-          headers: {'content-type': 'application/json'},
-          body: {
-            'name': 'John',
-            'tags': ['a'],
-          },
-        )),
+        curlArgs(
+          bare(
+            method: RequestMethod.POST,
+            headers: {'content-type': 'application/json'},
+            body: {
+              'name': 'John',
+              'tags': ['a'],
+            },
+          ),
+        ),
         containsAllInOrder(['-d', '{"name":"John","tags":["a"]}', '-L']),
       );
       expect(
@@ -112,17 +119,19 @@ void main() {
 
     test('keeps the JSON types of body values (uses the raw body)', () {
       expect(
-        curlArgs(bare(
-          method: RequestMethod.POST,
-          headers: {'content-type': 'application/json'},
-          body: {
-            'active': true,
-            'n': 1,
-            'd': 1.5,
-            'x': null,
-            'nested': {'off': false},
-          },
-        )),
+        curlArgs(
+          bare(
+            method: RequestMethod.POST,
+            headers: {'content-type': 'application/json'},
+            body: {
+              'active': true,
+              'n': 1,
+              'd': 1.5,
+              'x': null,
+              'nested': {'off': false},
+            },
+          ),
+        ),
         containsAllInOrder([
           '-d',
           '{"active":true,"n":1,"d":1.5,"x":null,"nested":{"off":false}}',
@@ -132,11 +141,13 @@ void main() {
 
     test('encodes x-www-form-urlencoded bodies', () {
       for (final header in ['content-type', 'Content-Type']) {
-        final args = curlArgs(bare(
-          method: RequestMethod.POST,
-          headers: {header: 'application/x-www-form-urlencoded'},
-          body: {'name': 'John Doe', 'age': 30},
-        ));
+        final args = curlArgs(
+          bare(
+            method: RequestMethod.POST,
+            headers: {header: 'application/x-www-form-urlencoded'},
+            body: {'name': 'John Doe', 'age': 30},
+          ),
+        );
 
         expect(args, containsAllInOrder(['-d', 'name=John+Doe&age=30']));
       }
@@ -144,17 +155,21 @@ void main() {
 
     test('uses -F for multipart form data', () {
       final formData = FormData.fromMap({'field': 'value'})
-        ..files.add(MapEntry(
-          'avatar',
-          MultipartFile.fromString('bytes', filename: 'me.png'),
-        ))
+        ..files.add(
+          MapEntry(
+            'avatar',
+            MultipartFile.fromString('bytes', filename: 'me.png'),
+          ),
+        )
         ..files.add(MapEntry('blob', MultipartFile.fromString('bytes')));
 
-      final args = curlArgs(bare(
-        method: RequestMethod.POST,
-        headers: {'content-type': 'multipart/form-data; boundary=x'},
-        body: formData,
-      ));
+      final args = curlArgs(
+        bare(
+          method: RequestMethod.POST,
+          headers: {'content-type': 'multipart/form-data; boundary=x'},
+          body: formData,
+        ),
+      );
 
       expect(
         args,
@@ -170,67 +185,71 @@ void main() {
     });
 
     test('skips a multipart body that is not FormData', () {
-      final args = curlArgs(bare(
-        method: RequestMethod.POST,
-        headers: {'content-type': 'multipart/form-data'},
-        body: {'not': 'form data'},
-      ));
+      final args = curlArgs(
+        bare(
+          method: RequestMethod.POST,
+          headers: {'content-type': 'multipart/form-data'},
+          body: {'not': 'form data'},
+        ),
+      );
 
       expect(args, isNot(contains('-d')));
       expect(args, isNot(contains('-F')));
     });
 
     test('quotes a JSON body that contains a single quote', () {
-      final args = curlArgs(bare(
-        method: RequestMethod.POST,
-        headers: {'content-type': 'application/json'},
-        body: {'msg': "it's"},
-      ));
+      final args = curlArgs(
+        bare(
+          method: RequestMethod.POST,
+          headers: {'content-type': 'application/json'},
+          body: {'msg': "it's"},
+        ),
+      );
 
       expect(args, containsAllInOrder(['-d', '{"msg":"it\'s"}']));
     });
 
     test(r'quotes header values that contain " or $', () {
-      final args = curlArgs(bare(headers: {
-        'x-quote': 'say "hi"',
-        'x-price': r'$5',
-      }));
+      final args = curlArgs(
+        bare(headers: {'x-quote': 'say "hi"', 'x-price': r'$5'}),
+      );
 
       expect(
         args,
-        containsAllInOrder([
-          '-H',
-          'x-quote: say "hi"',
-          '-H',
-          r'x-price: $5',
-        ]),
+        containsAllInOrder(['-H', 'x-quote: say "hi"', '-H', r'x-price: $5']),
       );
     });
 
     test('sends a String body as-is', () {
       expect(
-        curlArgs(bare(
-          method: RequestMethod.POST,
-          headers: {'content-type': 'text/plain'},
-          body: 'plain text',
-        )),
+        curlArgs(
+          bare(
+            method: RequestMethod.POST,
+            headers: {'content-type': 'text/plain'},
+            body: 'plain text',
+          ),
+        ),
         containsAllInOrder(['-d', 'plain text']),
       );
       expect(
-        curlArgs(bare(
-          method: RequestMethod.POST,
-          headers: {'content-type': 'application/json'},
-          body: '{"a":1}',
-        )),
+        curlArgs(
+          bare(
+            method: RequestMethod.POST,
+            headers: {'content-type': 'application/json'},
+            body: '{"a":1}',
+          ),
+        ),
         containsAllInOrder(['-d', '{"a":1}']),
       );
     });
 
     test('quotes a URL that contains shell metacharacters', () {
-      final args = curlArgs(bare(
-        url: "https://api.example.com/a\"b\$c`d'e",
-        queryParameters: {'q': "it's"},
-      ));
+      final args = curlArgs(
+        bare(
+          url: "https://api.example.com/a\"b\$c`d'e",
+          queryParameters: {'q': "it's"},
+        ),
+      );
 
       expect(args[3], "https://api.example.com/a\"b\$c`d'e?q=it%27s");
     });

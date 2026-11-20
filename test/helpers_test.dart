@@ -12,17 +12,16 @@ void main() {
     });
 
     test('finds every case-insensitive occurrence', () {
-      final matches =
-          SearchHelper.findMatches(text: 'Token: TOKEN token', query: 'token');
-
-      expect(
-        matches.map((m) => [m.start, m.end]),
-        [
-          [0, 5],
-          [7, 12],
-          [13, 18],
-        ],
+      final matches = SearchHelper.findMatches(
+        text: 'Token: TOKEN token',
+        query: 'token',
       );
+
+      expect(matches.map((m) => [m.start, m.end]), [
+        [0, 5],
+        [7, 12],
+        [13, 18],
+      ]);
       expect(matches.first.length, 5);
       expect(matches.first.toString(), 'SearchMatch(start: 0, end: 5)');
     });
@@ -57,10 +56,10 @@ void main() {
         SearchHelper.findMatches(text: text, query: query).length;
 
     RequestDetails urlOnly(String url) => RequestDetails(
-          requestMethod: RequestMethod.GET,
-          url: url,
-          sentTime: DateTime(2024),
-        );
+      requestMethod: RequestMethod.GET,
+      url: url,
+      sentTime: DateTime(2024),
+    );
 
     test('agree when matches do not overlap', () {
       controller

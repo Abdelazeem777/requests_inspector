@@ -17,10 +17,7 @@ class SearchHelper {
       final index = searchText.indexOf(searchQuery, startIndex);
       if (index == -1) break;
 
-      matches.add(SearchMatch(
-        start: index,
-        end: index + searchQuery.length,
-      ));
+      matches.add(SearchMatch(start: index, end: index + searchQuery.length));
       startIndex = index + searchQuery.length;
     }
 

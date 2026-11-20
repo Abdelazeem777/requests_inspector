@@ -41,27 +41,22 @@ Response _response(
   Map<String, dynamic> body, {
   int statusCode = 200,
   Map<String, String> headers = const {'content-type': 'application/json'},
-}) =>
-    Response(
-      data: body['data'] as Map<String, dynamic>?,
-      response: body,
-      context: const Context().withEntry(
-        HttpLinkResponseContext(statusCode: statusCode, headers: headers),
-      ),
-    );
+}) => Response(
+  data: body['data'] as Map<String, dynamic>?,
+  response: body,
+  context: const Context().withEntry(
+    HttpLinkResponseContext(statusCode: statusCode, headers: headers),
+  ),
+);
 
 Request _request({
   String document = 'query products { products { id __typename } }',
   String? operationName = 'products',
   Map<String, dynamic> variables = const {},
-}) =>
-    Request(
-      operation: Operation(
-        document: gql(document),
-        operationName: operationName,
-      ),
-      variables: variables,
-    );
+}) => Request(
+  operation: Operation(document: gql(document), operationName: operationName),
+  variables: variables,
+);
 
 void main() {
   late InspectorController controller;
@@ -89,8 +84,9 @@ void main() {
         _FakeHttpLink((_) => Stream.value(_response(body))),
       );
 
-      final responses =
-          await link.request(_request(variables: const {'first': 10})).toList();
+      final responses = await link
+          .request(_request(variables: const {'first': 10}))
+          .toList();
 
       expect(responses.single.response, body);
       final logged = controller.requestsList.single;
@@ -106,24 +102,28 @@ void main() {
       expect(logged.requestBody, isNot(contains('__typename')));
     });
 
-    test('logs empty variables as null and missing context as status 0',
-        () async {
-      final link = GraphQLInspectorLink(
-        _FakeHttpLink((_) => Stream.value(const Response(response: body))),
-      );
+    test(
+      'logs empty variables as null and missing context as status 0',
+      () async {
+        final link = GraphQLInspectorLink(
+          _FakeHttpLink((_) => Stream.value(const Response(response: body))),
+        );
 
-      await link.request(_request()).drain<void>();
+        await link.request(_request()).drain<void>();
 
-      final logged = controller.requestsList.single;
-      expect(logged.graphqlRequestVars, isNull);
-      expect(logged.statusCode, 0);
-      expect(logged.headers, isNull);
-    });
+        final logged = controller.requestsList.single;
+        expect(logged.graphqlRequestVars, isNull);
+        expect(logged.statusCode, 0);
+        expect(logged.headers, isNull);
+      },
+    );
 
     test('logs every response of a multi-response stream', () async {
-      final link = GraphQLInspectorLink(_FakeHttpLink(
-        (_) => Stream.fromIterable([_response(body), _response(body)]),
-      ));
+      final link = GraphQLInspectorLink(
+        _FakeHttpLink(
+          (_) => Stream.fromIterable([_response(body), _response(body)]),
+        ),
+      );
 
       await link.request(_request()).drain<void>();
 
@@ -134,10 +134,12 @@ void main() {
       'records the time the request was sent, not when it was answered',
       () async {
         const latency = Duration(milliseconds: 100);
-        final link = GraphQLInspectorLink(_FakeHttpLink((_) async* {
-          await Future<void>.delayed(latency);
-          yield _response(body);
-        }));
+        final link = GraphQLInspectorLink(
+          _FakeHttpLink((_) async* {
+            await Future<void>.delayed(latency);
+            yield _response(body);
+          }),
+        );
 
         await link.request(_request()).drain<void>();
 
@@ -149,30 +151,30 @@ void main() {
       },
     );
 
-    test(
-      'logs a failed request before rethrowing',
-      () async {
-        final error = ServerException(
-          statusCode: 400,
-          parsedResponse: const Response(response: {
+    test('logs a failed request before rethrowing', () async {
+      final error = ServerException(
+        statusCode: 400,
+        parsedResponse: const Response(
+          response: {
             'errors': [
               {'message': 'Cannot query field "price"'},
             ],
-          }),
-        );
-        final link =
-            GraphQLInspectorLink(_FakeHttpLink((_) => Stream.error(error)));
+          },
+        ),
+      );
+      final link = GraphQLInspectorLink(
+        _FakeHttpLink((_) => Stream.error(error)),
+      );
 
-        await expectLater(
-          link.request(_request()).toList(),
-          throwsA(same(error)),
-        );
+      await expectLater(
+        link.request(_request()).toList(),
+        throwsA(same(error)),
+      );
 
-        final logged = controller.requestsList.single;
-        expect(logged.statusCode, 400);
-        expect(logged.responseBody, error.parsedResponse!.response);
-      },
-    );
+      final logged = controller.requestsList.single;
+      expect(logged.statusCode, 400);
+      expect(logged.responseBody, error.parsedResponse!.response);
+    });
   });
 
   group('GraphQLInspectorLink over WebSocketLink', () {
@@ -182,11 +184,13 @@ void main() {
       );
 
       await link
-          .request(_request(
-            document: 'subscription { onProduct { id } }',
-            operationName: null,
-            variables: const {'a': 1},
-          ))
+          .request(
+            _request(
+              document: 'subscription { onProduct { id } }',
+              operationName: null,
+              variables: const {'a': 1},
+            ),
+          )
           .drain<void>();
 
       expect(controller.requestsList, hasLength(2));

@@ -57,21 +57,25 @@ void main() {
       expect(find.byIcon(Icons.search), findsOneWidget, reason: 'URL search');
     });
 
-    testWidgets('lists requests newest first with their summary',
-        (tester) async {
+    testWidgets('lists requests newest first with their summary', (
+      tester,
+    ) async {
       await pumpInspectorApp(tester);
       await openInspector(tester, requests: [users, createOrder, failed]);
 
       final items = tester
-          .widgetList<ListTile>(find.descendant(
-            of: find.byType(RequestItemWidget),
-            matching: find.byType(ListTile),
-          ))
+          .widgetList<ListTile>(
+            find.descendant(
+              of: find.byType(RequestItemWidget),
+              matching: find.byType(ListTile),
+            ),
+          )
           .toList();
-      expect(
-        items.map((tile) => (tile.title as Text).data),
-        ['SESSIONS', 'ORDERS', 'USERS'],
-      );
+      expect(items.map((tile) => (tile.title as Text).data), [
+        'SESSIONS',
+        'ORDERS',
+        'USERS',
+      ]);
 
       expect(find.text('https://api.example.com/users'), findsOneWidget);
       expect(find.text('GET'), findsOneWidget);
@@ -125,8 +129,9 @@ void main() {
       expect(InspectorController().searchUrlQuery, isEmpty);
     });
 
-    testWidgets('filters dialog applies and clears method and status filters',
-        (tester) async {
+    testWidgets('filters dialog applies and clears method and status filters', (
+      tester,
+    ) async {
       await pumpInspectorApp(tester);
       await openInspector(tester, requests: [users, createOrder]);
 
@@ -229,8 +234,9 @@ void main() {
       expect(InspectorController().isDarkMode, isTrue);
     });
 
-    testWidgets('toggles the JSON tree view and child expansion',
-        (tester) async {
+    testWidgets('toggles the JSON tree view and child expansion', (
+      tester,
+    ) async {
       await pumpInspectorApp(tester);
       await openInspector(tester, requests: [users]);
       await tester.tap(find.text('USERS'));
@@ -260,8 +266,9 @@ void main() {
       expect(controller.expandChildren, isTrue);
     });
 
-    testWidgets('hides the stopper options without a navigatorKey',
-        (tester) async {
+    testWidgets('hides the stopper options without a navigatorKey', (
+      tester,
+    ) async {
       await pumpInspectorApp(tester);
       await openInspector(tester);
 
@@ -353,7 +360,9 @@ void main() {
     setUp(FakeShareChannel.install);
 
     Future<void> openDetails(
-        WidgetTester tester, RequestDetails request) async {
+      WidgetTester tester,
+      RequestDetails request,
+    ) async {
       await pumpInspectorApp(tester);
       await openInspector(tester, requests: [request]);
       await tester.tap(find.text(request.requestName));
@@ -368,8 +377,9 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('shares the cURL command over the share_plus channel',
-        (tester) async {
+    testWidgets('shares the cURL command over the share_plus channel', (
+      tester,
+    ) async {
       await openDetails(tester, createOrder);
 
       await shareAs(tester, 'cURL Command');
@@ -384,8 +394,10 @@ void main() {
       await openDetails(tester, createOrder);
 
       await shareAs(tester, 'Normal Log');
-      expect(FakeShareChannel.lastSharedText,
-          contains('=[ url ]===================\n'));
+      expect(
+        FakeShareChannel.lastSharedText,
+        contains('=[ url ]===================\n'),
+      );
 
       await shareAs(tester, 'Both');
       expect(FakeShareChannel.lastSharedText, contains('[cURL Command]'));

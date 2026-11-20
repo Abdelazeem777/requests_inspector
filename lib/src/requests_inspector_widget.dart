@@ -21,14 +21,14 @@ class RequestsInspector extends StatelessWidget {
     GlobalKey<NavigatorState>? navigatorKey,
     bool defaultExpandChildren = true,
     bool defaultIsDarkMode = true,
-  })  : _enabled = enabled,
-        _hideInspectorBanner = hideInspectorBanner,
-        _showInspectorOn = showInspectorOn,
-        _child = child,
-        _navigatorKey = navigatorKey,
-        _defaultTreeViewEnabled = defaultTreeViewEnabled,
-        _defaultExpandChildren = defaultExpandChildren,
-        _defaultIsDarkMode = defaultIsDarkMode;
+  }) : _enabled = enabled,
+       _hideInspectorBanner = hideInspectorBanner,
+       _showInspectorOn = showInspectorOn,
+       _child = child,
+       _navigatorKey = navigatorKey,
+       _defaultTreeViewEnabled = defaultTreeViewEnabled,
+       _defaultExpandChildren = defaultExpandChildren,
+       _defaultIsDarkMode = defaultIsDarkMode;
 
   final bool _enabled;
   final bool _hideInspectorBanner;
@@ -41,8 +41,9 @@ class RequestsInspector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showInspectorOn =
-        _isSupportShaking() ? _showInspectorOn : ShowInspectorOn.LongPress;
+    final showInspectorOn = _isSupportShaking()
+        ? _showInspectorOn
+        : ShowInspectorOn.LongPress;
     var widget = _enabled
         ? ChangeNotifierProvider(
             create: (context) => InspectorController(
@@ -57,9 +58,9 @@ class RequestsInspector extends StatelessWidget {
               ),
               onStoppingResponse: (responseDetails) =>
                   _showResponseEditorDialog(
-                context,
-                responseDetails: responseDetails,
-              ),
+                    context,
+                    responseDetails: responseDetails,
+                  ),
             ),
             lazy: false,
             builder: (context, _) {
@@ -193,18 +194,16 @@ class _InspectorPagesState extends State<_InspectorPages>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onLongPress:
-          widget.openOnLongPress ? InspectorController().showInspector : null,
+      onLongPress: widget.openOnLongPress
+          ? InspectorController().showInspector
+          : null,
       child: PageView(
         controller: InspectorController().pageController,
         physics: const NeverScrollableScrollPhysics(),
         onPageChanged: _onPageChanged,
         // Only the page on screen is in the accessibility tree.
         children: [
-          ExcludeSemantics(
-            excluding: _isInspectorShown,
-            child: widget.child,
-          ),
+          ExcludeSemantics(excluding: _isInspectorShown, child: widget.child),
           ExcludeSemantics(
             excluding: !_isInspectorShown,
             // The inspector is a second MaterialApp. Without its own semantics

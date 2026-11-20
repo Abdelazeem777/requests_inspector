@@ -9,8 +9,9 @@ void main() {
 
   /// Pretends the previous shake happened [ago], since the detector
   /// throttles on the wall clock.
-  void lastShake(Duration ago) => detector.mShakeTimestamp =
-      DateTime.now().subtract(ago).millisecondsSinceEpoch;
+  void lastShake(Duration ago) => detector.mShakeTimestamp = DateTime.now()
+      .subtract(ago)
+      .millisecondsSinceEpoch;
 
   Future<void> shake({double gForce = 3}) async {
     FakeSensors.emit(gForce: gForce);

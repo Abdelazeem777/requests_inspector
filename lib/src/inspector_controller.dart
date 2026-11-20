@@ -13,11 +13,11 @@ import 'helpers/inspector_helper.dart';
 import 'enums/share_type_enum.dart';
 import 'requests_filter.dart';
 
-typedef StoppingRequestCallback = Future<RequestDetails?> Function(
-    RequestDetails requestDetails);
+typedef StoppingRequestCallback =
+    Future<RequestDetails?> Function(RequestDetails requestDetails);
 
-typedef StoppingResponseCallback = Future<ResponseDetails?> Function(
-    ResponseDetails responseDetails);
+typedef StoppingResponseCallback =
+    Future<ResponseDetails?> Function(ResponseDetails responseDetails);
 
 ///Singleton
 class InspectorController extends ChangeNotifier {
@@ -29,16 +29,15 @@ class InspectorController extends ChangeNotifier {
     bool defaultTreeViewEnabled = true,
     bool defaultExpandChildren = true,
     bool defaultIsDarkMode = true,
-  }) =>
-      _singleton ??= InspectorController._internal(
-        enabled: enabled,
-        showInspectorOn: showInspectorOn,
-        onStoppingRequest: onStoppingRequest,
-        onStoppingResponse: onStoppingResponse,
-        defaultTreeViewEnabled: defaultTreeViewEnabled,
-        defaultExpandChildren: defaultExpandChildren,
-        defaultIsDarkMode: defaultIsDarkMode,
-      );
+  }) => _singleton ??= InspectorController._internal(
+    enabled: enabled,
+    showInspectorOn: showInspectorOn,
+    onStoppingRequest: onStoppingRequest,
+    onStoppingResponse: onStoppingResponse,
+    defaultTreeViewEnabled: defaultTreeViewEnabled,
+    defaultExpandChildren: defaultExpandChildren,
+    defaultIsDarkMode: defaultIsDarkMode,
+  );
 
   InspectorController._internal({
     required bool enabled,
@@ -48,13 +47,13 @@ class InspectorController extends ChangeNotifier {
     required bool defaultTreeViewEnabled,
     required bool defaultExpandChildren,
     required bool defaultIsDarkMode,
-  })  : _enabled = enabled,
-        _showInspectorOn = showInspectorOn,
-        _onStoppingRequest = onStoppingRequest,
-        _isTreeView = defaultTreeViewEnabled,
-        _expandChildren = defaultExpandChildren,
-        _isDarkMode = defaultIsDarkMode,
-        _onStoppingResponse = onStoppingResponse {
+  }) : _enabled = enabled,
+       _showInspectorOn = showInspectorOn,
+       _onStoppingRequest = onStoppingRequest,
+       _isTreeView = defaultTreeViewEnabled,
+       _expandChildren = defaultExpandChildren,
+       _isDarkMode = defaultIsDarkMode,
+       _onStoppingResponse = onStoppingResponse {
     if (_enabled && _allowShaking)
       _shakeDetector = ShakeDetector.autoStart(
         onPhoneShake: showInspector,
@@ -163,12 +162,14 @@ class InspectorController extends ChangeNotifier {
     Iterable<RequestDetails> list = [..._requestsList];
 
     if (_filterRequestMethod != null)
-      list =
-          list.where(RequestMethodFilter(_filterRequestMethod!).requestFilter);
+      list = list.where(
+        RequestMethodFilter(_filterRequestMethod!).requestFilter,
+      );
 
     if (_filterStatusCode != null)
-      list =
-          list.where(RequestStatusCodeFilter(_filterStatusCode!).requestFilter);
+      list = list.where(
+        RequestStatusCodeFilter(_filterStatusCode!).requestFilter,
+      );
 
     if (_searchUrlQuery.trim().isNotEmpty)
       list = list.where(RequestUrlFilter(_searchUrlQuery).requestFilter);
@@ -177,9 +178,9 @@ class InspectorController extends ChangeNotifier {
   }
 
   bool get _allowShaking => [
-        ShowInspectorOn.Shaking,
-        ShowInspectorOn.Both,
-      ].contains(_showInspectorOn);
+    ShowInspectorOn.Shaking,
+    ShowInspectorOn.Both,
+  ].contains(_showInspectorOn);
 
   set selectedTab(int value) {
     if (_selectedTab == value) return;
@@ -377,10 +378,9 @@ class InspectorController extends ChangeNotifier {
         mimeType: 'application/json',
       );
 
-      SharePlus.instance.share(ShareParams(
-        files: [file],
-        sharePositionOrigin: sharePositionOrigin,
-      ));
+      SharePlus.instance.share(
+        ShareParams(files: [file], sharePositionOrigin: sharePositionOrigin),
+      );
       return;
     } else {
       final curlCommandGenerator = CurlCommandGenerator(_selectedRequest!);
@@ -392,10 +392,12 @@ class InspectorController extends ChangeNotifier {
       requestShareContent =
           '================[cURL Command]=================\n$curlContent\n\n==================[Normal Log]===================\n$normalLogContent';
     }
-    SharePlus.instance.share(ShareParams(
-      text: requestShareContent,
-      sharePositionOrigin: sharePositionOrigin,
-    ));
+    SharePlus.instance.share(
+      ShareParams(
+        text: requestShareContent,
+        sharePositionOrigin: sharePositionOrigin,
+      ),
+    );
   }
 
   @override
@@ -426,11 +428,13 @@ class InspectorController extends ChangeNotifier {
   Future<ResponseDetails?> editResponse(ResponseDetails responseDetails) {
     if (!_enabled || _onStoppingResponse == null) return Future.value(null);
 
-    if (!['Map', 'String', 'List'].any((e) => responseDetails
-        .responseBody.runtimeType
-        .toString()
-        .replaceFirst('_', '')
-        .startsWith(e))) return Future.value(null);
+    if (!['Map', 'String', 'List'].any(
+      (e) => responseDetails.responseBody.runtimeType
+          .toString()
+          .replaceFirst('_', '')
+          .startsWith(e),
+    ))
+      return Future.value(null);
 
     return _onStoppingResponse!(responseDetails);
   }
@@ -508,10 +512,13 @@ class InspectorController extends ChangeNotifier {
     var text = 'Sent at: $sentTimeText';
 
     if (request.receivedTime != null) {
-      final receivedTimeText =
-          InspectorHelper.extractTimeText(request.receivedTime!);
+      final receivedTimeText = InspectorHelper.extractTimeText(
+        request.receivedTime!,
+      );
       final durationText = InspectorHelper.calculateDuration(
-          request.sentTime, request.receivedTime!);
+        request.sentTime,
+        request.receivedTime!,
+      );
       text += '\nReceived at: $receivedTimeText\nDuration: $durationText';
     }
 

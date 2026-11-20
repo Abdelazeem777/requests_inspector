@@ -6,10 +6,7 @@ import 'response_details.dart';
 import 'shared_widgets/inspector_dialog_text_field.dart';
 
 class ResponseStopperEditorDialog extends StatefulWidget {
-  const ResponseStopperEditorDialog({
-    super.key,
-    required this.responseDetails,
-  });
+  const ResponseStopperEditorDialog({super.key, required this.responseDetails});
 
   final ResponseDetails responseDetails;
 
@@ -54,8 +51,9 @@ class _ResponseStopperEditorDialogState
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ElevatedButton(
-                    style:
-                        ElevatedButton.styleFrom(foregroundColor: Colors.white),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                    ),
                     child: const Text('Receive'),
                     onPressed: () =>
                         Navigator.of(context).pop(_newResponseDetails),
@@ -70,8 +68,8 @@ class _ResponseStopperEditorDialogState
   }
 
   Widget _buildBody(BuildContext context) {
-    final responseDataType =
-        _newResponseDetails.responseBody.runtimeType.toString();
+    final responseDataType = _newResponseDetails.responseBody.runtimeType
+        .toString();
     return Scrollbar(
       trackVisibility: true,
       thumbVisibility: true,
@@ -112,15 +110,18 @@ class _ResponseStopperEditorDialogState
             ],
             decoration: const InputDecoration(
               border: InputBorder.none,
-              contentPadding:
-                  EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 12.0,
+                vertical: 8.0,
+              ),
               hintText: '200',
               hintStyle: TextStyle(color: Colors.grey),
             ),
             onChanged: (value) {
               final statusCode = int.tryParse(value) ?? 200;
-              _newResponseDetails =
-                  _newResponseDetails.copyWith(statusCode: statusCode);
+              _newResponseDetails = _newResponseDetails.copyWith(
+                statusCode: statusCode,
+              );
             },
           ),
         ),
@@ -138,11 +139,11 @@ class _ResponseStopperEditorDialogState
           text: JsonPrettyConverter().convert(_newResponseDetails.headers),
           onChanged: (value) =>
               _newResponseDetails = _newResponseDetails.copyWith(
-            headers: JsonPrettyConverter().deconvertFrom(
-              value,
-              _newResponseDetails.headers.runtimeType.toString(),
-            ),
-          ),
+                headers: JsonPrettyConverter().deconvertFrom(
+                  value,
+                  _newResponseDetails.headers.runtimeType.toString(),
+                ),
+              ),
         ),
       ],
     );
@@ -158,9 +159,11 @@ class _ResponseStopperEditorDialogState
           text: JsonPrettyConverter().convert(_newResponseDetails.responseBody),
           onChanged: (value) =>
               _newResponseDetails = _newResponseDetails.copyWith(
-            responseBody:
-                JsonPrettyConverter().deconvertFrom(value, responseDataType),
-          ),
+                responseBody: JsonPrettyConverter().deconvertFrom(
+                  value,
+                  responseDataType,
+                ),
+              ),
         ),
       ],
     );

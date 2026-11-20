@@ -16,8 +16,9 @@ void main() {
       expect(inspectorBanner, findsNothing);
     });
 
-    testWidgets('wraps the child with the inspector and a banner',
-        (tester) async {
+    testWidgets('wraps the child with the inspector and a banner', (
+      tester,
+    ) async {
       await pumpInspectorApp(tester);
 
       expect(find.text(hostAppText).hitTestable(), findsOneWidget);
@@ -49,8 +50,9 @@ void main() {
     });
 
     for (final mode in [ShowInspectorOn.LongPress, ShowInspectorOn.Both]) {
-      testWidgets('opens on long press with $mode and closes with X',
-          (tester) async {
+      testWidgets('opens on long press with $mode and closes with X', (
+        tester,
+      ) async {
         await pumpInspectorApp(tester, showInspectorOn: mode);
 
         await tester.longPress(find.text(hostAppText));
@@ -101,28 +103,40 @@ void main() {
       expect(visibleInspectorTitle, findsOneWidget);
     });
 
-    testWidgets('does not open on long press with ShowInspectorOn.Shaking',
-        (tester) async {
-      await pumpInspectorApp(tester, showInspectorOn: ShowInspectorOn.Shaking);
+    testWidgets(
+      'does not open on long press with ShowInspectorOn.Shaking',
+      (tester) async {
+        await pumpInspectorApp(
+          tester,
+          showInspectorOn: ShowInspectorOn.Shaking,
+        );
 
-      await tester.longPress(find.text(hostAppText));
-      await tester.pumpAndSettle();
+        await tester.longPress(find.text(hostAppText));
+        await tester.pumpAndSettle();
 
-      expect(isInspectorShown, isFalse);
-      expect(FakeSensors.isListening, isTrue);
-    }, variant: mobilePlatforms);
+        expect(isInspectorShown, isFalse);
+        expect(FakeSensors.isListening, isTrue);
+      },
+      variant: mobilePlatforms,
+    );
 
     // Web uses the same fallback (kIsWeb), checked on the example app.
-    testWidgets('falls back to long press where shaking is not supported',
-        (tester) async {
-      await pumpInspectorApp(tester, showInspectorOn: ShowInspectorOn.Shaking);
+    testWidgets(
+      'falls back to long press where shaking is not supported',
+      (tester) async {
+        await pumpInspectorApp(
+          tester,
+          showInspectorOn: ShowInspectorOn.Shaking,
+        );
 
-      await tester.longPress(find.text(hostAppText));
-      await tester.pumpAndSettle();
+        await tester.longPress(find.text(hostAppText));
+        await tester.pumpAndSettle();
 
-      expect(isInspectorShown, isTrue);
-      expect(FakeSensors.isListening, isFalse);
-    }, variant: TargetPlatformVariant.desktop());
+        expect(isInspectorShown, isTrue);
+        expect(FakeSensors.isListening, isFalse);
+      },
+      variant: TargetPlatformVariant.desktop(),
+    );
   });
 
   group('RequestsInspector system back', () {
@@ -131,11 +145,12 @@ void main() {
     setUp(() => navigatorKey = GlobalKey<NavigatorState>());
 
     void pushHostPage(Widget page) => navigatorKey.currentState!.push(
-          MaterialPageRoute<void>(builder: (_) => page),
-        );
+      MaterialPageRoute<void>(builder: (_) => page),
+    );
 
-    testWidgets('does not pop the host app behind the inspector',
-        (tester) async {
+    testWidgets('does not pop the host app behind the inspector', (
+      tester,
+    ) async {
       await pumpInspectorApp(tester, navigatorKey: navigatorKey);
       pushHostPage(const Text('Second page'));
       await tester.pumpAndSettle();
@@ -154,8 +169,9 @@ void main() {
       expect(find.text(hostAppText).hitTestable(), findsOneWidget);
     });
 
-    testWidgets('leaves the host app on its first page as before',
-        (tester) async {
+    testWidgets('leaves the host app on its first page as before', (
+      tester,
+    ) async {
       final calls = recordSystemNavigator(tester);
       bool appLeft() => calls.any((c) => c.method == 'SystemNavigator.pop');
       await pumpInspectorApp(tester, navigatorKey: navigatorKey);
@@ -169,8 +185,9 @@ void main() {
       expect(appLeft(), isTrue);
     });
 
-    testWidgets('closes a dialog open in the inspector before the inspector',
-        (tester) async {
+    testWidgets('closes a dialog open in the inspector before the inspector', (
+      tester,
+    ) async {
       await pumpInspectorApp(tester, navigatorKey: navigatorKey);
       await openInspector(tester);
       await tester.tap(find.byIcon(Icons.filter_list));
@@ -190,8 +207,9 @@ void main() {
       expect(find.text('Filter requests'), findsNothing);
     });
 
-    testWidgets('closes the inspector menu before the inspector',
-        (tester) async {
+    testWidgets('closes the inspector menu before the inspector', (
+      tester,
+    ) async {
       await pumpInspectorApp(tester, navigatorKey: navigatorKey);
       await openInspector(tester);
       // The test font is wider than the fixed-width menu rows.
@@ -207,8 +225,9 @@ void main() {
       expect(isInspectorShown, isTrue);
     });
 
-    testWidgets('closes a stopper dialog while the inspector is hidden',
-        (tester) async {
+    testWidgets('closes a stopper dialog while the inspector is hidden', (
+      tester,
+    ) async {
       final dio = inspectedDio(FakeHttpClientAdapter.json({'id': 1}));
       await pumpInspectorApp(tester, navigatorKey: navigatorKey);
       pushHostPage(const Text('Second page'));
@@ -230,11 +249,13 @@ void main() {
     testWidgets("keeps the host app's PopScope working", (tester) async {
       var blockedPops = 0;
       await pumpInspectorApp(tester, navigatorKey: navigatorKey);
-      pushHostPage(PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (didPop, _) => blockedPops++,
-        child: const Text('Unsaved changes'),
-      ));
+      pushHostPage(
+        PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, _) => blockedPops++,
+          child: const Text('Unsaved changes'),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // With the inspector open, back only closes the inspector.
@@ -249,15 +270,18 @@ void main() {
       expect(find.text('Unsaved changes'), findsOneWidget);
     });
 
-    testWidgets('closes the inspector before a Router-based host app pops',
-        (tester) async {
+    testWidgets('closes the inspector before a Router-based host app pops', (
+      tester,
+    ) async {
       final delegate = _PagesRouterDelegate(['Home', 'Second page']);
-      await tester.pumpWidget(RequestsInspector(
-        child: MaterialApp.router(
-          routerDelegate: delegate,
-          backButtonDispatcher: RootBackButtonDispatcher(),
+      await tester.pumpWidget(
+        RequestsInspector(
+          child: MaterialApp.router(
+            routerDelegate: delegate,
+            backButtonDispatcher: RootBackButtonDispatcher(),
+          ),
         ),
-      ));
+      );
       await openInspector(tester);
 
       await systemBack(tester);
@@ -271,14 +295,15 @@ void main() {
     // Android predictive back (enableOnBackInvokedCallback, the default when
     // targeting Android 16): back only reaches Flutter while the framework
     // says it handles it.
-    testWidgets('makes the framework handle back while the inspector is open',
-        (tester) async {
+    testWidgets('makes the framework handle back while the inspector is open', (
+      tester,
+    ) async {
       final calls = recordSystemNavigator(tester);
       List<Object?> handlesBack() => [
-            for (final call in calls)
-              if (call.method == 'SystemNavigator.setFrameworkHandlesBack')
-                call.arguments,
-          ];
+        for (final call in calls)
+          if (call.method == 'SystemNavigator.setFrameworkHandlesBack')
+            call.arguments,
+      ];
       await pumpInspectorApp(tester, navigatorKey: navigatorKey);
       tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
       pushHostPage(const Text('Second page'));
@@ -301,8 +326,9 @@ void main() {
       expect(handlesBack(), isEmpty);
     });
 
-    testWidgets('closes the inspector on a predictive back gesture',
-        (tester) async {
+    testWidgets('closes the inspector on a predictive back gesture', (
+      tester,
+    ) async {
       await pumpInspectorApp(tester, navigatorKey: navigatorKey);
       await openInspector(tester);
 
@@ -313,36 +339,41 @@ void main() {
     });
 
     knownBug(
-        'the predictive back route transition of a pushed host page handles '
-        'the back gesture itself (it never reaches didPopRoute), so the '
-        'hidden host page pops and the inspector stays open. Button backs '
-        'and the host app\'s first page are fine.', () {
-      testWidgets('a predictive back gesture does not pop the host app',
-          (tester) async {
-        await pumpInspectorApp(tester, navigatorKey: navigatorKey);
-        pushHostPage(const Text('Second page'));
-        await tester.pumpAndSettle();
-        await openInspector(tester);
+      'the predictive back route transition of a pushed host page handles '
+      'the back gesture itself (it never reaches didPopRoute), so the '
+      'hidden host page pops and the inspector stays open. Button backs '
+      'and the host app\'s first page are fine.',
+      () {
+        testWidgets('a predictive back gesture does not pop the host app', (
+          tester,
+        ) async {
+          await pumpInspectorApp(tester, navigatorKey: navigatorKey);
+          pushHostPage(const Text('Second page'));
+          await tester.pumpAndSettle();
+          await openInspector(tester);
 
-        await predictiveBackGesture(tester);
+          await predictiveBackGesture(tester);
 
-        expect(isInspectorShown, isFalse);
-        expect(find.text('Second page'), findsOneWidget);
-      });
-    });
+          expect(isInspectorShown, isFalse);
+          expect(find.text('Second page'), findsOneWidget);
+        });
+      },
+    );
 
-    knownBug(
-        'inside MaterialApp.builder, RequestsInspector registers its back '
+    knownBug('inside MaterialApp.builder, RequestsInspector registers its back '
         "handler after the host app's, so back pops the hidden host page "
         'first. Wrap the MaterialApp instead (as in the README).', () {
-      testWidgets('back closes the inspector when placed in builder',
-          (tester) async {
-        await tester.pumpWidget(MaterialApp(
-          navigatorKey: navigatorKey,
-          builder: (_, child) =>
-              RequestsInspector(navigatorKey: navigatorKey, child: child!),
-          home: const Text(hostAppText),
-        ));
+      testWidgets('back closes the inspector when placed in builder', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            navigatorKey: navigatorKey,
+            builder: (_, child) =>
+                RequestsInspector(navigatorKey: navigatorKey, child: child!),
+            home: const Text(hostAppText),
+          ),
+        );
         pushHostPage(const Text('Second page'));
         await tester.pumpAndSettle();
         await openInspector(tester);
@@ -356,8 +387,9 @@ void main() {
   });
 
   group('RequestsInspector accessibility', () {
-    testWidgets('keeps the host app visible to accessibility services',
-        (tester) async {
+    testWidgets('keeps the host app visible to accessibility services', (
+      tester,
+    ) async {
       final semantics = tester.ensureSemantics();
       await pumpInspectorApp(tester);
 
@@ -400,16 +432,16 @@ class _PagesRouterDelegate extends RouterDelegate<Object>
 
   @override
   Widget build(BuildContext context) => Navigator(
-        key: navigatorKey,
-        pages: [
-          for (final page in pages)
-            MaterialPage<void>(key: ValueKey(page), child: Text(page)),
-        ],
-        onDidRemovePage: (page) {
-          pages.remove((page.key! as ValueKey<String>).value);
-          notifyListeners();
-        },
-      );
+    key: navigatorKey,
+    pages: [
+      for (final page in pages)
+        MaterialPage<void>(key: ValueKey(page), child: Text(page)),
+    ],
+    onDidRemovePage: (page) {
+      pages.remove((page.key! as ValueKey<String>).value);
+      notifyListeners();
+    },
+  );
 
   @override
   Future<void> setNewRoutePath(Object configuration) async {}

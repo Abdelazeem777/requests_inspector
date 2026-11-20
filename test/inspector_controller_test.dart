@@ -27,7 +27,9 @@ void main() {
 
     test('Should add new request', () {
       var request = RequestDetails(
-          url: 'http://example.com', requestMethod: RequestMethod.GET);
+        url: 'http://example.com',
+        requestMethod: RequestMethod.GET,
+      );
       inspectorController.addNewRequest(request);
       expect(inspectorController.requestsList.length, 1);
       expect(inspectorController.requestsList.first.url, 'http://example.com');
@@ -35,7 +37,9 @@ void main() {
 
     test('Should clear all requests', () {
       var request = RequestDetails(
-          url: 'http://example.com', requestMethod: RequestMethod.GET);
+        url: 'http://example.com',
+        requestMethod: RequestMethod.GET,
+      );
       inspectorController.addNewRequest(request);
       inspectorController.clearAllRequests();
       expect(inspectorController.requestsList, isEmpty);
@@ -51,16 +55,22 @@ void main() {
 
     test('Search functionality works correctly', () {
       var request1 = RequestDetails(
-          url: 'http://test1.com', requestMethod: RequestMethod.GET);
+        url: 'http://test1.com',
+        requestMethod: RequestMethod.GET,
+      );
       var request2 = RequestDetails(
-          url: 'http://test2.com', requestMethod: RequestMethod.GET);
+        url: 'http://test2.com',
+        requestMethod: RequestMethod.GET,
+      );
       inspectorController.addNewRequest(request1);
       inspectorController.addNewRequest(request2);
       inspectorController.searchForRequests('test1');
 
       expect(inspectorController.filteredRequestsList.length, 1);
-      expect(inspectorController.filteredRequestsList.first.url,
-          'http://test1.com');
+      expect(
+        inspectorController.filteredRequestsList.first.url,
+        'http://test1.com',
+      );
     });
   });
 
@@ -83,8 +93,10 @@ void main() {
 
     test('listens to the accelerometer only when shaking is allowed', () async {
       for (final mode in ShowInspectorOn.values) {
-        final controller =
-            InspectorController(enabled: true, showInspectorOn: mode);
+        final controller = InspectorController(
+          enabled: true,
+          showInspectorOn: mode,
+        );
         await pumpEventQueue();
         expect(
           FakeSensors.isListening,
@@ -106,7 +118,8 @@ void main() {
         final controller = InspectorController();
         expect(controller.dispose, returnsNormally);
       },
-      skip: 'Known bug: dispose() reads `late _shakeDetector`, which is only '
+      skip:
+          'Known bug: dispose() reads `late _shakeDetector`, which is only '
           'assigned when enabled, so a disabled controller with the default '
           'ShowInspectorOn.Shaking throws LateInitializationError.',
     );
@@ -127,7 +140,8 @@ void main() {
 
         expect(controller.requestsList, hasLength(1));
       },
-      skip: 'Known bug: the singleton keeps the arguments of the first call, '
+      skip:
+          'Known bug: the singleton keeps the arguments of the first call, '
           'so an early InspectorController() leaves the inspector disabled '
           'for the whole app session.',
     );
@@ -217,8 +231,11 @@ void main() {
 
       test('without filters every request is listed', () {
         expect(controller.areAnyFiltersApplied, isFalse);
-        expect(
-            controller.filteredRequestsList, [getPosts, postUsers, getUsers]);
+        expect(controller.filteredRequestsList, [
+          getPosts,
+          postUsers,
+          getUsers,
+        ]);
       });
 
       test('filters by method, status code and URL together', () {
@@ -316,17 +333,21 @@ void main() {
         expect(controller.hasRequestStopperFilters, isTrue);
 
         expect(
-          controller.shouldStopRequest(sampleRequest(
-            requestMethod: RequestMethod.POST,
-            url: 'https://api.example.com/users',
-          )),
+          controller.shouldStopRequest(
+            sampleRequest(
+              requestMethod: RequestMethod.POST,
+              url: 'https://api.example.com/users',
+            ),
+          ),
           isTrue,
         );
         expect(
-          controller.shouldStopRequest(sampleRequest(
-            requestMethod: RequestMethod.GET,
-            url: 'https://api.example.com/users',
-          )),
+          controller.shouldStopRequest(
+            sampleRequest(
+              requestMethod: RequestMethod.GET,
+              url: 'https://api.example.com/users',
+            ),
+          ),
           isFalse,
         );
 
@@ -450,7 +471,7 @@ void main() {
         requestBody: {'needle': 'needle'},
         graphqlRequestVars: {'id': 'needle'},
         responseBody: {
-          'items': ['Needle']
+          'items': ['Needle'],
         },
       );
 

@@ -19,8 +19,8 @@ class JsonTreeView extends StatelessWidget {
     this.searchQuery = '',
     this.matchIndexOffset = 0,
     bool expandChildren = true,
-  })  : _isDarkMode = isDarkMode,
-        _expandChildren = expandChildren;
+  }) : _isDarkMode = isDarkMode,
+       _expandChildren = expandChildren;
 
   @override
   Widget build(BuildContext context) {
@@ -89,8 +89,14 @@ class JsonTreeView extends StatelessWidget {
     var offset = currentOffset;
 
     for (final entry in map.entries) {
-      children.add(_buildNode(context, entry.value,
-          keyName: entry.key, currentOffset: offset));
+      children.add(
+        _buildNode(
+          context,
+          entry.value,
+          keyName: entry.key,
+          currentOffset: offset,
+        ),
+      );
       offset += _countMatchesInNode(entry.value, entry.key);
     }
 
@@ -161,8 +167,14 @@ class JsonTreeView extends StatelessWidget {
     var offset = currentOffset;
 
     for (final field in formData.fields) {
-      children.add(_buildNode(context, field.value,
-          keyName: field.key, currentOffset: offset));
+      children.add(
+        _buildNode(
+          context,
+          field.value,
+          keyName: field.key,
+          currentOffset: offset,
+        ),
+      );
       offset += _countMatchesInNode(field.value, field.key);
     }
 
@@ -170,8 +182,14 @@ class JsonTreeView extends StatelessWidget {
       final sizeInMb = file.value.length ~/ 1024;
       final fileSizeString = '${sizeInMb.toStringAsFixed(1)} kb';
       final nodeValue = "($fileSizeString) - ${file.value.filename}";
-      children.add(_buildNode(context, nodeValue,
-          keyName: file.key, currentOffset: offset));
+      children.add(
+        _buildNode(
+          context,
+          nodeValue,
+          keyName: file.key,
+          currentOffset: offset,
+        ),
+      );
       offset += _countMatchesInNode(nodeValue, file.key);
     }
 
@@ -224,13 +242,19 @@ class JsonTreeView extends StatelessWidget {
           : '$node';
       final fullText =
           '${key != null ? '"$key" : ' : ''}$formattedValue${key != null ? ',' : ''}';
-      return SearchHelper.findMatches(text: fullText, query: searchQuery)
-          .length;
+      return SearchHelper.findMatches(
+        text: fullText,
+        query: searchQuery,
+      ).length;
     }
   }
 
   Widget _buildLeafNode(
-      BuildContext context, String? key, dynamic value, int currentOffset) {
+    BuildContext context,
+    String? key,
+    dynamic value,
+    int currentOffset,
+  ) {
     String formattedValue;
     Color valueColor;
 
@@ -245,8 +269,9 @@ class JsonTreeView extends StatelessWidget {
       valueColor = _isDarkMode ? Colors.blue.shade300 : Colors.blue.shade700;
     } else if (value is bool) {
       formattedValue = value.toString();
-      valueColor =
-          _isDarkMode ? Colors.orange.shade300 : Colors.orange.shade700;
+      valueColor = _isDarkMode
+          ? Colors.orange.shade300
+          : Colors.orange.shade700;
     } else if (value == null) {
       formattedValue = 'null';
       valueColor = _isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600;
@@ -257,33 +282,39 @@ class JsonTreeView extends StatelessWidget {
 
     final spans = <TextSpan>[];
     if (key != null) {
-      spans.add(TextSpan(
-        text: '"$key" : ',
-        style: TextStyle(
-          fontSize: 14,
-          color: _isDarkMode ? Colors.white : Colors.black87,
-          fontWeight: FontWeight.w500,
+      spans.add(
+        TextSpan(
+          text: '"$key" : ',
+          style: TextStyle(
+            fontSize: 14,
+            color: _isDarkMode ? Colors.white : Colors.black87,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-      ));
+      );
     }
 
-    spans.add(TextSpan(
-      text: formattedValue,
-      style: TextStyle(
-        fontSize: 14,
-        color: valueColor,
-        fontWeight: FontWeight.w500,
-      ),
-    ));
-
-    if (key != null) {
-      spans.add(TextSpan(
-        text: ',',
+    spans.add(
+      TextSpan(
+        text: formattedValue,
         style: TextStyle(
           fontSize: 14,
-          color: _isDarkMode ? Colors.white : Colors.black87,
+          color: valueColor,
+          fontWeight: FontWeight.w500,
         ),
-      ));
+      ),
+    );
+
+    if (key != null) {
+      spans.add(
+        TextSpan(
+          text: ',',
+          style: TextStyle(
+            fontSize: 14,
+            color: _isDarkMode ? Colors.white : Colors.black87,
+          ),
+        ),
+      );
     }
 
     return Padding(
@@ -360,8 +391,9 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
   @override
   Widget build(BuildContext context) {
     final textColor = widget.isDarkMode ? Colors.white : Colors.black87;
-    final secondaryTextColor =
-        widget.isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600;
+    final secondaryTextColor = widget.isDarkMode
+        ? Colors.grey.shade400
+        : Colors.grey.shade600;
 
     final bool hasTitleString =
         widget.titleString != null && widget.titleString!.isNotEmpty;
@@ -369,7 +401,8 @@ class _CustomExpansionTileState extends State<_CustomExpansionTile>
     return Selector<InspectorController, int>(
       selector: (_, controller) => controller.currentMatchIndex,
       builder: (context, currentMatchIndex, _) {
-        final isActive = currentMatchIndex >= widget.matchIndexOffset &&
+        final isActive =
+            currentMatchIndex >= widget.matchIndexOffset &&
             currentMatchIndex < widget.matchIndexOffset + widget.totalMatches;
 
         if (isActive && !_expanded) {

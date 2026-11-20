@@ -26,20 +26,22 @@ Future<void> pumpInspectorApp(
     ..devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  await tester.pumpWidget(RequestsInspector(
-    enabled: enabled,
-    showInspectorOn: showInspectorOn,
-    hideInspectorBanner: hideInspectorBanner,
-    navigatorKey: navigatorKey,
-    defaultIsDarkMode: defaultIsDarkMode,
-    defaultTreeViewEnabled: defaultTreeViewEnabled,
-    defaultExpandChildren: defaultExpandChildren,
-    child: MaterialApp(
+  await tester.pumpWidget(
+    RequestsInspector(
+      enabled: enabled,
+      showInspectorOn: showInspectorOn,
+      hideInspectorBanner: hideInspectorBanner,
       navigatorKey: navigatorKey,
-      debugShowCheckedModeBanner: false,
-      home: home ?? const Scaffold(body: Center(child: Text(hostAppText))),
+      defaultIsDarkMode: defaultIsDarkMode,
+      defaultTreeViewEnabled: defaultTreeViewEnabled,
+      defaultExpandChildren: defaultExpandChildren,
+      child: MaterialApp(
+        navigatorKey: navigatorKey,
+        debugShowCheckedModeBanner: false,
+        home: home ?? const Scaffold(body: Center(child: Text(hostAppText))),
+      ),
     ),
-  ));
+  );
 }
 
 /// Adds [requests] (oldest first) and shows the inspector.
@@ -68,8 +70,9 @@ Finder get visibleInspectorTitle =>
 /// Highlighted search matches (all [SelectableText]s on screen).
 List<TextSpan> highlightedSpans(WidgetTester tester) {
   final spans = <TextSpan>[];
-  for (final widget
-      in tester.widgetList<SelectableText>(find.byType(SelectableText))) {
+  for (final widget in tester.widgetList<SelectableText>(
+    find.byType(SelectableText),
+  )) {
     widget.textSpan?.visitChildren((span) {
       if (span is TextSpan &&
           span.text != null &&
@@ -84,10 +87,11 @@ List<TextSpan> highlightedSpans(WidgetTester tester) {
 
 /// The plain text of every [SelectableText] on screen.
 List<String> selectableTexts(WidgetTester tester) => [
-      for (final widget
-          in tester.widgetList<SelectableText>(find.byType(SelectableText)))
-        widget.data ?? widget.textSpan!.toPlainText(),
-    ];
+  for (final widget in tester.widgetList<SelectableText>(
+    find.byType(SelectableText),
+  ))
+    widget.data ?? widget.textSpan!.toPlainText(),
+];
 
 /// Declares widget tests for a known bug as skipped, with a reason.
 ///
@@ -97,8 +101,10 @@ void knownBug(String reason, void Function() body) =>
     group('(known bug)', body, skip: 'Known bug: $reason');
 
 /// Android and iOS, where [RequestsInspector] listens to the accelerometer.
-final mobilePlatforms =
-    TargetPlatformVariant({TargetPlatform.android, TargetPlatform.iOS});
+final mobilePlatforms = TargetPlatformVariant({
+  TargetPlatform.android,
+  TargetPlatform.iOS,
+});
 
 /// A system back (Android back button, browser back button), as sent by the
 /// platform when the framework handles back.
@@ -112,8 +118,9 @@ Future<void> predictiveBackGesture(WidgetTester tester) async {
   Future<void> send(String method, [Map<String, Object?>? arguments]) =>
       tester.binding.defaultBinaryMessenger.handlePlatformMessage(
         SystemChannels.backGesture.name,
-        SystemChannels.backGesture.codec
-            .encodeMethodCall(MethodCall(method, arguments)),
+        SystemChannels.backGesture.codec.encodeMethodCall(
+          MethodCall(method, arguments),
+        ),
         (_) {},
       );
 

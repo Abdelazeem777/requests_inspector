@@ -40,9 +40,9 @@ Future<void> search(WidgetTester tester, String query) async {
 }
 
 List<String> activeMatches(WidgetTester tester) => [
-      for (final span in highlightedSpans(tester))
-        if (span.style!.backgroundColor == Colors.orange) span.text!,
-    ];
+  for (final span in highlightedSpans(tester))
+    if (span.style!.backgroundColor == Colors.orange) span.text!,
+];
 
 void main() {
   group('RequestDetailsPage', () {
@@ -101,8 +101,9 @@ void main() {
       expect(find.text('Copied to clipboard'), findsOneWidget);
     });
 
-    testWidgets('renders bodies as text when the tree view is off',
-        (tester) async {
+    testWidgets('renders bodies as text when the tree view is off', (
+      tester,
+    ) async {
       await showDetails(tester, needles, treeView: false);
 
       expect(selectableTexts(tester), contains('  "x-needle": "NEEDLE"'));
@@ -111,7 +112,9 @@ void main() {
 
     testWidgets('re-runs the request from the Run button', (tester) async {
       await showDetails(
-          tester, sampleRequest(url: 'https://api.example.com/x'));
+        tester,
+        sampleRequest(url: 'https://api.example.com/x'),
+      );
 
       await tester.tap(find.text('Run'));
       await tester.pump();
@@ -145,8 +148,9 @@ void main() {
       expect(activeMatches(tester), hasLength(1));
     });
 
-    testWidgets('moves the active match with next and previous',
-        (tester) async {
+    testWidgets('moves the active match with next and previous', (
+      tester,
+    ) async {
       await showDetails(tester, needles);
       await search(tester, 'needle');
 
@@ -186,8 +190,9 @@ void main() {
       expect(highlightedSpans(tester), isEmpty);
     });
 
-    testWidgets('closing the search bar clears query and highlights',
-        (tester) async {
+    testWidgets('closing the search bar clears query and highlights', (
+      tester,
+    ) async {
       await showDetails(tester, needles);
       await search(tester, 'needle');
 
@@ -206,8 +211,9 @@ void main() {
       expect(field.controller!.text, isEmpty);
     });
 
-    testWidgets('keeps the text intact for overlapping matches',
-        (tester) async {
+    testWidgets('keeps the text intact for overlapping matches', (
+      tester,
+    ) async {
       await showDetails(
         tester,
         RequestDetails(
@@ -233,8 +239,7 @@ void main() {
   group('top-level primitive bodies', () {
     for (final body in <Object>[true, 42, 1.5]) {
       for (final treeView in [true, false]) {
-        testWidgets(
-            'shows a top-level ${body.runtimeType} response '
+        testWidgets('shows a top-level ${body.runtimeType} response '
             '(tree view: $treeView)', (tester) async {
           await showDetails(
             tester,
@@ -262,8 +267,9 @@ void main() {
     });
   });
 
-  testWidgets('shows nested bool, number and null values as JSON literals',
-      (tester) async {
+  testWidgets('shows nested bool, number and null values as JSON literals', (
+    tester,
+  ) async {
     await showDetails(
       tester,
       sampleRequest(responseBody: {'active': true, 'age': 30, 'nick': null}),
