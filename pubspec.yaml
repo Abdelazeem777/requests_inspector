@@ -28,4 +28,5 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
+  http: ^1.2.0
   share_plus_platform_interface: ^7.1.0
