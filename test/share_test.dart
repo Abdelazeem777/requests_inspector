@@ -48,6 +48,19 @@ void main() {
     expect(text, isNot(contains('graphqlRequestVars')));
   });
 
+  test('NormalLog keeps the JSON types of nested body values', () async {
+    controller.selectedRequest = sampleRequest(
+      requestMethod: RequestMethod.POST,
+      requestBody: {'active': true, 'n': 1, 'x': null},
+    );
+
+    final text = (await share(ShareType.NormalLog)).text!;
+
+    expect(text, contains('"active": true'));
+    expect(text, contains('"n": 1'));
+    expect(text, contains('"x": null'));
+  });
+
   test('CurlCommand shares the generated command', () async {
     final params = await share(ShareType.CurlCommand);
 

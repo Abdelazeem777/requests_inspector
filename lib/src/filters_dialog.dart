@@ -57,7 +57,7 @@ class _FiltersDialogState extends State<FiltersDialog> {
                 border: OutlineInputBorder(),
                 isDense: true,
               ),
-              value: _selectedMethod,
+              initialValue: _selectedMethod,
               items: [
                 const DropdownMenuItem<RequestMethod?>(
                   value: null,

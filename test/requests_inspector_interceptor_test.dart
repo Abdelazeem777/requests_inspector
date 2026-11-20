@@ -91,10 +91,29 @@ void main() {
 
         expect(response.statusCode, 200);
       },
-      skip: 'Known bug: RequestMethod has no HEAD/OPTIONS, so '
-          'RequestMethod.values.firstWhere throws inside the interceptor and '
-          'the app request never completes.',
     );
+
+    test('does not break OPTIONS requests', () async {
+      final dio = inspectedDio(FakeHttpClientAdapter.json(''));
+
+      final response = await dio
+          .request('/users', options: Options(method: 'OPTIONS'))
+          .timeout(const Duration(seconds: 2));
+
+      expect(response.statusCode, 200);
+      expect(onlyLogged().requestMethod, RequestMethod.OPTIONS);
+    });
+
+    test('does not break requests with an unknown method', () async {
+      final dio = inspectedDio(FakeHttpClientAdapter.json(''));
+
+      final response = await dio
+          .request('/users', options: Options(method: 'TRACE'))
+          .timeout(const Duration(seconds: 2));
+
+      expect(response.statusCode, 200);
+      expect(controller.requestsList, isEmpty);
+    });
   });
 
   group('RequestsInspectorInterceptor.onError', () {
@@ -203,9 +222,6 @@ void main() {
         expect(adapter.requests.single.uri.toString(),
             'https://api.example.com/users?a=1');
       },
-      skip: 'Known bug: the stopper copies the full URL (already containing '
-          'the query) into `path` and also keeps `queryParameters`, so the '
-          'query is sent twice (?a=1&a=1).',
     );
   });
 

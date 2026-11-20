@@ -228,6 +228,24 @@ void main() {
       expect(listEntry['request']['postData']['text'], '[1,2]');
     });
 
+    test('keeps the JSON types of body values (uses the raw bodies)', () {
+      const body = {
+        'active': true,
+        'n': 1,
+        'd': 1.5,
+        'x': null,
+        'nested': {'off': false},
+      };
+      final entry = entryOf(harFor(sampleRequest(
+        requestMethod: RequestMethod.POST,
+        requestBody: body,
+        responseBody: body,
+      )));
+
+      expect(entry['request']['postData']['text'], jsonEncode(body));
+      expect(entry['response']['content']['text'], jsonEncode(body));
+    });
+
     test('encodes FormData as multipart params', () {
       final formData = FormData.fromMap({'name': 'John'})
         ..files.add(MapEntry(
