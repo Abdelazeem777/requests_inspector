@@ -18,13 +18,15 @@ class FakeHttpClientAdapter implements HttpClientAdapter {
   final requests = <RequestOptions>[];
 
   static Future<ResponseBody> jsonBody(Object? body, {int statusCode = 200}) =>
-      Future.value(ResponseBody.fromString(
-        body is String ? body : jsonEncode(body),
-        statusCode,
-        headers: {
-          Headers.contentTypeHeader: [Headers.jsonContentType],
-        },
-      ));
+      Future.value(
+        ResponseBody.fromString(
+          body is String ? body : jsonEncode(body),
+          statusCode,
+          headers: {
+            Headers.contentTypeHeader: [Headers.jsonContentType],
+          },
+        ),
+      );
 
   @override
   Future<ResponseBody> fetch(
@@ -41,9 +43,8 @@ class FakeHttpClientAdapter implements HttpClientAdapter {
 }
 
 /// A [Dio] with the inspector interceptor and a fake adapter.
-Dio inspectedDio(HttpClientAdapter adapter, {BaseOptions? options}) => Dio(
-      options ?? BaseOptions(baseUrl: 'https://api.example.com'),
-    )
+Dio inspectedDio(HttpClientAdapter adapter, {BaseOptions? options}) =>
+    Dio(options ?? BaseOptions(baseUrl: 'https://api.example.com'))
       ..httpClientAdapter = adapter
       ..interceptors.add(RequestsInspectorInterceptor());
 

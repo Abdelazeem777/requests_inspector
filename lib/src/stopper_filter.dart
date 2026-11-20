@@ -7,10 +7,7 @@ abstract class StopperFilter {
 }
 
 class RequestStopperFilter implements StopperFilter {
-  const RequestStopperFilter({
-    this.requestMethod,
-    this.urlPattern,
-  });
+  const RequestStopperFilter({this.requestMethod, this.urlPattern});
 
   final RequestMethod? requestMethod;
   final String? urlPattern;
@@ -36,10 +33,7 @@ class RequestStopperFilter implements StopperFilter {
 }
 
 class ResponseStopperFilter implements StopperFilter {
-  const ResponseStopperFilter({
-    this.statusCode,
-    this.urlPattern,
-  });
+  const ResponseStopperFilter({this.statusCode, this.urlPattern});
 
   final int? statusCode;
   final String? urlPattern;

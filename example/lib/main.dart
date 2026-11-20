@@ -128,7 +128,7 @@ Future<List<Post>> fetchPostsUsingInterceptor() async {
       headers: {
         'User-Agent':
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-                '(KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+            '(KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
         'Accept': 'application/json, text/plain, */*',
         'Accept-Language': 'en-US,en;q=0.9',
       },
@@ -142,8 +142,9 @@ Future<List<Post>> fetchPostsUsingInterceptor() async {
     // The request does no need the body, but added for TESTING
   );
 
-  final posts =
-      List.from(response.data['posts']).map((e) => Post.fromMap(e)).toList();
+  final posts = List.from(
+    response.data['posts'],
+  ).map((e) => Post.fromMap(e)).toList();
 
   return posts;
 }
@@ -162,9 +163,7 @@ Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
   }
 ''';
 
-  final options = QueryOptions(
-    document: gql(query),
-  );
+  final options = QueryOptions(document: gql(query));
   final result = await client.query(options);
   if (result.hasException) {
     log(result.exception.toString());
@@ -176,7 +175,7 @@ Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
 }
 
 Future<List<Post>>
-    fetchPostsGraphQlWithVariablesUsingGraphQLFlutterInterceptor() async {
+fetchPostsGraphQlWithVariablesUsingGraphQLFlutterInterceptor() async {
   final client = GraphQLClient(
     cache: GraphQLCache(),
     link: GraphQLInspectorLink(HttpLink('https://graphqlzero.almansi.me/api')),
@@ -191,10 +190,7 @@ Future<List<Post>>
   }
 ''';
 
-  final options = QueryOptions(
-    document: gql(query),
-    variables: variables,
-  );
+  final options = QueryOptions(document: gql(query), variables: variables);
   final result = await client.query(options);
   if (result.hasException) {
     log(result.exception.toString());
@@ -249,11 +245,7 @@ class Post {
   final String title;
   final String body;
 
-  Post({
-    required this.id,
-    required this.title,
-    required this.body,
-  });
+  Post({required this.id, required this.title, required this.body});
 
   Post copyWith({int? id, String? title, String? body}) {
     return Post(

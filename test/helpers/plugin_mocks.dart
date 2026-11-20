@@ -15,10 +15,12 @@ TestDefaultBinaryMessenger get _messenger =>
 class FakeSensors {
   FakeSensors._();
 
-  static const methodChannel =
-      MethodChannel('dev.fluttercommunity.plus/sensors/method');
-  static const accelerometerChannel =
-      EventChannel('dev.fluttercommunity.plus/sensors/accelerometer');
+  static const methodChannel = MethodChannel(
+    'dev.fluttercommunity.plus/sensors/method',
+  );
+  static const accelerometerChannel = EventChannel(
+    'dev.fluttercommunity.plus/sensors/accelerometer',
+  );
 
   static MockStreamHandlerEventSink? _sink;
 

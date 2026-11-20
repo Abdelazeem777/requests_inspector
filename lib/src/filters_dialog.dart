@@ -37,9 +37,7 @@ class _FiltersDialogState extends State<FiltersDialog> {
           : (widget.isDarkMode ? Colors.grey[700] : Colors.grey[400]),
       foregroundColor: widget.isDarkMode ? Colors.white : Colors.black87,
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     );
   }
 

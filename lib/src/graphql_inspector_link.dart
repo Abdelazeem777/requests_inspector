@@ -44,7 +44,7 @@ class GraphQLInspectorLink extends Link {
           sentTime: requestHandlerStartedAt,
           statusCode:
               response.context.entry<HttpLinkResponseContext>()?.statusCode ??
-                  0,
+              0,
           headers: response.context.entry<HttpLinkResponseContext>()?.headers,
           responseBody: response.response,
         );
@@ -107,8 +107,9 @@ class GraphQLInspectorLink extends Link {
     required DateTime sentTime,
     required ServerException exception,
   }) {
-    final httpException =
-        exception is HttpLinkServerException ? exception : null;
+    final httpException = exception is HttpLinkServerException
+        ? exception
+        : null;
     _logHttpExchange(
       request: request,
       link: link,
@@ -156,8 +157,9 @@ class GraphQLInspectorLink extends Link {
         requestBody: printNode(
           request.operation.document,
         ).replaceAll('\n', '').replaceAll('__typename', ''),
-        graphqlRequestVars:
-            request.variables.isEmpty ? null : request.variables,
+        graphqlRequestVars: request.variables.isEmpty
+            ? null
+            : request.variables,
         headers: headers,
         url: link.uri.toString(),
         responseBody: responseBody,

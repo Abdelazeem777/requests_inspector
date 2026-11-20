@@ -91,14 +91,20 @@ class _SearchWidgetState extends State<SearchWidget> {
                     },
                   ),
                   IconButton(
-                    icon: Icon(Icons.keyboard_arrow_up,
-                        size: 20, color: iconColor),
+                    icon: Icon(
+                      Icons.keyboard_arrow_up,
+                      size: 20,
+                      color: iconColor,
+                    ),
                     onPressed: InspectorController().previousMatch,
                     tooltip: 'Previous match',
                   ),
                   IconButton(
-                    icon: Icon(Icons.keyboard_arrow_down,
-                        size: 20, color: iconColor),
+                    icon: Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 20,
+                      color: iconColor,
+                    ),
                     onPressed: InspectorController().nextMatch,
                     tooltip: 'Next match',
                   ),

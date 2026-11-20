@@ -99,31 +99,46 @@ class _HighlightedTextState extends State<HighlightedText> {
               }
 
               // Overlap found
-              final highlightStartInSpan =
-                  (match.start - spanStart).clamp(0, spanText.length);
-              final highlightEndInSpan =
-                  (match.end - spanStart).clamp(0, spanText.length);
+              final highlightStartInSpan = (match.start - spanStart).clamp(
+                0,
+                spanText.length,
+              );
+              final highlightEndInSpan = (match.end - spanStart).clamp(
+                0,
+                spanText.length,
+              );
 
               // Add text before highlight within this span
               if (highlightStartInSpan > lastInternalIdx) {
-                finalSpans.add(TextSpan(
-                  text:
-                      spanText.substring(lastInternalIdx, highlightStartInSpan),
-                  style: originalSpan.style ?? widget.style,
-                ));
+                finalSpans.add(
+                  TextSpan(
+                    text: spanText.substring(
+                      lastInternalIdx,
+                      highlightStartInSpan,
+                    ),
+                    style: originalSpan.style ?? widget.style,
+                  ),
+                );
               }
 
               // Add the highlighted portion
-              finalSpans.add(TextSpan(
-                text: spanText.substring(
-                    highlightStartInSpan, highlightEndInSpan),
-                style: (originalSpan.style ?? widget.style ?? const TextStyle())
-                    .copyWith(
-                  backgroundColor: isActive ? Colors.orange : Colors.yellow,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
+              finalSpans.add(
+                TextSpan(
+                  text: spanText.substring(
+                    highlightStartInSpan,
+                    highlightEndInSpan,
+                  ),
+                  style:
+                      (originalSpan.style ?? widget.style ?? const TextStyle())
+                          .copyWith(
+                            backgroundColor: isActive
+                                ? Colors.orange
+                                : Colors.yellow,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
                 ),
-              ));
+              );
 
               lastInternalIdx = highlightEndInSpan;
 
@@ -142,10 +157,12 @@ class _HighlightedTextState extends State<HighlightedText> {
 
             // Add remaining text in span
             if (lastInternalIdx < spanText.length) {
-              finalSpans.add(TextSpan(
-                text: spanText.substring(lastInternalIdx),
-                style: originalSpan.style ?? widget.style,
-              ));
+              finalSpans.add(
+                TextSpan(
+                  text: spanText.substring(lastInternalIdx),
+                  style: originalSpan.style ?? widget.style,
+                ),
+              );
             }
 
             charOffset += spanText.length;
@@ -158,20 +175,24 @@ class _HighlightedTextState extends State<HighlightedText> {
             final isActive = globalMatchIndex == currentMatchIndex;
 
             if (match.start > lastIndex) {
-              finalSpans.add(TextSpan(
-                text: effectiveText.substring(lastIndex, match.start),
-                style: widget.style,
-              ));
+              finalSpans.add(
+                TextSpan(
+                  text: effectiveText.substring(lastIndex, match.start),
+                  style: widget.style,
+                ),
+              );
             }
 
-            finalSpans.add(TextSpan(
-              text: effectiveText.substring(match.start, match.end),
-              style: (widget.style ?? const TextStyle()).copyWith(
-                backgroundColor: isActive ? Colors.orange : Colors.yellow,
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
+            finalSpans.add(
+              TextSpan(
+                text: effectiveText.substring(match.start, match.end),
+                style: (widget.style ?? const TextStyle()).copyWith(
+                  backgroundColor: isActive ? Colors.orange : Colors.yellow,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ));
+            );
 
             lastIndex = match.end;
 
@@ -181,10 +202,12 @@ class _HighlightedTextState extends State<HighlightedText> {
           }
 
           if (lastIndex < effectiveText.length) {
-            finalSpans.add(TextSpan(
-              text: effectiveText.substring(lastIndex),
-              style: widget.style,
-            ));
+            finalSpans.add(
+              TextSpan(
+                text: effectiveText.substring(lastIndex),
+                style: widget.style,
+              ),
+            );
           }
         }
 
@@ -211,7 +234,9 @@ class _HighlightedTextState extends State<HighlightedText> {
   }
 
   Widget _buildContextMenu(
-      BuildContext context, EditableTextState editableTextState) {
+    BuildContext context,
+    EditableTextState editableTextState,
+  ) {
     return AdaptiveTextSelectionToolbar.buttonItems(
       anchors: editableTextState.contextMenuAnchors,
       buttonItems: <ContextMenuButtonItem>[

@@ -20,15 +20,19 @@ Future<T? Function()> showTestDialog<T>(
     ..physicalSize = const Size(800, 1600)
     ..devicePixelRatio = 1;
   addTearDown(tester.view.reset);
-  await tester.pumpWidget(MaterialApp(
-    home: Builder(
-      builder: (context) => TextButton(
-        onPressed: () async => result =
-            await showDialog<T>(context: context, builder: (_) => dialog),
-        child: const Text('open'),
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Builder(
+        builder: (context) => TextButton(
+          onPressed: () async => result = await showDialog<T>(
+            context: context,
+            builder: (_) => dialog,
+          ),
+          child: const Text('open'),
+        ),
       ),
     ),
-  ));
+  );
   await tester.tap(find.text('open'));
   await tester.pumpAndSettle();
   return () => result;
@@ -36,16 +40,15 @@ Future<T? Function()> showTestDialog<T>(
 
 /// The dialog text field that follows the [label] text.
 Finder fieldAfter(String label) => find
-    .descendant(
-      of: find.byType(ListView),
-      matching: find.byType(TextField),
-    )
-    .at(const {
-      'URL: ': 0,
-      'Headers: ': 1,
-      'Query Parameters: ': 2,
-      'Request Body: ': 3,
-    }[label]!);
+    .descendant(of: find.byType(ListView), matching: find.byType(TextField))
+    .at(
+      const {
+        'URL: ': 0,
+        'Headers: ': 1,
+        'Query Parameters: ': 2,
+        'Request Body: ': 3,
+      }[label]!,
+    );
 
 /// The text currently shown in [field].
 String textOf(WidgetTester tester, Finder field) =>
@@ -94,8 +97,9 @@ void main() {
       requestBody: {'name': 'John'},
     );
 
-    testWidgets('returns the request unchanged when sent as is',
-        (tester) async {
+    testWidgets('returns the request unchanged when sent as is', (
+      tester,
+    ) async {
       final result = await showTestDialog<RequestDetails>(
         tester,
         RequestStopperEditorDialog(requestDetails: request),
@@ -109,8 +113,9 @@ void main() {
       expect(result(), same(request));
     });
 
-    testWidgets('returns the edited method, URL, headers, query and body',
-        (tester) async {
+    testWidgets('returns the edited method, URL, headers, query and body', (
+      tester,
+    ) async {
       final result = await showTestDialog<RequestDetails>(
         tester,
         RequestStopperEditorDialog(requestDetails: request),
@@ -135,8 +140,9 @@ void main() {
       expect(edited.requestBody, {'name': 'Jo'});
     });
 
-    testWidgets('keeps every JSON type when a field is edited back as is',
-        (tester) async {
+    testWidgets('keeps every JSON type when a field is edited back as is', (
+      tester,
+    ) async {
       final typed = sampleRequest(
         requestMethod: RequestMethod.POST,
         headers: {'x-retry': 3, 'x-debug': true},
@@ -151,7 +157,7 @@ void main() {
       for (final label in [
         'Headers: ',
         'Query Parameters: ',
-        'Request Body: '
+        'Request Body: ',
       ]) {
         await retypeSameText(tester, fieldAfter(label));
       }
@@ -165,8 +171,9 @@ void main() {
       expectSameJson(sent.requestBody, typedBody);
     });
 
-    testWidgets('editing one body value keeps the types of the others',
-        (tester) async {
+    testWidgets('editing one body value keeps the types of the others', (
+      tester,
+    ) async {
       final result = await showTestDialog<RequestDetails>(
         tester,
         RequestStopperEditorDialog(
@@ -183,7 +190,9 @@ void main() {
       expect(text, contains('"age": 30'));
       expect(text, contains('"nickname": null'));
       await tester.enterText(
-          body, text.replaceFirst('"name": "John"', '"name": "Jo"'));
+        body,
+        text.replaceFirst('"name": "John"', '"name": "Jo"'),
+      );
       await tester.tap(find.text('Send'));
       await tester.pumpAndSettle();
 
@@ -228,17 +237,22 @@ void main() {
       responseBody: {'id': 1},
     );
 
-    testWidgets('returns an equal response when received as is',
-        (tester) async {
+    testWidgets('returns an equal response when received as is', (
+      tester,
+    ) async {
       final result = await showTestDialog<ResponseDetails>(
         tester,
         const ResponseStopperEditorDialog(responseDetails: response),
       );
 
-      final statusField = tester.widget<TextField>(find
-          .descendant(
-              of: find.byType(ListView), matching: find.byType(TextField))
-          .first);
+      final statusField = tester.widget<TextField>(
+        find
+            .descendant(
+              of: find.byType(ListView),
+              matching: find.byType(TextField),
+            )
+            .first,
+      );
       expect(statusField.controller!.text, '200');
       await tester.tap(find.text('Receive'));
       await tester.pumpAndSettle();
@@ -289,8 +303,9 @@ void main() {
       expect(result()!.statusCode, 200);
     });
 
-    testWidgets('keeps every JSON type when the body is edited back as is',
-        (tester) async {
+    testWidgets('keeps every JSON type when the body is edited back as is', (
+      tester,
+    ) async {
       final result = await showTestDialog<ResponseDetails>(
         tester,
         const ResponseStopperEditorDialog(
@@ -351,8 +366,9 @@ void main() {
       dio = inspectedDio(adapter);
     });
 
-    testWidgets('the request stopper lets the user edit before sending',
-        (tester) async {
+    testWidgets('the request stopper lets the user edit before sending', (
+      tester,
+    ) async {
       await pumpInspectorApp(tester, navigatorKey: navigatorKey);
       InspectorController().requestStopperEnabled = true;
 
@@ -367,11 +383,14 @@ void main() {
 
       expect(adapter.requests.single.uri.toString(), 'https://x.io/edited');
       expect(
-          InspectorController().requestsList.single.url, 'https://x.io/edited');
+        InspectorController().requestsList.single.url,
+        'https://x.io/edited',
+      );
     });
 
-    testWidgets('a request body left as is is sent with its JSON types',
-        (tester) async {
+    testWidgets('a request body left as is is sent with its JSON types', (
+      tester,
+    ) async {
       await pumpInspectorApp(tester, navigatorKey: navigatorKey);
       InspectorController().requestStopperEnabled = true;
 
@@ -384,11 +403,14 @@ void main() {
 
       expectSameJson(adapter.requests.single.data, typedBody);
       expectSameJson(
-          InspectorController().requestsList.single.requestBody, typedBody);
+        InspectorController().requestsList.single.requestBody,
+        typedBody,
+      );
     });
 
-    testWidgets('requests outside the stopper filters are not stopped',
-        (tester) async {
+    testWidgets('requests outside the stopper filters are not stopped', (
+      tester,
+    ) async {
       await pumpInspectorApp(tester, navigatorKey: navigatorKey);
       InspectorController()
         ..requestStopperEnabled = true
@@ -416,8 +438,9 @@ void main() {
       expect((await future).data, {'id': 1});
     });
 
-    testWidgets('the response stopper lets the user edit what the app gets',
-        (tester) async {
+    testWidgets('the response stopper lets the user edit what the app gets', (
+      tester,
+    ) async {
       await pumpInspectorApp(tester, navigatorKey: navigatorKey);
       InspectorController().responseStopperEnabled = true;
 
@@ -438,12 +461,14 @@ void main() {
       await tester.pumpAndSettle();
 
       expect((await future).data, {'id': 99});
-      expect(
-          InspectorController().requestsList.single.responseBody, {'id': 99});
+      expect(InspectorController().requestsList.single.responseBody, {
+        'id': 99,
+      });
     });
 
-    testWidgets('a response body left as is reaches the app with its types',
-        (tester) async {
+    testWidgets('a response body left as is reaches the app with its types', (
+      tester,
+    ) async {
       adapter = FakeHttpClientAdapter.json(typedBody);
       dio = inspectedDio(adapter);
       await pumpInspectorApp(tester, navigatorKey: navigatorKey);
@@ -458,8 +483,9 @@ void main() {
       expectSameJson((await future).data, typedBody);
     });
 
-    testWidgets('responses outside the stopper filters are not stopped',
-        (tester) async {
+    testWidgets('responses outside the stopper filters are not stopped', (
+      tester,
+    ) async {
       await pumpInspectorApp(tester, navigatorKey: navigatorKey);
       InspectorController()
         ..responseStopperEnabled = true

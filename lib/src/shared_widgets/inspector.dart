@@ -426,8 +426,9 @@ class Inspector extends StatelessWidget {
 
                 if (!context.mounted) return;
 
-                var shareType =
-                    isHttp ? await _showDialogShareType(context) : null;
+                var shareType = isHttp
+                    ? await _showDialogShareType(context)
+                    : null;
 
                 if (shareType == null) return;
 
@@ -520,10 +521,11 @@ class Inspector extends StatelessWidget {
         builder: (context, requests, _) => requests.isEmpty
             ? Center(
                 child: Text(
-                InspectorController().areAnyFiltersApplied
-                    ? 'No requests can be found with applied filters'
-                    : 'No requests added yet',
-              ))
+                  InspectorController().areAnyFiltersApplied
+                      ? 'No requests can be found with applied filters'
+                      : 'No requests added yet',
+                ),
+              )
             : Selector<InspectorController, RequestDetails?>(
                 selector: (_, controller) => controller.selectedRequest,
                 builder: (context, selectedRequest, _) => ListView.separated(

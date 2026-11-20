@@ -33,7 +33,9 @@ void main() {
 
   Future<ShareParams> share(ShareType type, {Rect? origin}) async {
     controller.shareSelectedRequest(
-        shareType: type, sharePositionOrigin: origin);
+      shareType: type,
+      sharePositionOrigin: origin,
+    );
     await pumpEventQueue();
     return platform.shared.single;
   }
@@ -111,7 +113,8 @@ void main() {
         'request.har',
       );
     },
-    skip: 'Known bug: on Android/iOS the file is shared as "<uuid>.json" '
+    skip:
+        'Known bug: on Android/iOS the file is shared as "<uuid>.json" '
         'because XFile.fromData(name:) is ignored on dart:io and no '
         'fileNameOverrides is passed (inspector_controller.dart:374).',
   );

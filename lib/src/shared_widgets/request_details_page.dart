@@ -61,9 +61,8 @@ class RequestDetailsPage extends StatelessWidget {
                   const SizedBox(height: 8),
                   Selector<InspectorController, bool>(
                     selector: (_, controller) => controller.isDarkMode,
-                    builder: (context, isDarkMode, _) => SearchWidget(
-                      isDarkMode: isDarkMode,
-                    ),
+                    builder: (context, isDarkMode, _) =>
+                        SearchWidget(isDarkMode: isDarkMode),
                   ),
                   Expanded(
                     child: _buildRequestDetails(context, selectedRequest),
@@ -91,85 +90,101 @@ class RequestDetailsPage extends StatelessWidget {
         var timeAndUrlText = 'Sent at: $sentTimeText';
 
         if (request.receivedTime != null) {
-          final receivedTimeText =
-              InspectorHelper.extractTimeText(request.receivedTime!);
+          final receivedTimeText = InspectorHelper.extractTimeText(
+            request.receivedTime!,
+          );
           final durationText = InspectorHelper.calculateDuration(
-              request.sentTime, request.receivedTime!);
+            request.sentTime,
+            request.receivedTime!,
+          );
           timeAndUrlText +=
               '\nReceived at: $receivedTimeText\nDuration: $durationText';
         }
 
         timeAndUrlText += '\n\nURL: ${request.url}';
 
-        final timeAndUrlMatches =
-            SearchHelper.findMatches(text: timeAndUrlText, query: query).length;
+        final timeAndUrlMatches = SearchHelper.findMatches(
+          text: timeAndUrlText,
+          query: query,
+        ).length;
         final timeAndUrlOffset = currentOffset;
         currentOffset += timeAndUrlMatches;
 
         final headersPretty = request.headers != null
             ? JsonPrettyConverter().convert(request.headers)
             : '';
-        final headersMatches =
-            SearchHelper.findMatches(text: headersPretty, query: query).length;
+        final headersMatches = SearchHelper.findMatches(
+          text: headersPretty,
+          query: query,
+        ).length;
         final headersOffset = currentOffset;
         currentOffset += headersMatches;
 
         final queryParamsPretty = request.queryParameters != null
             ? JsonPrettyConverter().convert(request.queryParameters)
             : '';
-        final queryParamsMatches =
-            SearchHelper.findMatches(text: queryParamsPretty, query: query)
-                .length;
+        final queryParamsMatches = SearchHelper.findMatches(
+          text: queryParamsPretty,
+          query: query,
+        ).length;
         final queryParamsOffset = currentOffset;
         currentOffset += queryParamsMatches;
 
         final requestBodyPretty = request.requestBody != null
             ? JsonPrettyConverter().convert(request.requestBody)
             : '';
-        final requestBodyMatches =
-            SearchHelper.findMatches(text: requestBodyPretty, query: query)
-                .length;
+        final requestBodyMatches = SearchHelper.findMatches(
+          text: requestBodyPretty,
+          query: query,
+        ).length;
         final requestBodyOffset = currentOffset;
         currentOffset += requestBodyMatches;
 
         final graphqlVarsPretty = request.graphqlRequestVars != null
             ? JsonPrettyConverter().convert(request.graphqlRequestVars)
             : '';
-        final graphqlVarsMatches =
-            SearchHelper.findMatches(text: graphqlVarsPretty, query: query)
-                .length;
+        final graphqlVarsMatches = SearchHelper.findMatches(
+          text: graphqlVarsPretty,
+          query: query,
+        ).length;
         final graphqlVarsOffset = currentOffset;
         currentOffset += graphqlVarsMatches;
 
         final responseBodyPretty = request.responseBody != null
             ? JsonPrettyConverter().convert(request.responseBody)
             : '';
-        final responseBodyMatches =
-            SearchHelper.findMatches(text: responseBodyPretty, query: query)
-                .length;
+        final responseBodyMatches = SearchHelper.findMatches(
+          text: responseBodyPretty,
+          query: query,
+        ).length;
         final responseBodyOffset = currentOffset;
         currentOffset += responseBodyMatches;
 
         return Selector<InspectorController, int>(
           selector: (_, controller) => controller.currentMatchIndex,
           builder: (context, currentMatchIndex, _) {
-            final isHeadersActive = currentMatchIndex >= headersOffset &&
+            final isHeadersActive =
+                currentMatchIndex >= headersOffset &&
                 currentMatchIndex < headersOffset + headersMatches;
             final isQueryParamsActive =
                 currentMatchIndex >= queryParamsOffset &&
-                    currentMatchIndex < queryParamsOffset + queryParamsMatches;
+                currentMatchIndex < queryParamsOffset + queryParamsMatches;
             final isRequestBodyActive =
                 currentMatchIndex >= requestBodyOffset &&
-                    currentMatchIndex < requestBodyOffset + requestBodyMatches;
-            final isGraphqlActive = currentMatchIndex >= graphqlVarsOffset &&
+                currentMatchIndex < requestBodyOffset + requestBodyMatches;
+            final isGraphqlActive =
+                currentMatchIndex >= graphqlVarsOffset &&
                 currentMatchIndex < graphqlVarsOffset + graphqlVarsMatches;
-            final isResponseBodyActive = currentMatchIndex >=
-                    responseBodyOffset &&
+            final isResponseBodyActive =
+                currentMatchIndex >= responseBodyOffset &&
                 currentMatchIndex < responseBodyOffset + responseBodyMatches;
 
             return ListView(
-              padding:
-                  const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 96.0),
+              padding: const EdgeInsets.only(
+                left: 12.0,
+                right: 12.0,
+                bottom: 96.0,
+              ),
               children: [
                 _buildExpandableSection(
                   context: context,
@@ -316,7 +331,8 @@ class RequestDetailsPage extends StatelessWidget {
             title: Row(
               children: [
                 Expanded(
-                  child: titleWidget ??
+                  child:
+                      titleWidget ??
                       Text(
                         title ?? '',
                         style: theme.textTheme.titleMedium?.copyWith(
@@ -446,8 +462,10 @@ class RequestDetailsPage extends StatelessWidget {
     var currentOffset = matchIndexOffset;
 
     for (final line in lines) {
-      final matchesCount =
-          SearchHelper.findMatches(text: line, query: searchQuery).length;
+      final matchesCount = SearchHelper.findMatches(
+        text: line,
+        query: searchQuery,
+      ).length;
 
       children.add(
         Padding(

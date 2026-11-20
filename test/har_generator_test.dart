@@ -9,8 +9,9 @@ import 'package:requests_inspector/src/har_generator.dart';
 import 'helpers/fakes.dart';
 
 Map<String, dynamic> harFor(RequestDetails request, {String? curlCommand}) =>
-    jsonDecode(const HarGenerator()
-        .generate(request: request, curlCommand: curlCommand));
+    jsonDecode(
+      const HarGenerator().generate(request: request, curlCommand: curlCommand),
+    );
 
 Map<String, dynamic> entryOf(Map<String, dynamic> har) =>
     (har['log']['entries'] as List).single as Map<String, dynamic>;
@@ -111,8 +112,10 @@ void main() {
       final entry = entries.first as Map<String, dynamic>;
 
       expect(entry['request']['method'], 'POST');
-      expect((entry['request']['url'] as String),
-          contains('https://api.example.com/users'));
+      expect(
+        (entry['request']['url'] as String),
+        contains('https://api.example.com/users'),
+      );
       expect(entry['response']['status'], 201);
       expect(entry['time'], 123);
       expect(entry['timings']['wait'], 123);
@@ -135,7 +138,8 @@ void main() {
     test(
       'produces valid HAR 1.2 for a request without a body',
       () => expectValidHar12(harFor(sampleRequest(requestBody: null))),
-      skip: 'Known bug: postData is emitted as null when there is no body; '
+      skip:
+          'Known bug: postData is emitted as null when there is no body; '
           'HAR 1.2 expects the optional object to be omitted.',
     );
 
@@ -143,15 +147,18 @@ void main() {
       'reports the package version as the creator version',
       () {
         final pubspec = File('pubspec.yaml').readAsStringSync();
-        final version =
-            RegExp(r'^version:\s*(\S+)', multiLine: true).firstMatch(pubspec)!;
+        final version = RegExp(
+          r'^version:\s*(\S+)',
+          multiLine: true,
+        ).firstMatch(pubspec)!;
 
         expect(
           harFor(sampleRequest())['log']['creator']['version'],
           version.group(1),
         );
       },
-      skip: "Known bug: creator.version is hard-coded to '5.1.1' in "
+      skip:
+          "Known bug: creator.version is hard-coded to '5.1.1' in "
           'har_generator.dart.',
     );
 
@@ -170,13 +177,19 @@ void main() {
     });
 
     test('adds query parameters to the URL and to queryString', () {
-      final entry = entryOf(harFor(sampleRequest(
-        url: 'https://api.example.com/search',
-        queryParameters: {'q': 'a b', 'page': 2, 'skip': null},
-      )));
+      final entry = entryOf(
+        harFor(
+          sampleRequest(
+            url: 'https://api.example.com/search',
+            queryParameters: {'q': 'a b', 'page': 2, 'skip': null},
+          ),
+        ),
+      );
 
-      expect(entry['request']['url'],
-          'https://api.example.com/search?q=a+b&page=2');
+      expect(
+        entry['request']['url'],
+        'https://api.example.com/search?q=a+b&page=2',
+      );
       expect(entry['request']['queryString'], [
         {'name': 'q', 'value': 'a b'},
         {'name': 'page', 'value': '2'},
@@ -184,47 +197,65 @@ void main() {
     });
 
     test('appends query parameters to a URL that already has a query', () {
-      final entry = entryOf(harFor(sampleRequest(
-        url: 'https://api.example.com/search?lang=en',
-        queryParameters: {'q': 'x'},
-      )));
+      final entry = entryOf(
+        harFor(
+          sampleRequest(
+            url: 'https://api.example.com/search?lang=en',
+            queryParameters: {'q': 'x'},
+          ),
+        ),
+      );
 
-      expect(entry['request']['url'],
-          'https://api.example.com/search?lang=en&q=x');
+      expect(
+        entry['request']['url'],
+        'https://api.example.com/search?lang=en&q=x',
+      );
     });
 
     test('lists request headers and drops null values', () {
-      final entry = entryOf(harFor(sampleRequest(
-        headers: {'accept': 'application/json', 'x-null': null, 'x-num': 1},
-      )));
+      final entry = entryOf(
+        harFor(
+          sampleRequest(
+            headers: {'accept': 'application/json', 'x-null': null, 'x-num': 1},
+          ),
+        ),
+      );
 
       expect(entry['request']['headers'], [
         {'name': 'accept', 'value': 'application/json'},
         {'name': 'x-num', 'value': '1'},
       ]);
       expect(
-        entryOf(harFor(sampleRequest(headers: 'not a map')))['request']
-            ['headers'],
+        entryOf(
+          harFor(sampleRequest(headers: 'not a map')),
+        )['request']['headers'],
         isEmpty,
       );
     });
 
     test('encodes Map and List bodies as JSON postData', () {
-      final mapEntry = entryOf(harFor(sampleRequest(
-        requestMethod: RequestMethod.POST,
-        requestBody: {'name': 'Jörg'},
-      )));
+      final mapEntry = entryOf(
+        harFor(
+          sampleRequest(
+            requestMethod: RequestMethod.POST,
+            requestBody: {'name': 'Jörg'},
+          ),
+        ),
+      );
       expect(mapEntry['request']['postData'], {
         'mimeType': 'application/json',
         'text': '{"name":"Jörg"}',
       });
-      expect(mapEntry['request']['bodySize'],
-          utf8.encode('{"name":"Jörg"}').length);
+      expect(
+        mapEntry['request']['bodySize'],
+        utf8.encode('{"name":"Jörg"}').length,
+      );
 
-      final listEntry = entryOf(harFor(sampleRequest(
-        requestMethod: RequestMethod.POST,
-        requestBody: [1, 2],
-      )));
+      final listEntry = entryOf(
+        harFor(
+          sampleRequest(requestMethod: RequestMethod.POST, requestBody: [1, 2]),
+        ),
+      );
       expect(listEntry['request']['postData']['text'], '[1,2]');
     });
 
@@ -236,11 +267,15 @@ void main() {
         'x': null,
         'nested': {'off': false},
       };
-      final entry = entryOf(harFor(sampleRequest(
-        requestMethod: RequestMethod.POST,
-        requestBody: body,
-        responseBody: body,
-      )));
+      final entry = entryOf(
+        harFor(
+          sampleRequest(
+            requestMethod: RequestMethod.POST,
+            requestBody: body,
+            responseBody: body,
+          ),
+        ),
+      );
 
       expect(entry['request']['postData']['text'], jsonEncode(body));
       expect(entry['response']['content']['text'], jsonEncode(body));
@@ -248,16 +283,22 @@ void main() {
 
     test('encodes FormData as multipart params', () {
       final formData = FormData.fromMap({'name': 'John'})
-        ..files.add(MapEntry(
-          'avatar',
-          MultipartFile.fromString('bytes', filename: 'me.png'),
-        ))
+        ..files.add(
+          MapEntry(
+            'avatar',
+            MultipartFile.fromString('bytes', filename: 'me.png'),
+          ),
+        )
         ..files.add(MapEntry('blob', MultipartFile.fromString('bytes')));
 
-      final entry = entryOf(harFor(sampleRequest(
-        requestMethod: RequestMethod.POST,
-        requestBody: formData,
-      )));
+      final entry = entryOf(
+        harFor(
+          sampleRequest(
+            requestMethod: RequestMethod.POST,
+            requestBody: formData,
+          ),
+        ),
+      );
 
       expect(entry['request']['postData'], {
         'mimeType': 'multipart/form-data',
@@ -271,10 +312,14 @@ void main() {
     });
 
     test('encodes other bodies as text/plain', () {
-      final entry = entryOf(harFor(sampleRequest(
-        requestMethod: RequestMethod.POST,
-        requestBody: 'raw body',
-      )));
+      final entry = entryOf(
+        harFor(
+          sampleRequest(
+            requestMethod: RequestMethod.POST,
+            requestBody: 'raw body',
+          ),
+        ),
+      );
 
       expect(entry['request']['postData'], {
         'mimeType': 'text/plain',
@@ -286,11 +331,15 @@ void main() {
     test(
       'encodes x-www-form-urlencoded Map bodies as params',
       () {
-        final entry = entryOf(harFor(sampleRequest(
-          requestMethod: RequestMethod.POST,
-          headers: {'content-type': 'application/x-www-form-urlencoded'},
-          requestBody: {'name': 'John'},
-        )));
+        final entry = entryOf(
+          harFor(
+            sampleRequest(
+              requestMethod: RequestMethod.POST,
+              headers: {'content-type': 'application/x-www-form-urlencoded'},
+              requestBody: {'name': 'John'},
+            ),
+          ),
+        );
 
         expect(entry['request']['postData'], {
           'mimeType': 'application/x-www-form-urlencoded',
@@ -299,14 +348,15 @@ void main() {
           ],
         });
       },
-      skip: 'Known bug: the `body is Map` JSON branch runs first, so the '
+      skip:
+          'Known bug: the `body is Map` JSON branch runs first, so the '
           'x-www-form-urlencoded branch in _buildPostData is unreachable.',
     );
 
     test('describes the response content', () {
-      Map<String, dynamic> contentFor(dynamic body) =>
-          entryOf(harFor(sampleRequest(responseBody: body)))['response']
-              ['content'];
+      Map<String, dynamic> contentFor(dynamic body) => entryOf(
+        harFor(sampleRequest(responseBody: body)),
+      )['response']['content'];
 
       expect(contentFor({'id': 1}), {
         'size': 8,

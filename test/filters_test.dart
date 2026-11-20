@@ -19,8 +19,9 @@ void main() {
 
   group('RequestFilter', () {
     test('RequestMethodFilter matches the method', () {
-      final filter =
-          const RequestMethodFilter(RequestMethod.POST).requestFilter;
+      final filter = const RequestMethodFilter(
+        RequestMethod.POST,
+      ).requestFilter;
 
       expect(filter(postOrders), isTrue);
       expect(filter(getUsers), isFalse);
@@ -29,9 +30,13 @@ void main() {
     test('RequestUrlFilter is a trimmed, case-insensitive contains', () {
       expect(const RequestUrlFilter(' users ').requestFilter(getUsers), isTrue);
       expect(
-          const RequestUrlFilter('EXAMPLE').requestFilter(postOrders), isTrue);
+        const RequestUrlFilter('EXAMPLE').requestFilter(postOrders),
+        isTrue,
+      );
       expect(
-          const RequestUrlFilter('users').requestFilter(postOrders), isFalse);
+        const RequestUrlFilter('users').requestFilter(postOrders),
+        isFalse,
+      );
       expect(const RequestUrlFilter('').requestFilter(postOrders), isTrue);
     });
 
@@ -61,10 +66,12 @@ void main() {
       expect(filter.shouldStop(getUsers), isTrue);
       expect(filter.shouldStop(postOrders), isFalse);
       expect(
-        filter.shouldStop(sampleRequest(
-          requestMethod: RequestMethod.GET,
-          url: 'https://api.example.com/orders',
-        )),
+        filter.shouldStop(
+          sampleRequest(
+            requestMethod: RequestMethod.GET,
+            url: 'https://api.example.com/orders',
+          ),
+        ),
         isFalse,
       );
     });
@@ -108,14 +115,18 @@ void main() {
         isTrue,
       );
       expect(
-          const ResponseStopperFilter(statusCode: 404).shouldStop(ok), isFalse);
+        const ResponseStopperFilter(statusCode: 404).shouldStop(ok),
+        isFalse,
+      );
       expect(
         const ResponseStopperFilter(urlPattern: 'users').shouldStop(notFound),
         isTrue,
       );
       expect(
-        const ResponseStopperFilter(statusCode: 404, urlPattern: 'orders')
-            .shouldStop(notFound),
+        const ResponseStopperFilter(
+          statusCode: 404,
+          urlPattern: 'orders',
+        ).shouldStop(notFound),
         isFalse,
       );
       expect(
