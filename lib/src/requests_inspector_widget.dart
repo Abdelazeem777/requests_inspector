@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -85,8 +84,12 @@ class RequestsInspector extends StatelessWidget {
     return Directionality(textDirection: TextDirection.ltr, child: widget);
   }
 
+  // defaultTargetPlatform is the platform the app runs on (and, unlike
+  // dart:io's Platform, follows debugDefaultTargetPlatformOverride in tests).
   bool _isSupportShaking() =>
-      kIsWeb ? false : Platform.isAndroid || Platform.isIOS;
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS);
 
   Future<RequestDetails?> _showRequestEditorDialog(
     BuildContext context, {

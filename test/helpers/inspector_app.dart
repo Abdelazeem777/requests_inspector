@@ -96,6 +96,10 @@ List<String> selectableTexts(WidgetTester tester) => [
 void knownBug(String reason, void Function() body) =>
     group('(known bug)', body, skip: 'Known bug: $reason');
 
+/// Android and iOS, where [RequestsInspector] listens to the accelerometer.
+final mobilePlatforms =
+    TargetPlatformVariant({TargetPlatform.android, TargetPlatform.iOS});
+
 /// A system back (Android back button, browser back button), as sent by the
 /// platform when the framework handles back.
 Future<void> systemBack(WidgetTester tester) async {

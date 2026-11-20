@@ -80,13 +80,8 @@ void main() {
       expect(visibleInspectorTitle, findsNothing);
     });
 
+    // flutter test uses TargetPlatform.android unless a variant overrides it.
     testWidgets('opens when the phone is shaken three times', (tester) async {
-      // Create the singleton first: on the test host RequestsInspector would
-      // fall back to long press because the platform is not Android/iOS.
-      InspectorController(
-        enabled: true,
-        showInspectorOn: ShowInspectorOn.Shaking,
-      );
       await pumpInspectorApp(tester, showInspectorOn: ShowInspectorOn.Shaking);
       await tester.pump();
       expect(FakeSensors.isListening, isTrue);
@@ -106,22 +101,28 @@ void main() {
       expect(visibleInspectorTitle, findsOneWidget);
     });
 
-    // flutter test runs on a desktop host, like web/desktop apps, where the
-    // accelerometer is not used. (The Android/iOS branch, where Shaking
-    // disables long press, can't be simulated: RequestsInspector checks
-    // dart:io's Platform.)
+    testWidgets('does not open on long press with ShowInspectorOn.Shaking',
+        (tester) async {
+      await pumpInspectorApp(tester, showInspectorOn: ShowInspectorOn.Shaking);
+
+      await tester.longPress(find.text(hostAppText));
+      await tester.pumpAndSettle();
+
+      expect(isInspectorShown, isFalse);
+      expect(FakeSensors.isListening, isTrue);
+    }, variant: mobilePlatforms);
+
+    // Web uses the same fallback (kIsWeb), checked on the example app.
     testWidgets('falls back to long press where shaking is not supported',
         (tester) async {
-      await pumpInspectorApp(
-        tester,
-        showInspectorOn: ShowInspectorOn.Shaking,
-      );
+      await pumpInspectorApp(tester, showInspectorOn: ShowInspectorOn.Shaking);
 
       await tester.longPress(find.text(hostAppText));
       await tester.pumpAndSettle();
 
       expect(isInspectorShown, isTrue);
-    });
+      expect(FakeSensors.isListening, isFalse);
+    }, variant: TargetPlatformVariant.desktop());
   });
 
   group('RequestsInspector system back', () {
