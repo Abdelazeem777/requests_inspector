@@ -165,7 +165,7 @@ class _InspectorPagesState extends State<_InspectorPages>
   }
 
   void _onPageChanged(int page) {
-    _isInspectorShown = page != 0;
+    setState(() => _isInspectorShown = page != 0);
 
     // With Android predictive back, back only reaches Flutter while the
     // framework says it handles it, and on its first page the host app says
@@ -196,17 +196,24 @@ class _InspectorPagesState extends State<_InspectorPages>
         controller: InspectorController().pageController,
         physics: const NeverScrollableScrollPhysics(),
         onPageChanged: _onPageChanged,
+        // Only the page on screen is in the accessibility tree.
         children: [
-          widget.child,
-          // The inspector is a second MaterialApp. Without its own semantics
-          // container, the BlockSemantics of its route's ModalBarrier drops
-          // everything painted before it, i.e. the whole host app, from the
-          // accessibility tree.
-          Semantics(
-            container: true,
-            child: Inspector(
-              navigatorKey: widget.navigatorKey,
-              inspectorNavigatorKey: _inspectorNavigatorKey,
+          ExcludeSemantics(
+            excluding: _isInspectorShown,
+            child: widget.child,
+          ),
+          ExcludeSemantics(
+            excluding: !_isInspectorShown,
+            // The inspector is a second MaterialApp. Without its own semantics
+            // container, the BlockSemantics of its route's ModalBarrier drops
+            // everything painted before it, i.e. the whole host app, from the
+            // accessibility tree.
+            child: Semantics(
+              container: true,
+              child: Inspector(
+                navigatorKey: widget.navigatorKey,
+                inspectorNavigatorKey: _inspectorNavigatorKey,
+              ),
             ),
           ),
         ],

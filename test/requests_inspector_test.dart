@@ -122,24 +122,6 @@ void main() {
 
       expect(isInspectorShown, isTrue);
     });
-
-    testWidgets('keeps the host app visible to accessibility services',
-        (tester) async {
-      final semantics = tester.ensureSemantics();
-      await pumpInspectorApp(tester);
-
-      expect(find.bySemanticsLabel(hostAppText), findsOneWidget);
-
-      // The inspector page stays accessible too.
-      await openInspector(tester);
-      expect(find.bySemanticsLabel(RegExp('^Inspector')), findsOneWidget);
-      expect(find.bySemanticsLabel('Clear All'), findsOneWidget);
-      expect(
-        tester.getSemantics(find.byIcon(Icons.close)),
-        containsSemantics(isButton: true, tooltip: 'Close inspector'),
-      );
-      semantics.dispose();
-    });
   });
 
   group('RequestsInspector system back', () {
@@ -369,6 +351,38 @@ void main() {
         expect(isInspectorShown, isFalse);
         expect(find.text('Second page'), findsOneWidget);
       });
+    });
+  });
+
+  group('RequestsInspector accessibility', () {
+    testWidgets('keeps the host app visible to accessibility services',
+        (tester) async {
+      final semantics = tester.ensureSemantics();
+      await pumpInspectorApp(tester);
+
+      expect(find.semantics.byLabel(hostAppText), findsOneWidget);
+      // The hidden inspector page is not, not even its edge (its "All" tab)
+      // that the PageView keeps on screen. (find.semantics searches the live
+      // semantics tree; find.bySemanticsLabel can match a dropped node.)
+      expect(find.semantics.byLabel('All'), findsNothing);
+      expect(find.semantics.byLabel('Clear All'), findsNothing);
+
+      // The inspector page is accessible while it is shown...
+      await openInspector(tester);
+      expect(find.semantics.byLabel(RegExp('^Inspector')), findsOneWidget);
+      expect(find.semantics.byLabel('Clear All'), findsOneWidget);
+      expect(
+        tester.getSemantics(find.byIcon(Icons.close)),
+        containsSemantics(isButton: true, tooltip: 'Close inspector'),
+      );
+      // ...and the host app behind it is not.
+      expect(find.semantics.byLabel(hostAppText), findsNothing);
+
+      InspectorController().hideInspector();
+      await tester.pumpAndSettle();
+      expect(find.semantics.byLabel(hostAppText), findsOneWidget);
+      expect(find.semantics.byLabel('All'), findsNothing);
+      semantics.dispose();
     });
   });
 }
