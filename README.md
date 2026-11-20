@@ -92,7 +92,7 @@ Future<List<Post>> fetchPosts() async {
   final params = {'userId': 1};
 
   final response = await dio.get(
-    '[https://jsonplaceholder.typicode.com/posts](https://jsonplaceholder.typicode.com/posts)',
+    'https://jsonplaceholder.typicode.com/posts',
     queryParameters: params,
   );
 
@@ -103,7 +103,7 @@ Future<List<Post>> fetchPosts() async {
     RequestDetails(
       requestName: 'Posts',
       requestMethod: RequestMethod.GET,
-      url: '[https://jsonplaceholder.typicode.com/posts](https://jsonplaceholder.typicode.com/posts)',
+      url: 'https://jsonplaceholder.typicode.com/posts',
       queryParameters: params,
       statusCode: response.statusCode ?? 0,
       responseBody: response.data,
@@ -119,7 +119,7 @@ b. Using `RequestsInspectorInterceptor`.
 ```dart
 Future<List<Post>> fetchPosts() async {
   final dio = Dio()..interceptors.add(RequestsInspectorInterceptor());
-  final response = await dio.get('[https://jsonplaceholder.typicode.com/posts](https://jsonplaceholder.typicode.com/posts)');
+  final response = await dio.get('https://jsonplaceholder.typicode.com/posts');
 
   final postsMap = response.data as List;
   final posts = postsMap.map((postMap) => Post.fromMap(postMap)).toList();
@@ -142,14 +142,13 @@ you jus need to wrap your normal `HttpLink` with our `GraphQLInspectorLink` and 
 **Example:**
 
 ```dart
- Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
- Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
+Future<List<Post>> fetchPostsGraphQlUsingGraphQLFlutterInterceptor() async {
   final client = GraphQLClient(
     cache: GraphQLCache(),
     link: Link.split(
       (request) => request.isSubscription,
       GraphQLInspectorLink(WebSocketLink('ws://graphqlzero.almansi.me/api')),
-      GraphQLInspectorLink(HttpLink('[https://graphqlzero.almansi.me/api](https://graphqlzero.almansi.me/api)')),
+      GraphQLInspectorLink(HttpLink('https://graphqlzero.almansi.me/api')),
     ),
   );
   const query = r'''query {
@@ -218,7 +217,7 @@ So you can specify `showInspectorOn` with `ShowInspectorOn.LongPress`.
 void main() {
   runApp(const RequestsInspector(
     enabled: true,
-    showInspectorOn: ShowInspectorOn.LongPress
+    showInspectorOn: ShowInspectorOn.LongPress,
     child: MyApp(),
   ));
 }
