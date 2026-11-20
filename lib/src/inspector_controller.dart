@@ -106,15 +106,11 @@ class InspectorController extends ChangeNotifier {
   String? _requestStopperFilterUrl;
   int? _responseStopperFilterStatusCode;
   String? _responseStopperFilterUrl;
-
   // ------------------------------
 
   RequestMethod? get requestStopperFilterMethod => _requestStopperFilterMethod;
-
   String? get requestStopperFilterUrl => _requestStopperFilterUrl;
-
   int? get responseStopperFilterStatusCode => _responseStopperFilterStatusCode;
-
   String? get responseStopperFilterUrl => _responseStopperFilterUrl;
 
   bool get hasRequestStopperFilters =>
