@@ -51,6 +51,12 @@ class CurlCommandGenerator {
       case RequestMethod.DELETE:
         curlCommand.write("DELETE ");
         break;
+      case RequestMethod.HEAD:
+        curlCommand.write("HEAD ");
+        break;
+      case RequestMethod.OPTIONS:
+        curlCommand.write("OPTIONS ");
+        break;
       default:
         throw Exception("Invalid Request Method");
     }
