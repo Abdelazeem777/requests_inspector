@@ -283,14 +283,12 @@ class RequestDetailsPage extends StatelessWidget {
     bool initiallyExpanded = true,
   }) {
     final theme = Theme.of(context);
-    final cardColor = theme.cardColor;
     final borderColor = theme.dividerColor;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: cardColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: borderColor.withOpacity(0.3)),
           boxShadow: [
