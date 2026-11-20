@@ -33,21 +33,15 @@ class GraphQLInspectorLink extends Link {
     Request request,
     NextLink? forward,
   ) async* {
-    // Used when the link throws before any response is emitted.
+    // Start time shown in the inspector for both responses and failures.
     final requestHandlerStartedAt = DateTime.now();
 
     try {
-      await for (final entry in link
-          .request(request, forward)
-          // Per-event timestamp: when this response arrived on the stream.
-          .map((event) => MapEntry(DateTime.now(), event))) {
-        final responseReceivedAt = entry.key;
-        final response = entry.value;
-
+      await for (final response in link.request(request, forward)) {
         _logHttpExchange(
           request: request,
           link: link,
-          sentTime: responseReceivedAt,
+          sentTime: requestHandlerStartedAt,
           statusCode:
               response.context.entry<HttpLinkResponseContext>()?.statusCode ??
                   0,
@@ -149,7 +143,7 @@ class GraphQLInspectorLink extends Link {
     required Request request,
     required HttpLink link,
 
-    /// Start time shown in the inspector (stream arrival or handler start).
+    /// Time the request was sent, shown as the start time in the inspector.
     required DateTime sentTime,
     required int statusCode,
     Map<String, String>? headers,
