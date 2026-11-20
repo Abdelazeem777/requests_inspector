@@ -36,7 +36,10 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      # The formatter output differs between Flutter versions, so it is only
+      # checked with the floor version the code is formatted with.
       - name: Check formatting
+        if: matrix.name != 'stable'
         run: dart format --output=none --set-exit-if-changed lib test
 
       # Infos (mostly deprecations: Share, WillPopScope, withOpacity, ...)
@@ -96,7 +99,9 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          # Flutter stable (3.50) needs Gradle 9.3.1+, which the example's AGP
+          # (8.11) can't use, so build with the floor version.
+          flutter-version: "3.38.1"
           cache: true
 
       - name: Install dependencies
