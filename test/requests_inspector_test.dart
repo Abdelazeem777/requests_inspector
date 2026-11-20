@@ -285,6 +285,69 @@ void main() {
       expect(delegate.pages, ['Home']);
     });
 
+    // Android predictive back (enableOnBackInvokedCallback, the default when
+    // targeting Android 16): back only reaches Flutter while the framework
+    // says it handles it.
+    testWidgets('makes the framework handle back while the inspector is open',
+        (tester) async {
+      final calls = recordSystemNavigator(tester);
+      List<Object?> handlesBack() => [
+            for (final call in calls)
+              if (call.method == 'SystemNavigator.setFrameworkHandlesBack')
+                call.arguments,
+          ];
+      await pumpInspectorApp(tester, navigatorKey: navigatorKey);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      pushHostPage(const Text('Second page'));
+      await tester.pumpAndSettle();
+      expect(handlesBack().last, isTrue);
+
+      navigatorKey.currentState!.pop();
+      await tester.pumpAndSettle();
+      expect(handlesBack().last, isFalse);
+
+      await openInspector(tester);
+      expect(handlesBack().last, isTrue);
+
+      // The inspector's own dialogs don't override it.
+      calls.clear();
+      await tester.tap(find.byIcon(Icons.filter_list));
+      await tester.pumpAndSettle();
+      await systemBack(tester);
+      expect(find.text('Filter requests'), findsNothing);
+      expect(handlesBack(), isEmpty);
+    });
+
+    testWidgets('closes the inspector on a predictive back gesture',
+        (tester) async {
+      await pumpInspectorApp(tester, navigatorKey: navigatorKey);
+      await openInspector(tester);
+
+      await predictiveBackGesture(tester);
+
+      expect(isInspectorShown, isFalse);
+      expect(find.text(hostAppText).hitTestable(), findsOneWidget);
+    });
+
+    knownBug(
+        'the predictive back route transition of a pushed host page handles '
+        'the back gesture itself (it never reaches didPopRoute), so the '
+        'hidden host page pops and the inspector stays open. Button backs '
+        'and the host app\'s first page are fine.', () {
+      testWidgets('a predictive back gesture does not pop the host app',
+          (tester) async {
+        await pumpInspectorApp(tester, navigatorKey: navigatorKey);
+        pushHostPage(const Text('Second page'));
+        await tester.pumpAndSettle();
+        await openInspector(tester);
+
+        await predictiveBackGesture(tester);
+
+        expect(isInspectorShown, isFalse);
+        expect(find.text('Second page'), findsOneWidget);
+      });
+    });
+
     knownBug(
         'inside MaterialApp.builder, RequestsInspector registers its back '
         "handler after the host app's, so back pops the hidden host page "

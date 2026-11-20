@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:requests_inspector/src/request_stopper_editor_dialog.dart';
 import 'package:requests_inspector/src/response_stopper_editor_dialog.dart';
@@ -163,7 +164,15 @@ class _InspectorPagesState extends State<_InspectorPages>
     super.dispose();
   }
 
-  void _onPageChanged(int page) => _isInspectorShown = page != 0;
+  void _onPageChanged(int page) {
+    _isInspectorShown = page != 0;
+
+    // With Android predictive back, back only reaches Flutter while the
+    // framework says it handles it, and on its first page the host app says
+    // it doesn't: back would leave the app instead of closing the inspector.
+    // (The host app updates it again on its next navigation.)
+    if (_isInspectorShown) SystemNavigator.setFrameworkHandlesBack(true);
+  }
 
   @override
   Future<bool> didPopRoute() async {

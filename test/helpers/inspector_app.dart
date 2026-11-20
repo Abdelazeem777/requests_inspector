@@ -103,6 +103,32 @@ Future<void> systemBack(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+/// A full Android predictive back swipe from the left edge.
+Future<void> predictiveBackGesture(WidgetTester tester) async {
+  Future<void> send(String method, [Map<String, Object?>? arguments]) =>
+      tester.binding.defaultBinaryMessenger.handlePlatformMessage(
+        SystemChannels.backGesture.name,
+        SystemChannels.backGesture.codec
+            .encodeMethodCall(MethodCall(method, arguments)),
+        (_) {},
+      );
+
+  await send('startBackGesture', {
+    'touchOffset': <double>[5, 300],
+    'progress': 0.0,
+    'swipeEdge': 0,
+  });
+  await tester.pump();
+  await send('updateBackGestureProgress', {
+    'touchOffset': <double>[400, 300],
+    'progress': 0.6,
+    'swipeEdge': 0,
+  });
+  await tester.pump();
+  await send('commitBackGesture');
+  await tester.pumpAndSettle();
+}
+
 /// Records the `SystemNavigator.*` calls the app sends to the platform
 /// (`setFrameworkHandlesBack`, `pop`, ...).
 List<MethodCall> recordSystemNavigator(WidgetTester tester) {

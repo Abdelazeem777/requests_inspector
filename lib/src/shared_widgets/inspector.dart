@@ -31,6 +31,10 @@ class Inspector extends StatelessWidget {
       builder: (context, isDarkMode, child) {
         return MaterialApp(
           navigatorKey: inspectorNavigatorKey,
+          // RequestsInspector tells the platform that the app handles back
+          // while the inspector is shown. Opening and closing the inspector's
+          // dialogs must not change that (or what the host app reported).
+          onNavigationNotification: (_) => true,
           theme: isDarkMode
               ? ThemeData.dark().copyWith(
                   colorScheme: ColorScheme.dark(primary: Colors.grey[800]!),
