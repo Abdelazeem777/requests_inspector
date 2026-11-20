@@ -77,3 +77,6 @@ build/
 
 .fvm/
 .fvmrc
+
+# flutter test --coverage
+coverage/

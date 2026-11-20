@@ -7,9 +7,9 @@ class SearchHelper {
       return [];
     }
 
-    final searchText =  text.toLowerCase();
+    final searchText = text.toLowerCase();
     final searchQuery = query.toLowerCase();
-    
+
     final matches = <SearchMatch>[];
     var startIndex = 0;
 
@@ -39,4 +39,3 @@ class SearchMatch {
   @override
   String toString() => 'SearchMatch(start: $start, end: $end)';
 }
-
