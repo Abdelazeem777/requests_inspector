@@ -31,19 +31,14 @@ void main() {
       expect(SearchHelper.findMatches(text: 'abc', query: 'x'), isEmpty);
     });
 
-    test(
-      'does not return overlapping matches',
-      () {
-        // Overlapping ranges make HighlightedText render "aa" + "aa".
-        final matches = SearchHelper.findMatches(text: 'aaa', query: 'aa');
+    test('does not return overlapping matches', () {
+      // Overlapping ranges make HighlightedText render "aa" + "aa".
+      final matches = SearchHelper.findMatches(text: 'aaa', query: 'aa');
 
-        expect(matches.map((m) => [m.start, m.end]), [
-          [0, 2],
-        ]);
-      },
-      skip: 'Known bug: findMatches advances by 1 instead of query.length, '
-          'returning overlapping matches (reported on PR #61).',
-    );
+      expect(matches.map((m) => [m.start, m.end]), [
+        [0, 2],
+      ]);
+    });
   });
 
   group('SearchHelper and InspectorController', () {
@@ -79,23 +74,16 @@ void main() {
       );
     });
 
-    test(
-      'agree when matches overlap ("aa" in "aaa")',
-      () {
-        controller
-          ..selectedRequest = urlOnly('https://api.example.com/aaa')
-          ..updateSearchQuery('aa');
+    test('agree when matches overlap ("aa" in "aaa")', () {
+      controller
+        ..selectedRequest = urlOnly('https://api.example.com/aaa')
+        ..updateSearchQuery('aa');
 
-        expect(
-          controller.totalMatches,
-          helperCount('URL: https://api.example.com/aaa', 'aa'),
-        );
-      },
-      skip: 'Known bug: the controller counts non-overlapping matches (1) '
-          'while SearchHelper, used for highlighting, finds overlapping ones '
-          '(2), so the "x / y" counter and the highlights disagree. '
-          'Reported on PR #61.',
-    );
+      expect(
+        controller.totalMatches,
+        helperCount('URL: https://api.example.com/aaa', 'aa'),
+      );
+    });
   });
 
   group('InspectorHelper', () {

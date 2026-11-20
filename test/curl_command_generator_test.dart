@@ -32,7 +32,7 @@ void main() {
     test('builds a minimal GET command', () {
       expect(
         curlFor(bare()),
-        'curl -X GET "https://api.example.com/users" -L -k ',
+        "curl -X GET 'https://api.example.com/users' -L -k ",
       );
       expect(curlArgs(bare()), [
         'curl',
@@ -110,6 +110,26 @@ void main() {
       );
     });
 
+    test('keeps the JSON types of body values (uses the raw body)', () {
+      expect(
+        curlArgs(bare(
+          method: RequestMethod.POST,
+          headers: {'content-type': 'application/json'},
+          body: {
+            'active': true,
+            'n': 1,
+            'd': 1.5,
+            'x': null,
+            'nested': {'off': false},
+          },
+        )),
+        containsAllInOrder([
+          '-d',
+          '{"active":true,"n":1,"d":1.5,"x":null,"nested":{"off":false}}',
+        ]),
+      );
+    });
+
     test('encodes x-www-form-urlencoded bodies', () {
       for (final header in ['content-type', 'Content-Type']) {
         final args = curlArgs(bare(
@@ -160,65 +180,59 @@ void main() {
       expect(args, isNot(contains('-F')));
     });
 
-    test(
-      'quotes a JSON body that contains a single quote',
-      () {
-        final args = curlArgs(bare(
+    test('quotes a JSON body that contains a single quote', () {
+      final args = curlArgs(bare(
+        method: RequestMethod.POST,
+        headers: {'content-type': 'application/json'},
+        body: {'msg': "it's"},
+      ));
+
+      expect(args, containsAllInOrder(['-d', '{"msg":"it\'s"}']));
+    });
+
+    test(r'quotes header values that contain " or $', () {
+      final args = curlArgs(bare(headers: {
+        'x-quote': 'say "hi"',
+        'x-price': r'$5',
+      }));
+
+      expect(
+        args,
+        containsAllInOrder([
+          '-H',
+          'x-quote: say "hi"',
+          '-H',
+          r'x-price: $5',
+        ]),
+      );
+    });
+
+    test('sends a String body as-is', () {
+      expect(
+        curlArgs(bare(
+          method: RequestMethod.POST,
+          headers: {'content-type': 'text/plain'},
+          body: 'plain text',
+        )),
+        containsAllInOrder(['-d', 'plain text']),
+      );
+      expect(
+        curlArgs(bare(
           method: RequestMethod.POST,
           headers: {'content-type': 'application/json'},
-          body: {'msg': "it's"},
-        ));
+          body: '{"a":1}',
+        )),
+        containsAllInOrder(['-d', '{"a":1}']),
+      );
+    });
 
-        expect(args, containsAllInOrder(['-d', '{"msg":"it\'s"}']));
-      },
-      skip: "Known bug: the -d '...' argument is not shell-escaped, so a "
-          "body containing ' produces a broken command.",
-    );
+    test('quotes a URL that contains shell metacharacters', () {
+      final args = curlArgs(bare(
+        url: "https://api.example.com/a\"b\$c`d'e",
+        queryParameters: {'q': "it's"},
+      ));
 
-    test(
-      r'quotes header values that contain " or $',
-      () {
-        final args = curlArgs(bare(headers: {
-          'x-quote': 'say "hi"',
-          'x-price': r'$5',
-        }));
-
-        expect(
-          args,
-          containsAllInOrder([
-            '-H',
-            'x-quote: say "hi"',
-            '-H',
-            r'x-price: $5',
-          ]),
-        );
-      },
-      skip: r'Known bug: -H "..." values (and the URL) are not escaped, so " '
-          r'breaks the command and $ is expanded by the shell.',
-    );
-
-    test(
-      'sends a String body as-is',
-      () {
-        expect(
-          curlArgs(bare(
-            method: RequestMethod.POST,
-            headers: {'content-type': 'text/plain'},
-            body: 'plain text',
-          )),
-          containsAllInOrder(['-d', 'plain text']),
-        );
-        expect(
-          curlArgs(bare(
-            method: RequestMethod.POST,
-            headers: {'content-type': 'application/json'},
-            body: '{"a":1}',
-          )),
-          containsAllInOrder(['-d', '{"a":1}']),
-        );
-      },
-      skip: 'Known bug: String bodies go through jsonEncode, so curl sends '
-          r'"plain text" / "{\"a\":1}" (with the quotes) instead of the body.',
-    );
+      expect(args[3], "https://api.example.com/a\"b\$c`d'e?q=it%27s");
+    });
   });
 }

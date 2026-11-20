@@ -206,38 +206,31 @@ void main() {
       expect(field.controller!.text, isEmpty);
     });
 
-    knownBug(
-        'SearchHelper returns overlapping matches and HighlightedText '
-        'duplicates the overlap, so "aaa" searched for "aa" renders "aaaa" '
-        'and the counter says 1 / 1 next to 2 highlights. Reported on PR #61.',
-        () {
-      testWidgets('keeps the text intact for overlapping matches',
-          (tester) async {
-        await showDetails(
-          tester,
-          RequestDetails(
-            requestMethod: RequestMethod.GET,
-            url: 'https://api.example.com/aaa',
-            sentTime: DateTime(2024),
-          ),
-        );
+    testWidgets('keeps the text intact for overlapping matches',
+        (tester) async {
+      await showDetails(
+        tester,
+        RequestDetails(
+          requestMethod: RequestMethod.GET,
+          url: 'https://api.example.com/aaa',
+          sentTime: DateTime(2024),
+        ),
+      );
 
-        await search(tester, 'aa');
+      await search(tester, 'aa');
 
-        expect(
-          selectableTexts(tester).first,
-          'Sent at: 00:00.00\n\nURL: https://api.example.com/aaa',
-        );
-        expect(highlightedSpans(tester), hasLength(1));
-        expect(find.text('1 / 1'), findsOneWidget);
-      });
+      expect(
+        selectableTexts(tester).first,
+        'Sent at: 00:00.00\n\nURL: https://api.example.com/aaa',
+      );
+      expect(highlightedSpans(tester), hasLength(1));
+      expect(find.text('1 / 1'), findsOneWidget);
     });
   });
 
-  knownBug(
-      'JsonPrettyConverter.convert returns a bool/int/double unchanged and '
-      "the page passes it on as a String: \"type 'bool' is not a subtype of "
-      "type 'String'\". See PR #64.", () {
+  // Used to throw "type 'bool' is not a subtype of type 'String'" because
+  // JsonPrettyConverter.convert returned top-level bools/numbers as-is (#64).
+  group('top-level primitive bodies', () {
     for (final body in <Object>[true, 42, 1.5]) {
       for (final treeView in [true, false]) {
         testWidgets(
@@ -255,5 +248,31 @@ void main() {
         });
       }
     }
+
+    testWidgets('shows a top-level bool request body', (tester) async {
+      await showDetails(
+        tester,
+        sampleRequest(requestMethod: RequestMethod.POST, requestBody: false),
+        treeView: false,
+      );
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Request Body'), findsOneWidget);
+      expect(selectableTexts(tester), contains('false'));
+    });
+  });
+
+  testWidgets('shows nested bool, number and null values as JSON literals',
+      (tester) async {
+    await showDetails(
+      tester,
+      sampleRequest(responseBody: {'active': true, 'age': 30, 'nick': null}),
+      treeView: false,
+    );
+
+    final text = selectableTexts(tester).join('\n');
+    expect(text, contains('"active": true'));
+    expect(text, contains('"age": 30'));
+    expect(text, contains('"nick": null'));
   });
 }
