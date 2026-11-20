@@ -1,0 +1,66 @@
+# Smoke test for the example app: log a few requests, open the inspector
+# with a long press (shaking is not reliable on simulators), open a
+# request's details, go back to the list and close the inspector.
+# The example calls the real https://dummyjson.com/posts endpoint.
+#
+# While RequestsInspector wraps the app, the host app is hidden from the
+# accessibility tree (see the skipped "keeps the host app visible to
+# accessibility services" test), so host-app taps use screen positions.
+appId: com.example.example
+name: Requests inspector smoke test
+---
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# A second request: the refresh icon at the start of the app bar.
+- tapOn:
+    point: "7%,10%"
+
+# ShowInspectorOn.Both (the default): long press on any free space.
+- longPressOn:
+    point: "50%,60%"
+- extendedWaitUntil:
+    visible: "Inspector.*"
+    timeout: 10000
+- assertVisible: "Clear All"
+
+# Both requests show up as rows once their responses arrive. A row is one
+# accessibility element: "GET\n<duration>\nPOSTS\n<url>\n<status>".
+- extendedWaitUntil:
+    visible:
+      text: "(?s)GET.*POSTS.*https://dummyjson.com/posts.*"
+      index: 1
+    timeout: 30000
+
+# Request details.
+- tapOn:
+    text: "(?s)GET.*POSTS.*"
+    index: 0
+- assertVisible: "(?s).*GET - POSTS.*"
+- assertVisible: "(?s).*Status: .*"
+- assertVisible: "(?s).*Headers.*"
+- assertVisible: "(?s).*Query Parameters.*"
+- assertVisible: "(?s).*Response Body.*"
+
+# Back to the list.
+- tapOn: "All"
+- assertVisible:
+    text: "(?s)GET.*POSTS.*"
+    index: 1
+
+# Close the inspector with the X in its app bar (it has no label).
+- tapOn:
+    point: "7%,10%"
+- waitForAnimationToEnd
+- assertNotVisible: "Clear All"
+
+# It opens again with the same requests.
+- longPressOn:
+    point: "50%,60%"
+- extendedWaitUntil:
+    visible:
+      text: "(?s)GET.*POSTS.*"
+      index: 1
+    timeout: 10000

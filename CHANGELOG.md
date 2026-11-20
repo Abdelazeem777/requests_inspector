@@ -1,3 +1,18 @@
+## 5.5.1
+
+- Upgrade `connectivity_plus` to `^7.3.1`.
+
+## 5.5.0
+
+- Fix request details card background color rendering.
+- Add unit tests for `InspectorController` and upgrade dependencies.
+
+## 5.4.0
+
+- Add Search feature on the request details page.
+
+Special thanks to [amirbahrawy](https://github.com/amirbahrawy) and [Nourhan Sabrii](https://github.com/NourSabry) for this amazing contribution! 🎉
+
 ## 5.3.0
 
 - New Search and Filters for Requests List.
