@@ -147,9 +147,6 @@ void main() {
           greaterThanOrEqualTo(latency),
         );
       },
-      skip: 'Known bug: sentTime is taken in .map() when the response '
-          'arrives, so every GraphQL request shows a ~0 ms duration '
-          '(graphql_inspector_link.dart:32). Not fixed by PR #70.',
     );
 
     test(
@@ -175,8 +172,6 @@ void main() {
         expect(logged.statusCode, 400);
         expect(logged.responseBody, error.parsedResponse!.response);
       },
-      skip: 'Known bug: failed HttpLink requests (ServerException / '
-          'HttpLinkServerException) are not logged. Issue #69, PR #70.',
     );
   });
 
