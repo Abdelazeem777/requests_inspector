@@ -75,7 +75,7 @@ class HarGenerator {
               'receive': 0,
             },
             if (curlCommand != null && curlCommand.isNotEmpty)
-              'comment': 'cURL: ' + curlCommand,
+              'comment': 'cURL: $curlCommand',
           }
         ],
       }
@@ -122,7 +122,7 @@ class HarGenerator {
       }
       for (final file in body.files) {
         final filename = file.value.filename ?? 'file';
-        params.add({'name': file.key, 'value': '@' + filename});
+        params.add({'name': file.key, 'value': '@$filename'});
       }
       return {
         'mimeType': 'multipart/form-data',
@@ -208,11 +208,9 @@ class HarGenerator {
     if (q.isEmpty) return baseUrl;
     final qp = q
         .map((e) =>
-            Uri.encodeQueryComponent(e['name'].toString()) +
-            '=' +
-            Uri.encodeQueryComponent(e['value'].toString()))
+            '${Uri.encodeQueryComponent(e['name'].toString())}=${Uri.encodeQueryComponent(e['value'].toString())}')
         .join('&');
-    if (baseUrl.contains('?')) return baseUrl + '&' + qp;
-    return baseUrl + '?' + qp;
+    if (baseUrl.contains('?')) return '$baseUrl&$qp';
+    return '$baseUrl?$qp';
   }
 }

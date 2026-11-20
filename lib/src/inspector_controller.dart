@@ -377,10 +377,10 @@ class InspectorController extends ChangeNotifier {
         mimeType: 'application/json',
       );
 
-      Share.shareXFiles(
-        [file],
+      SharePlus.instance.share(ShareParams(
+        files: [file],
         sharePositionOrigin: sharePositionOrigin,
-      );
+      ));
       return;
     } else {
       final curlCommandGenerator = CurlCommandGenerator(_selectedRequest!);
@@ -392,11 +392,10 @@ class InspectorController extends ChangeNotifier {
       requestShareContent =
           '================[cURL Command]=================\n$curlContent\n\n==================[Normal Log]===================\n$normalLogContent';
     }
-
-    Share.share(
-      requestShareContent,
+    SharePlus.instance.share(ShareParams(
+      text: requestShareContent,
       sharePositionOrigin: sharePositionOrigin,
-    );
+    ));
   }
 
   @override

@@ -412,10 +412,14 @@ class Inspector extends StatelessWidget {
                 final selectedRequest = InspectorController().selectedRequest!;
                 final isHttp = _isHttp(selectedRequest);
 
+                if (!context.mounted) return;
+
                 var shareType =
                     isHttp ? await _showDialogShareType(context) : null;
 
                 if (shareType == null) return;
+
+                if (!context.mounted) return;
 
                 if (shareType == ShareType.Har) {
                   shareType = await _showHarFormatDialog(context);
