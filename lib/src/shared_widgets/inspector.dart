@@ -11,10 +11,16 @@ import '../../requests_inspector.dart';
 import '../enums/share_type_enum.dart';
 
 class Inspector extends StatelessWidget {
-  const Inspector({super.key, GlobalKey<NavigatorState>? navigatorKey})
-      : _navigatorKey = navigatorKey;
+  const Inspector({
+    super.key,
+    GlobalKey<NavigatorState>? navigatorKey,
+    this.inspectorNavigatorKey,
+  }) : _navigatorKey = navigatorKey;
 
   final GlobalKey<NavigatorState>? _navigatorKey;
+
+  /// The key of the inspector's own navigator (its dialogs and menus).
+  final GlobalKey<NavigatorState>? inspectorNavigatorKey;
 
   bool showStopperDialogsAllowed() => _navigatorKey?.currentContext != null;
 
@@ -24,6 +30,11 @@ class Inspector extends StatelessWidget {
       selector: (_, controller) => controller.isDarkMode,
       builder: (context, isDarkMode, child) {
         return MaterialApp(
+          navigatorKey: inspectorNavigatorKey,
+          // RequestsInspector tells the platform that the app handles back
+          // while the inspector is shown. Opening and closing the inspector's
+          // dialogs must not change that (or what the host app reported).
+          onNavigationNotification: (_) => true,
           theme: isDarkMode
               ? ThemeData.dark().copyWith(
                   colorScheme: ColorScheme.dark(primary: Colors.grey[800]!),
@@ -52,6 +63,7 @@ class Inspector extends StatelessWidget {
       title: const Text('Inspector 🕵️'),
 
       leading: IconButton(
+        tooltip: 'Close inspector',
         // Use method from controller (doesn't require listening)
         onPressed: () {
           _closeKeyboard();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:requests_inspector/requests_inspector.dart';
 
@@ -94,3 +95,55 @@ List<String> selectableTexts(WidgetTester tester) => [
 /// Run them with `flutter test --run-skipped` to check a fix.
 void knownBug(String reason, void Function() body) =>
     group('(known bug)', body, skip: 'Known bug: $reason');
+
+/// Android and iOS, where [RequestsInspector] listens to the accelerometer.
+final mobilePlatforms =
+    TargetPlatformVariant({TargetPlatform.android, TargetPlatform.iOS});
+
+/// A system back (Android back button, browser back button), as sent by the
+/// platform when the framework handles back.
+Future<void> systemBack(WidgetTester tester) async {
+  await tester.binding.handlePopRoute();
+  await tester.pumpAndSettle();
+}
+
+/// A full Android predictive back swipe from the left edge.
+Future<void> predictiveBackGesture(WidgetTester tester) async {
+  Future<void> send(String method, [Map<String, Object?>? arguments]) =>
+      tester.binding.defaultBinaryMessenger.handlePlatformMessage(
+        SystemChannels.backGesture.name,
+        SystemChannels.backGesture.codec
+            .encodeMethodCall(MethodCall(method, arguments)),
+        (_) {},
+      );
+
+  await send('startBackGesture', {
+    'touchOffset': <double>[5, 300],
+    'progress': 0.0,
+    'swipeEdge': 0,
+  });
+  await tester.pump();
+  await send('updateBackGestureProgress', {
+    'touchOffset': <double>[400, 300],
+    'progress': 0.6,
+    'swipeEdge': 0,
+  });
+  await tester.pump();
+  await send('commitBackGesture');
+  await tester.pumpAndSettle();
+}
+
+/// Records the `SystemNavigator.*` calls the app sends to the platform
+/// (`setFrameworkHandlesBack`, `pop`, ...).
+List<MethodCall> recordSystemNavigator(WidgetTester tester) {
+  final calls = <MethodCall>[];
+  final messenger = tester.binding.defaultBinaryMessenger;
+  messenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
+    if (call.method.startsWith('SystemNavigator.')) calls.add(call);
+    return null;
+  });
+  addTearDown(
+    () => messenger.setMockMethodCallHandler(SystemChannels.platform, null),
+  );
+  return calls;
+}
