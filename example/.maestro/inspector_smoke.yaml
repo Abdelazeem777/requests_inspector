@@ -1,6 +1,7 @@
 # Smoke test for the example app: log a few requests, open the inspector
 # with a long press (shaking is not reliable on simulators), open a
-# request's details, go back to the list and close the inspector.
+# request's details, go back to the list and close the inspector (and, on
+# Android, close it again with the back button).
 # The example calls the real https://dummyjson.com/posts endpoint.
 #
 # Every step finds its element in the accessibility tree (no screen
@@ -42,7 +43,10 @@ name: Requests inspector smoke test
 - assertVisible: "(?s).*Status: .*"
 - assertVisible: "(?s).*Headers.*"
 - assertVisible: "(?s).*Query Parameters.*"
-- assertVisible: "(?s).*Response Body.*"
+# Below the fold on smaller screens.
+- scrollUntilVisible:
+    element: "(?s).*Response Body.*"
+    direction: DOWN
 
 # Back to the list.
 - tapOn: "All"
@@ -63,3 +67,12 @@ name: Requests inspector smoke test
       text: "(?s)GET.*POSTS.*"
       index: 1
     timeout: 10000
+
+# Android: system back closes the inspector, not the app behind it.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - pressKey: back
+      - assertNotVisible: "Clear All"
+      - assertVisible: "Fetch Data Example"
