@@ -63,27 +63,10 @@ class RequestsInspector extends StatelessWidget {
             ),
             lazy: false,
             builder: (context, _) {
-              return _CloseInspectorOnBack(
-                child: GestureDetector(
-                  onLongPress: showInspectorOn != ShowInspectorOn.Shaking
-                      ? InspectorController().showInspector
-                      : null,
-                  child: PageView(
-                    controller: InspectorController().pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      _child,
-                      // The inspector is a second MaterialApp. Without its own
-                      // semantics container, the BlockSemantics of its route's
-                      // ModalBarrier drops everything painted before it, i.e.
-                      // the whole host app, from the accessibility tree.
-                      Semantics(
-                        container: true,
-                        child: Inspector(navigatorKey: _navigatorKey),
-                      ),
-                    ],
-                  ),
-                ),
+              return _InspectorPages(
+                navigatorKey: _navigatorKey,
+                openOnLongPress: showInspectorOn != ShowInspectorOn.Shaking,
+                child: _child,
               );
             },
           )
@@ -135,24 +118,39 @@ class RequestsInspector extends StatelessWidget {
   }
 }
 
-/// Closes the inspector on system back (the Android back button or gesture)
-/// instead of letting the host app pop the page hidden behind it.
+/// The host app and the inspector, as the two pages of a [PageView].
+///
+/// It also handles system back (the Android back button or gesture, the
+/// browser back button) while the inspector is shown: back closes a dialog or
+/// menu open in the inspector, or else the inspector, instead of letting the
+/// host app pop the page hidden behind it.
 ///
 /// A [PopScope] (or the deprecated `WillPopScope`) can't do this here: it only
 /// applies inside a route, and [WidgetsBinding] notifies its observers in
 /// registration order, so the host app's navigator would pop first. As their
-/// ancestor, this widget registers before the host app and the inspector.
-class _CloseInspectorOnBack extends StatefulWidget {
-  const _CloseInspectorOnBack({required this.child});
+/// ancestor, this widget registers before the host app and the inspector
+/// (when [RequestsInspector] wraps the host's `MaterialApp`, not when it is
+/// inside its `builder`).
+class _InspectorPages extends StatefulWidget {
+  const _InspectorPages({
+    required this.navigatorKey,
+    required this.openOnLongPress,
+    required this.child,
+  });
 
+  final GlobalKey<NavigatorState>? navigatorKey;
+  final bool openOnLongPress;
   final Widget child;
 
   @override
-  State<_CloseInspectorOnBack> createState() => _CloseInspectorOnBackState();
+  State<_InspectorPages> createState() => _InspectorPagesState();
 }
 
-class _CloseInspectorOnBackState extends State<_CloseInspectorOnBack>
+class _InspectorPagesState extends State<_InspectorPages>
     with WidgetsBindingObserver {
+  final _inspectorNavigatorKey = GlobalKey<NavigatorState>();
+  var _isInspectorShown = false;
+
   @override
   void initState() {
     super.initState();
@@ -165,15 +163,45 @@ class _CloseInspectorOnBackState extends State<_CloseInspectorOnBack>
     super.dispose();
   }
 
+  void _onPageChanged(int page) => _isInspectorShown = page != 0;
+
   @override
   Future<bool> didPopRoute() async {
-    final pageController = InspectorController().pageController;
-    if (!pageController.hasClients || pageController.page == 0) return false;
+    if (!_isInspectorShown) return false;
+
+    final inspectorNavigator = _inspectorNavigatorKey.currentState;
+    if (inspectorNavigator != null && await inspectorNavigator.maybePop()) {
+      return true;
+    }
 
     InspectorController().hideInspector();
     return true;
   }
 
   @override
-  Widget build(BuildContext context) => widget.child;
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onLongPress:
+          widget.openOnLongPress ? InspectorController().showInspector : null,
+      child: PageView(
+        controller: InspectorController().pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        onPageChanged: _onPageChanged,
+        children: [
+          widget.child,
+          // The inspector is a second MaterialApp. Without its own semantics
+          // container, the BlockSemantics of its route's ModalBarrier drops
+          // everything painted before it, i.e. the whole host app, from the
+          // accessibility tree.
+          Semantics(
+            container: true,
+            child: Inspector(
+              navigatorKey: widget.navigatorKey,
+              inspectorNavigatorKey: _inspectorNavigatorKey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

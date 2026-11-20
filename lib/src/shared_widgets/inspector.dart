@@ -11,10 +11,16 @@ import '../../requests_inspector.dart';
 import '../enums/share_type_enum.dart';
 
 class Inspector extends StatelessWidget {
-  const Inspector({super.key, GlobalKey<NavigatorState>? navigatorKey})
-      : _navigatorKey = navigatorKey;
+  const Inspector({
+    super.key,
+    GlobalKey<NavigatorState>? navigatorKey,
+    this.inspectorNavigatorKey,
+  }) : _navigatorKey = navigatorKey;
 
   final GlobalKey<NavigatorState>? _navigatorKey;
+
+  /// The key of the inspector's own navigator (its dialogs and menus).
+  final GlobalKey<NavigatorState>? inspectorNavigatorKey;
 
   bool showStopperDialogsAllowed() => _navigatorKey?.currentContext != null;
 
@@ -24,6 +30,7 @@ class Inspector extends StatelessWidget {
       selector: (_, controller) => controller.isDarkMode,
       builder: (context, isDarkMode, child) {
         return MaterialApp(
+          navigatorKey: inspectorNavigatorKey,
           theme: isDarkMode
               ? ThemeData.dark().copyWith(
                   colorScheme: ColorScheme.dark(primary: Colors.grey[800]!),

@@ -55,6 +55,8 @@ void main() {
 }
 ```
 
+Wrap the whole `MaterialApp` like this rather than adding `RequestsInspector` in `MaterialApp.builder`: that way the system back button (Android, browser) closes the inspector instead of the page behind it.
+
 ### 1\. RESTful API:
 
 #### Using `Dio`, pass by `RequestsInspectorInterceptor()` to `Dio.interceptors` and we are good to go 🎉️🎉️.
@@ -370,7 +372,7 @@ To add yourself as a contributor, simply follow the contribution guidelines and 
 - [x] Click to Copy Content of each section.
 - [ ] Add search inside the request details page.
 - [ ] Add Http Interceptor.
-- [ ] 'WillPopScope' is deprecated and shouldn't be used. Use PopScope instead. The Android predictive back feature will not work with WillPopScope.
+- [x] 'WillPopScope' is deprecated and shouldn't be used. Use PopScope instead. The Android predictive back feature will not work with WillPopScope.
 
 ---
 
