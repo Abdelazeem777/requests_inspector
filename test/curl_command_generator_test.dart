@@ -110,6 +110,26 @@ void main() {
       );
     });
 
+    test('keeps the JSON types of body values (uses the raw body)', () {
+      expect(
+        curlArgs(bare(
+          method: RequestMethod.POST,
+          headers: {'content-type': 'application/json'},
+          body: {
+            'active': true,
+            'n': 1,
+            'd': 1.5,
+            'x': null,
+            'nested': {'off': false},
+          },
+        )),
+        containsAllInOrder([
+          '-d',
+          '{"active":true,"n":1,"d":1.5,"x":null,"nested":{"off":false}}',
+        ]),
+      );
+    });
+
     test('encodes x-www-form-urlencoded bodies', () {
       for (final header in ['content-type', 'Content-Type']) {
         final args = curlArgs(bare(
