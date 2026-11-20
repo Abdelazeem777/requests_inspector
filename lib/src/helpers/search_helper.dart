@@ -21,7 +21,7 @@ class SearchHelper {
         start: index,
         end: index + searchQuery.length,
       ));
-      startIndex = index + 1;
+      startIndex = index + searchQuery.length;
     }
 
     return matches;
