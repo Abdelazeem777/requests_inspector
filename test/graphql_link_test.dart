@@ -175,8 +175,6 @@ void main() {
         expect(logged.statusCode, 400);
         expect(logged.responseBody, error.parsedResponse!.response);
       },
-      skip: 'Known bug: failed HttpLink requests (ServerException / '
-          'HttpLinkServerException) are not logged. Issue #69, PR #70.',
     );
   });
 
