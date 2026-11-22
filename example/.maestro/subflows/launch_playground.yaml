@@ -4,8 +4,10 @@ appId: com.example.example
 ---
 - launchApp:
     clearState: true
-- waitForAnimationToEnd:
-    timeout: 5000
+# A debug build can take a while to start after its data is cleared.
+- extendedWaitUntil:
+    visible: "Playground"
+    timeout: 30000
 - tapOn: "Playground"
 - extendedWaitUntil:
     visible: "Tap a button to send a request"
