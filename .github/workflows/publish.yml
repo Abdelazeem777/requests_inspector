@@ -1,0 +1,71 @@
+name: Publish to pub.dev
+
+# Runs when a vX.Y.Z tag is pushed (normally by release.yml) and uploads that
+# version to pub.dev, then creates the GitHub release from CHANGELOG.md.
+#
+# One-time setup on pub.dev: package page > Admin > Automated publishing >
+# "Enable publishing from GitHub Actions", repository Abdelazeem777/requests_inspector,
+# tag pattern v{{version}}. Optionally also "Require GitHub Actions
+# environment" with the name pub.dev.
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+permissions:
+  contents: write # create the GitHub release
+  id-token: write # pub.dev authenticates the upload with GitHub's OIDC token
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pub.dev
+    steps:
+      - uses: actions/checkout@v4
+
+      # Same Flutter as the CI floor job, so formatting matches.
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.38.1"
+          channel: stable
+          cache: true
+
+      - name: Check that the tag matches pubspec.yaml
+        run: |
+          version=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | tr -d '[:space:]')
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match pubspec.yaml version $version."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Same steps as dart-lang/setup-dart, which only installs the Dart SDK.
+      - name: Get a pub.dev token from GitHub OIDC
+        run: |
+          token=$(curl --silent --show-error --fail \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=https://pub.dev" | jq -r '.value')
+          echo "::add-mask::$token"
+          echo "PUB_TOKEN=$token" >> "$GITHUB_ENV"
+          flutter pub token add https://pub.dev --env-var PUB_TOKEN
+
+      - name: Publish
+        run: flutter pub publish --force
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=${GITHUB_REF_NAME#v}
+          awk -v v="$version" '$0 == "## " v {f=1; next} /^## / {if (f) exit} f' CHANGELOG.md > notes.md
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            echo "Release $GITHUB_REF_NAME already exists."
+          else
+            gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" --notes-file notes.md
+          fi

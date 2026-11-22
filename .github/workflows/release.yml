@@ -1,0 +1,129 @@
+name: Release
+
+# Manual release. Run it from the Actions tab ("Release" > "Run workflow").
+#
+# 1. Takes the newest vX.Y.Z tag and bumps it (patch / minor / major).
+# 2. Writes the new version to pubspec.yaml and a section to CHANGELOG.md
+#    (from the "notes" input, else a "## Unreleased" section, else the
+#    commit subjects since the last tag).
+# 3. Runs format, analyze, tests and `flutter pub publish --dry-run`.
+# 4. Pushes the version commit to main and the vX.Y.Z tag in one atomic push.
+#    The tag push starts publish.yml, which uploads the package to pub.dev.
+#
+# Needs a RELEASE_TOKEN repository secret: a fine-grained personal access
+# token of a maintainer who may push to main, with "Contents: read and
+# write" on this repository. GITHUB_TOKEN can't be used: tags pushed with it
+# don't start other workflows, and it can't bypass main's protection.
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Part of the version to increase
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+      notes:
+        description: 'CHANGELOG entries, separated by \n (optional)'
+        type: string
+        required: false
+      dry_run:
+        description: Dry run (compute the version and run the checks, push nothing)
+        type: boolean
+        default: false
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the release token
+        if: ${{ !inputs.dry_run }}
+        env:
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        run: |
+          if [ -z "$RELEASE_TOKEN" ]; then
+            echo "::error::The RELEASE_TOKEN secret is missing. See the comment at the top of release.yml."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_TOKEN || github.token }}
+
+      # Same Flutter as the CI floor job, so formatting matches.
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.38.1"
+          channel: stable
+          cache: true
+
+      - name: Bump version and update CHANGELOG
+        id: version
+        env:
+          BUMP: ${{ inputs.bump }}
+          NOTES: ${{ inputs.notes }}
+        run: python3 .github/scripts/prepare_release.py --bump "$BUMP" --notes "$NOTES"
+
+      # Before the commit: example/pubspec.lock pins this package's version, so
+      # it changes with the bump and must be part of the release commit.
+      - name: Install dependencies
+        run: |
+          flutter pub get
+          flutter pub get --directory example
+
+      - name: Commit
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "chore: release $VERSION"
+          git show --stat HEAD
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos lib test
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Validate the package
+        run: flutter pub publish --dry-run
+
+      - name: Push the version commit and tag
+        if: ${{ !inputs.dry_run }}
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git tag -a "$TAG" -m "$VERSION"
+          git push --atomic origin HEAD:main "refs/tags/$TAG"
+
+      - name: Summary
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          PREVIOUS: ${{ steps.version.outputs.previous }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          {
+            if [ "$DRY_RUN" = "true" ]; then
+              echo "Dry run: would release **$TAG** (previous: $PREVIOUS). Nothing was pushed."
+            else
+              echo "Pushed **$TAG** (previous: $PREVIOUS). The Publish workflow uploads it to pub.dev."
+            fi
+            echo
+            echo '```'
+            git show HEAD -- CHANGELOG.md | sed -n '/^@@/,$p' | grep '^+' | sed 's/^+//'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
