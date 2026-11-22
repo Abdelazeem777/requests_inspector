@@ -11,17 +11,19 @@ void main() {
   });
 
   testWidgets('PostsListWidget shows every post', (tester) async {
-    await tester.pumpWidget(MaterialApp(
-      home: Scaffold(
-        body: PostsListWidget(
-          postsList: [
-            Post(id: 1, title: 'First', body: 'First body'),
-            Post(id: 2, title: 'Second', body: 'Second body'),
-          ],
-          onRefresh: () async {},
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: PostsListWidget(
+            postsList: [
+              Post(id: 1, title: 'First', body: 'First body'),
+              Post(id: 2, title: 'Second', body: 'Second body'),
+            ],
+            onRefresh: () async {},
+          ),
         ),
       ),
-    ));
+    );
 
     expect(find.byType(ListTile), findsNWidgets(2));
     expect(find.text('First'), findsOneWidget);

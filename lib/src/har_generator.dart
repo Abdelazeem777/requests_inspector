@@ -7,18 +7,15 @@ import '../requests_inspector.dart';
 class HarGenerator {
   const HarGenerator();
 
-  String generate({
-    required RequestDetails request,
-    String? curlCommand,
-  }) {
+  String generate({required RequestDetails request, String? curlCommand}) {
     final startedDateTime = request.sentTime.toUtc().toIso8601String();
     // We keep only start time in top-level page; end time is implied by timings
     final durationMs = (request.receivedTime == null)
         ? 0
         : request.receivedTime!
-            .difference(request.sentTime)
-            .inMilliseconds
-            .clamp(0, 1 << 31);
+              .difference(request.sentTime)
+              .inMilliseconds
+              .clamp(0, 1 << 31);
 
     final requestHeaders = _normalizeHeadersMap(request.headers);
     final queryString = _normalizeQueryParams(request.queryParameters);
@@ -27,19 +24,14 @@ class HarGenerator {
     final Map<String, dynamic> har = {
       'log': {
         'version': '1.2',
-        'creator': {
-          'name': 'requests_inspector',
-          'version': '5.1.1',
-        },
+        'creator': {'name': 'requests_inspector', 'version': '5.1.1'},
         'pages': [
           {
             'startedDateTime': startedDateTime,
             'id': request.id,
             'title': request.requestName,
-            'pageTimings': {
-              'onLoad': durationMs,
-            },
-          }
+            'pageTimings': {'onLoad': durationMs},
+          },
         ],
         'entries': [
           {
@@ -69,16 +61,12 @@ class HarGenerator {
               'bodySize': -1,
             },
             'cache': {},
-            'timings': {
-              'send': 0,
-              'wait': durationMs,
-              'receive': 0,
-            },
+            'timings': {'send': 0, 'wait': durationMs, 'receive': 0},
             if (curlCommand != null && curlCommand.isNotEmpty)
               'comment': 'cURL: $curlCommand',
-          }
+          },
         ],
-      }
+      },
     };
 
     return const JsonEncoder.withIndent('  ').convert(har);
@@ -88,10 +76,7 @@ class HarGenerator {
     if (headers is Map) {
       return headers.entries
           .where((e) => e.value != null)
-          .map((e) => {
-                'name': e.key.toString(),
-                'value': e.value.toString(),
-              })
+          .map((e) => {'name': e.key.toString(), 'value': e.value.toString()})
           .toList();
     }
     return [];
@@ -101,10 +86,7 @@ class HarGenerator {
     if (params is Map) {
       return params.entries
           .where((e) => e.value != null)
-          .map((e) => {
-                'name': e.key.toString(),
-                'value': e.value.toString(),
-              })
+          .map((e) => {'name': e.key.toString(), 'value': e.value.toString()})
           .toList();
     }
     return [];
@@ -124,24 +106,18 @@ class HarGenerator {
         final filename = file.value.filename ?? 'file';
         params.add({'name': file.key, 'value': '@$filename'});
       }
-      return {
-        'mimeType': 'multipart/form-data',
-        'params': params,
-      };
+      return {'mimeType': 'multipart/form-data', 'params': params};
     }
 
     if (body is Map || body is List) {
-      return {
-        'mimeType': 'application/json',
-        'text': jsonEncode(body),
-      };
+      return {'mimeType': 'application/json', 'text': jsonEncode(body)};
     }
 
     // x-www-form-urlencoded
     final contentType = (request.headers is Map)
         ? ((request.headers as Map)['content-type'] ??
-            (request.headers as Map)['Content-Type'] ??
-            '')
+              (request.headers as Map)['Content-Type'] ??
+              '')
         : '';
     if (contentType.toString().contains('application/x-www-form-urlencoded') &&
         body is Map) {
@@ -154,19 +130,12 @@ class HarGenerator {
       };
     }
 
-    return {
-      'mimeType': 'text/plain',
-      'text': body.toString(),
-    };
+    return {'mimeType': 'text/plain', 'text': body.toString()};
   }
 
   Map<String, dynamic> _buildResponseContent(dynamic responseBody) {
     if (responseBody == null) {
-      return {
-        'size': 0,
-        'mimeType': 'x-unknown',
-        'text': '',
-      };
+      return {'size': 0, 'mimeType': 'x-unknown', 'text': ''};
     }
     if (responseBody is Map || responseBody is List) {
       final text = jsonEncode(responseBody);
@@ -207,8 +176,10 @@ class HarGenerator {
   String _composeUrl(String baseUrl, List<Map<String, dynamic>> q) {
     if (q.isEmpty) return baseUrl;
     final qp = q
-        .map((e) =>
-            '${Uri.encodeQueryComponent(e['name'].toString())}=${Uri.encodeQueryComponent(e['value'].toString())}')
+        .map(
+          (e) =>
+              '${Uri.encodeQueryComponent(e['name'].toString())}=${Uri.encodeQueryComponent(e['value'].toString())}',
+        )
         .join('&');
     if (baseUrl.contains('?')) return '$baseUrl&$qp';
     return '$baseUrl?$qp';

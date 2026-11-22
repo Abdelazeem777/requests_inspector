@@ -90,7 +90,8 @@ class CurlCommandGenerator {
 
   void _addRequestBody(StringBuffer curlCommand) {
     if (details.requestBody != null) {
-      String contentType = details.headers?['content-type'] ??
+      String contentType =
+          details.headers?['content-type'] ??
           details.headers?['Content-Type'] ??
           '';
       if (contentType.contains('application/x-www-form-urlencoded')) {
@@ -110,8 +111,9 @@ class CurlCommandGenerator {
         if (details.requestBody is FormData) {
           FormData formData = details.requestBody as FormData;
           for (var mapEntry in formData.fields) {
-            curlCommand
-                .write("-F ${_quote('${mapEntry.key}=${mapEntry.value}')} ");
+            curlCommand.write(
+              "-F ${_quote('${mapEntry.key}=${mapEntry.value}')} ",
+            );
           }
 
           for (var file in formData.files) {

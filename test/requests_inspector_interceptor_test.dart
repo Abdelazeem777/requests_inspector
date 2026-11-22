@@ -10,13 +10,12 @@ void main() {
   InspectorController createController({
     StoppingRequestCallback? onStoppingRequest,
     StoppingResponseCallback? onStoppingResponse,
-  }) =>
-      InspectorController(
-        enabled: true,
-        showInspectorOn: ShowInspectorOn.LongPress,
-        onStoppingRequest: onStoppingRequest,
-        onStoppingResponse: onStoppingResponse,
-      );
+  }) => InspectorController(
+    enabled: true,
+    showInspectorOn: ShowInspectorOn.LongPress,
+    onStoppingRequest: onStoppingRequest,
+    onStoppingResponse: onStoppingResponse,
+  );
 
   setUp(() => controller = createController());
 
@@ -60,16 +59,13 @@ void main() {
       await dio.patch('/a');
       await dio.delete('/a');
 
-      expect(
-        controller.requestsList.map((r) => r.requestMethod),
-        [
-          RequestMethod.DELETE,
-          RequestMethod.PATCH,
-          RequestMethod.PUT,
-          RequestMethod.POST,
-          RequestMethod.GET,
-        ],
-      );
+      expect(controller.requestsList.map((r) => r.requestMethod), [
+        RequestMethod.DELETE,
+        RequestMethod.PATCH,
+        RequestMethod.PUT,
+        RequestMethod.POST,
+        RequestMethod.GET,
+      ]);
     });
 
     test('merges query parameters written in the path', () async {
@@ -81,17 +77,15 @@ void main() {
       expect(onlyLogged().queryParameters, {'lang': 'en', 'q': 'dart'});
     });
 
-    test(
-      'does not break HEAD requests',
-      () async {
-        final dio = inspectedDio(FakeHttpClientAdapter.json(''));
+    test('does not break HEAD requests', () async {
+      final dio = inspectedDio(FakeHttpClientAdapter.json(''));
 
-        final response =
-            await dio.head('/users').timeout(const Duration(seconds: 2));
+      final response = await dio
+          .head('/users')
+          .timeout(const Duration(seconds: 2));
 
-        expect(response.statusCode, 200);
-      },
-    );
+      expect(response.statusCode, 200);
+    });
 
     test('does not break OPTIONS requests', () async {
       final dio = inspectedDio(FakeHttpClientAdapter.json(''));
@@ -124,8 +118,13 @@ void main() {
 
       await expectLater(
         dio.get('/users/1'),
-        throwsA(isA<DioException>()
-            .having((e) => e.type, 'type', DioExceptionType.badResponse)),
+        throwsA(
+          isA<DioException>().having(
+            (e) => e.type,
+            'type',
+            DioExceptionType.badResponse,
+          ),
+        ),
       );
 
       final logged = onlyLogged();
@@ -135,31 +134,39 @@ void main() {
       expect(logged.receivedTime, isNotNull);
     });
 
-    test('logs a connection failure with status 0 and the error message',
-        () async {
-      final dio = inspectedDio(FakeHttpClientAdapter(
-        (options) => Future.error(DioException.connectionError(
-          requestOptions: options,
-          reason: 'no internet',
-        )),
-      ));
+    test(
+      'logs a connection failure with status 0 and the error message',
+      () async {
+        final dio = inspectedDio(
+          FakeHttpClientAdapter(
+            (options) => Future.error(
+              DioException.connectionError(
+                requestOptions: options,
+                reason: 'no internet',
+              ),
+            ),
+          ),
+        );
 
-      await expectLater(dio.get('/users'), throwsA(isA<DioException>()));
+        await expectLater(dio.get('/users'), throwsA(isA<DioException>()));
 
-      final logged = onlyLogged();
-      expect(logged.statusCode, 0);
-      expect(logged.responseBody, contains('no internet'));
-    });
+        final logged = onlyLogged();
+        expect(logged.statusCode, 0);
+        expect(logged.responseBody, contains('no internet'));
+      },
+    );
   });
 
   group('request stopper', () {
     test('is skipped while the request stopper is disabled', () async {
       var calls = 0;
       controller.dispose();
-      controller = createController(onStoppingRequest: (_) async {
-        calls++;
-        return null;
-      });
+      controller = createController(
+        onStoppingRequest: (_) async {
+          calls++;
+          return null;
+        },
+      );
       final dio = inspectedDio(FakeHttpClientAdapter.json({}));
 
       await dio.get('/users');
@@ -170,19 +177,22 @@ void main() {
     test('sends the original request when the editor returns null', () async {
       RequestDetails? stopped;
       controller.dispose();
-      controller = createController(onStoppingRequest: (details) async {
-        stopped = details;
-        return null;
-      })
-        ..requestStopperEnabled = true;
+      controller = createController(
+        onStoppingRequest: (details) async {
+          stopped = details;
+          return null;
+        },
+      )..requestStopperEnabled = true;
       final adapter = FakeHttpClientAdapter.json({});
 
       await inspectedDio(adapter).get('/users', queryParameters: {'a': '1'});
 
       expect(stopped!.url, 'https://api.example.com/users?a=1');
       expect(stopped!.queryParameters, {'a': '1'});
-      expect(adapter.requests.single.uri.toString(),
-          'https://api.example.com/users?a=1');
+      expect(
+        adapter.requests.single.uri.toString(),
+        'https://api.example.com/users?a=1',
+      );
     });
 
     test('sends the edited request', () async {
@@ -208,44 +218,46 @@ void main() {
       expect(onlyLogged().url, 'https://other.example.com/edited');
     });
 
-    test(
-      'keeps query parameters when the edited request is sent',
-      () async {
-        controller.dispose();
-        controller = createController(
-          onStoppingRequest: (details) async => details,
-        )..requestStopperEnabled = true;
-        final adapter = FakeHttpClientAdapter.json({});
+    test('keeps query parameters when the edited request is sent', () async {
+      controller.dispose();
+      controller = createController(
+        onStoppingRequest: (details) async => details,
+      )..requestStopperEnabled = true;
+      final adapter = FakeHttpClientAdapter.json({});
 
-        await inspectedDio(adapter).get('/users', queryParameters: {'a': '1'});
+      await inspectedDio(adapter).get('/users', queryParameters: {'a': '1'});
 
-        expect(adapter.requests.single.uri.toString(),
-            'https://api.example.com/users?a=1');
-      },
-    );
+      expect(
+        adapter.requests.single.uri.toString(),
+        'https://api.example.com/users?a=1',
+      );
+    });
   });
 
   group('response stopper', () {
-    test('receives the original response when the editor returns null',
-        () async {
-      ResponseDetails? stopped;
-      controller.dispose();
-      controller = createController(onStoppingResponse: (details) async {
-        stopped = details;
-        return null;
-      })
-        ..responseStopperEnabled = true;
+    test(
+      'receives the original response when the editor returns null',
+      () async {
+        ResponseDetails? stopped;
+        controller.dispose();
+        controller = createController(
+          onStoppingResponse: (details) async {
+            stopped = details;
+            return null;
+          },
+        )..responseStopperEnabled = true;
 
-      final response = await inspectedDio(
-        FakeHttpClientAdapter.json({'id': 1}),
-      ).get('/users', queryParameters: {'a': '1'});
+        final response = await inspectedDio(
+          FakeHttpClientAdapter.json({'id': 1}),
+        ).get('/users', queryParameters: {'a': '1'});
 
-      expect(response.data, {'id': 1});
-      expect(stopped!.url, 'https://api.example.com/users');
-      expect(stopped!.statusCode, 200);
-      expect(stopped!.responseBody, {'id': 1});
-      expect(stopped!.headers, contains('content-type'));
-    });
+        expect(response.data, {'id': 1});
+        expect(stopped!.url, 'https://api.example.com/users');
+        expect(stopped!.statusCode, 200);
+        expect(stopped!.responseBody, {'id': 1});
+        expect(stopped!.headers, contains('content-type'));
+      },
+    );
 
     test('lets the app receive the edited response', () async {
       controller.dispose();
@@ -257,8 +269,9 @@ void main() {
         ),
       )..responseStopperEnabled = true;
 
-      final response =
-          await inspectedDio(FakeHttpClientAdapter.json({'id': 1})).get('/u');
+      final response = await inspectedDio(
+        FakeHttpClientAdapter.json({'id': 1}),
+      ).get('/u');
 
       expect(response.statusCode, 202);
       expect(response.data, {'edited': true});
@@ -270,11 +283,12 @@ void main() {
     test('does not stop responses whose body cannot be edited', () async {
       var calls = 0;
       controller.dispose();
-      controller = createController(onStoppingResponse: (details) async {
-        calls++;
-        return null;
-      })
-        ..responseStopperEnabled = true;
+      controller = createController(
+        onStoppingResponse: (details) async {
+          calls++;
+          return null;
+        },
+      )..responseStopperEnabled = true;
 
       await inspectedDio(FakeHttpClientAdapter.json(42)).get('/count');
 

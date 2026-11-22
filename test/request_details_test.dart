@@ -115,11 +115,11 @@ void main() {
     test('equality and hashCode follow the field values', () {
       final sentTime = DateTime(2024);
       RequestDetails build({int status = 200}) => RequestDetails(
-            requestMethod: RequestMethod.GET,
-            url: 'https://api.example.com/users',
-            statusCode: status,
-            sentTime: sentTime,
-          );
+        requestMethod: RequestMethod.GET,
+        url: 'https://api.example.com/users',
+        statusCode: status,
+        sentTime: sentTime,
+      );
 
       expect(build(), build());
       expect(build().hashCode, build().hashCode);

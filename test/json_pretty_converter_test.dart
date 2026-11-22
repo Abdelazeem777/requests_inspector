@@ -55,21 +55,23 @@ void main() {
       expect(converter.convert(1.5), '1.5');
     });
 
-    test('keeps nested bool, int, double and String values as JSON literals',
-        () {
-      // Guards against fixing the top-level case by stringifying primitives
-      // everywhere (which would render `"flag": "true"`).
-      final input = {
-        'flag': true,
-        'count': 3,
-        'ratio': 1.5,
-        'name': 'John',
-        'list': [1, true, 2.5, 'x'],
-        'nested': {'off': false, 'n': 0},
-      };
+    test(
+      'keeps nested bool, int, double and String values as JSON literals',
+      () {
+        // Guards against fixing the top-level case by stringifying primitives
+        // everywhere (which would render `"flag": "true"`).
+        final input = {
+          'flag': true,
+          'count': 3,
+          'ratio': 1.5,
+          'name': 'John',
+          'list': [1, true, 2.5, 'x'],
+          'nested': {'off': false, 'n': 0},
+        };
 
-      expect(converter.convert(input), encoder.convert(input));
-    });
+        expect(converter.convert(input), encoder.convert(input));
+      },
+    );
 
     test('keeps nested null values as null', () {
       final input = {
@@ -123,17 +125,16 @@ void main() {
 
     test('describes FormData fields and file names', () {
       final formData = FormData.fromMap({'name': 'John'})
-        ..files.add(MapEntry(
-          'avatar',
-          MultipartFile.fromString('bytes', filename: 'me.png'),
-        ));
+        ..files.add(
+          MapEntry(
+            'avatar',
+            MultipartFile.fromString('bytes', filename: 'me.png'),
+          ),
+        );
 
       expect(
         converter.convert(formData),
-        'FormData:\n${encoder.convert({
-              'name': 'John',
-              'avatar': 'me.png',
-            })}',
+        'FormData:\n${encoder.convert({'name': 'John', 'avatar': 'me.png'})}',
       );
     });
 
@@ -168,10 +169,7 @@ void main() {
 
     test('decodes JSON string literals into Strings', () {
       expect(converter.deconvertFrom('"hello world"', 'String'), 'hello world');
-      expect(
-        converter.deconvertFrom(r'"{\"a\":1}"', 'String'),
-        '{"a":1}',
-      );
+      expect(converter.deconvertFrom(r'"{\"a\":1}"', 'String'), '{"a":1}');
     });
 
     test('decodes bools', () {
@@ -187,7 +185,9 @@ void main() {
 
     test('returns null for invalid input or unsupported types', () {
       expect(
-          converter.deconvertFrom('{not json', 'Map<String, dynamic>'), isNull);
+        converter.deconvertFrom('{not json', 'Map<String, dynamic>'),
+        isNull,
+      );
       expect(converter.deconvertFrom('yes', 'bool'), isNull);
       expect(converter.deconvertFrom('abc', 'int'), isNull);
       expect(converter.deconvertFrom('2024-01-01', 'DateTime'), isNull);
@@ -205,12 +205,16 @@ void main() {
 
       expect(
         converter.deconvertFrom(
-            converter.convert(map), map.runtimeType.toString()),
+          converter.convert(map),
+          map.runtimeType.toString(),
+        ),
         map,
       );
       expect(
         converter.deconvertFrom(
-            converter.convert(list), list.runtimeType.toString()),
+          converter.convert(list),
+          list.runtimeType.toString(),
+        ),
         list,
       );
     });
@@ -225,7 +229,9 @@ void main() {
   group('convert -> deconvertFrom round trip', () {
     /// Decodes what [convert] shows for [value] as the stopper editors do.
     dynamic roundTrip(Object? value) => converter.deconvertFrom(
-        converter.convert(value), value.runtimeType.toString());
+      converter.convert(value),
+      value.runtimeType.toString(),
+    );
 
     /// `==` treats `1 == 1.0`, so also compare the JSON encodings, which tell
     /// `true` from `"true"`, `1` from `1.0` and `null` from `""`.

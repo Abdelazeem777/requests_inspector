@@ -16,8 +16,10 @@ class JsonPrettyConverter {
 
   JsonPrettyConverter._internal();
 
-  late final JsonEncoder _encoder =
-      JsonEncoder.withIndent('  ', _toEncodableForDisplay);
+  late final JsonEncoder _encoder = JsonEncoder.withIndent(
+    '  ',
+    _toEncodableForDisplay,
+  );
 
   /// Always returns a String: callers pass it straight to text widgets.
   String convert(text) {

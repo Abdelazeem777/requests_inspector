@@ -1,3 +1,26 @@
+## 6.0.0
+
+### Breaking changes
+
+- The minimum supported versions are now Dart `3.10` and Flutter `3.38.1` (required by `share_plus ^13.1.0`).
+- `RequestMethod` has two new values, `HEAD` and `OPTIONS`. If you have an exhaustive `switch` over `RequestMethod`, add the new cases.
+- The generated `cURL` commands now quote every argument with single quotes (URL, headers and body, e.g. `curl -X GET 'https://x/y' -H 'k: v'`), and `String` bodies are sent as they are instead of being JSON-encoded a second time. If you compare against the old output, update it.
+
+### Fixes and improvements
+
+- Fix the type mismatch crash when a response body is a plain `bool`, `int` or `double`, and keep String bodies intact after editing them in the Stopper. Special thanks to [Nourhan Sabrii](https://github.com/NourSabry) for this fix! 🎉
+- Update the dependencies (including `sensors_plus` to `^7.0.0`) and resolve the lint warnings and deprecations. Special thanks to [Sahad2701](https://github.com/Sahad2701) for this contribution! 🎉
+- Failed GraphQL `HttpLink` requests (e.g. a `400` response) are now logged by `GraphQLInspectorLink` instead of looking as if nothing was sent (fixes [#69](https://github.com/Abdelazeem777/requests_inspector/issues/69)), and GraphQL requests now show their durations. Special thanks to [MAlazhariy](https://github.com/MAlazhariy) for this contribution! 🎉
+- Search on the request details page now shows the correct match count and no longer highlights overlapping matches.
+- Add support for `HEAD` and `OPTIONS` requests. Requests with an unknown method (e.g. `TRACE`) are no longer logged, but they don't break your request anymore.
+- The Request Stopper no longer duplicates the query parameters when it sends an edited request.
+- Generated `cURL` commands are now shell-safe: quotes, `$` and backticks in the URL, headers or body no longer break the command.
+- Keep the host app accessible (VoiceOver, TalkBack and UI automation tools) while the inspector is enabled, and add a `Close inspector` tooltip to the close button.
+- Android back button: it now closes the inspector's dialogs and menus first and then the inspector itself, instead of popping the page behind it. Predictive back is supported too.
+- `ShowInspectorOn.Shaking` now falls back to long press on web and desktop, where shaking isn't available.
+- README: wrap the whole `MaterialApp` with `RequestsInspector` rather than using `MaterialApp.builder` so the back button works as described above, and fix the code samples.
+- Add a full test suite, a Maestro smoke test and CI (Flutter `3.38.1` and stable), and fix the example app build on current Android, iOS and macOS toolchains.
+
 ## 5.5.1
 
 - Upgrade `connectivity_plus` to `^7.3.1`.

@@ -22,10 +22,9 @@ class RequestUrlFilter implements RequestFilter {
 
   @override
   bool Function(RequestDetails requestDetails) get requestFilter =>
-      (requestDetails) => requestDetails.url
-          .trim()
-          .toLowerCase()
-          .contains(url.trim().toLowerCase());
+      (requestDetails) => requestDetails.url.trim().toLowerCase().contains(
+        url.trim().toLowerCase(),
+      );
 }
 
 class RequestStatusCodeFilter implements RequestFilter {

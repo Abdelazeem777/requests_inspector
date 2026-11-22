@@ -25,26 +25,26 @@ void main() {
     bool expandChildren = true,
     String searchQuery = '',
     bool isDarkMode = false,
-  }) =>
-      tester.pumpWidget(
-        ChangeNotifierProvider<InspectorController>.value(
-          value: controller,
-          child: MaterialApp(
-            home: Scaffold(
-              body: JsonTreeView(
-                data,
-                isDarkMode: isDarkMode,
-                expandChildren: expandChildren,
-                searchQuery: searchQuery,
-              ),
-            ),
+  }) => tester.pumpWidget(
+    ChangeNotifierProvider<InspectorController>.value(
+      value: controller,
+      child: MaterialApp(
+        home: Scaffold(
+          body: JsonTreeView(
+            data,
+            isDarkMode: isDarkMode,
+            expandChildren: expandChildren,
+            searchQuery: searchQuery,
           ),
         ),
-      );
+      ),
+    ),
+  );
 
   Color? colorOf(WidgetTester tester, String value) {
-    for (final widget
-        in tester.widgetList<SelectableText>(find.byType(SelectableText))) {
+    for (final widget in tester.widgetList<SelectableText>(
+      find.byType(SelectableText),
+    )) {
       Color? color;
       widget.textSpan?.visitChildren((span) {
         if (span is TextSpan && span.text == value) color = span.style?.color;
@@ -131,10 +131,12 @@ void main() {
 
   testWidgets('renders FormData fields and files', (tester) async {
     final formData = FormData.fromMap({'name': 'John'})
-      ..files.add(MapEntry(
-        'avatar',
-        MultipartFile.fromBytes(List.filled(2048, 0), filename: 'me.png'),
-      ));
+      ..files.add(
+        MapEntry(
+          'avatar',
+          MultipartFile.fromBytes(List.filled(2048, 0), filename: 'me.png'),
+        ),
+      );
 
     await pumpTree(tester, formData);
 
@@ -162,8 +164,9 @@ void main() {
     expect(highlights.map((s) => s.text!.toLowerCase()), everyElement('a'));
   });
 
-  testWidgets('expands a collapsed node that holds the active match',
-      (tester) async {
+  testWidgets('expands a collapsed node that holds the active match', (
+    tester,
+  ) async {
     controller
       ..selectedRequest = RequestDetails(
         requestMethod: RequestMethod.GET,
@@ -186,6 +189,8 @@ void main() {
 
     expect(selectableTexts(tester), contains('"city" : "Cairo",'));
     expect(
-        highlightedSpans(tester).single.style!.backgroundColor, Colors.orange);
+      highlightedSpans(tester).single.style!.backgroundColor,
+      Colors.orange,
+    );
   });
 }
