@@ -1,10 +1,12 @@
-# Starts the example with a clean state and opens the Playground page
-# (lib/playground.dart), which sends requests with every client.
+# Restarts the example and opens the Playground page (lib/playground.dart),
+# which sends requests with every client.
+# launchApp stops the app first, and the inspector keeps everything in
+# memory, so each flow starts with no requests and the default settings.
+# (clearState isn't needed, and on a busy emulator the first start of a
+# debug build after clearing its data can exceed Android's start timeout.)
 appId: com.example.example
 ---
-- launchApp:
-    clearState: true
-# A debug build can take a while to start after its data is cleared.
+- launchApp
 - extendedWaitUntil:
     visible: "Playground"
     timeout: 30000
