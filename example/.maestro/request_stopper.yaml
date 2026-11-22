@@ -1,0 +1,168 @@
+# Request stopper: the filter dialog turns it on, only matching requests
+# stop, and what is edited in the stopper dialog (a header, a query
+# parameter, nested JSON values, numbers and bools) is what really goes out.
+# https://postman-echo.com echoes the request it got, and the Playground
+# shows that echo with the JSON type of every value.
+# Also covers the ways out without edits: Send as is, tapping outside the
+# dialog, Android back, and turning the stopper off with its switch.
+appId: com.example.example
+name: Request stopper
+---
+- runFlow: subflows/launch_playground.yaml
+
+# Stop only POSTs to the echo endpoint (Apply also turns the stopper on).
+- runFlow: subflows/open_inspector.yaml
+- tapOn: "Show menu"
+- tapOn: "Requests Stopper"
+- extendedWaitUntil:
+    visible: "Request Stopper Filters"
+    timeout: 5000
+- tapOn: "URL contains"
+- inputText: "postman-echo.com/post"
+- tapOn: "Apply"
+- assertVisible:
+    text: "Requests Stopper"
+    checked: true
+- tapOn: "Dismiss menu"
+- runFlow: subflows/close_inspector.yaml
+
+# A request the filter doesn't match is not stopped.
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "Dio GET"
+- assertNotVisible: "Send"
+
+# Edit the request.
+- tapOn: "Dio POST JSON"
+- extendedWaitUntil:
+    visible: "Send"
+    timeout: 10000
+- assertVisible: '(?s).*"name": "original",.*"count": 1,.*"active": true,.*"age": 30,.*"verified": false.*'
+- runFlow:
+    file: subflows/focus_field_end.yaml
+    env:
+      FIELD: '(?s)\{.*"x-e2e": "original".*'
+- eraseText: 80
+- inputText: '{"x-e2e": "edited", "content-type": "application/json"}'
+- assertVisible: '\{"x-e2e": "edited", "content-type": "application/json"\}'
+- runFlow:
+    file: subflows/focus_field_end.yaml
+    env:
+      FIELD: '(?s)\{.*"step": "original".*'
+      SCROLL: "bit"
+- eraseText: 40
+- inputText: '{"step": "edited", "page": 2}'
+- assertVisible: '\{"step": "edited", "page": 2\}'
+- runFlow:
+    file: subflows/focus_field_end.yaml
+    env:
+      FIELD: '(?s)\{.*"name": "original".*'
+      SCROLL: "end"
+- eraseText: 160
+- inputText: '{"name": "edited", "count": 2, "active": false, "note": "it''s \"edited\"", "profile": {"age": 31, "verified": true}}'
+- assertVisible: '.*"profile": \{"age": 31, "verified": true\}\}'
+- takeScreenshot: request-stopper-edited
+- tapOn: "Send"
+- extendedWaitUntil:
+    visible: "Dio POST JSON: done"
+    timeout: 30000
+# What postman-echo received: the edited values with their JSON types.
+- assertVisible: "status: 200"
+- assertVisible: >-
+    echo json: \{"name":"edited","count":2,"active":false,"note":"it's \\"edited\\"","profile":\{"age":31,"verified":true\}\}
+- assertVisible: "echo types: name=String count=int active=bool note=String profile.age=int profile.verified=bool"
+- assertVisible: "echo header x-e2e: edited"
+- assertVisible: 'echo query: \{"step":"edited","page":"2"\}'
+- takeScreenshot: request-stopper-echo
+
+# The inspector logs the edited request.
+- runFlow: subflows/open_inspector.yaml
+- runFlow:
+    file: subflows/open_request.yaml
+    env:
+      ROW: "(?s)POST.*POST.*https://postman-echo.com/post.*"
+- assertVisible: '"x-e2e" : "edited",'
+- assertVisible: '"step" : "edited",'
+- scrollUntilVisible:
+    element: '"verified" : true,'
+    direction: DOWN
+- assertVisible: '"count" : 2,'
+- assertVisible: '"active" : false,'
+- runFlow: subflows/close_inspector.yaml
+
+# Send without edits: the original request goes out.
+- tapOn: "Dio POST JSON"
+- extendedWaitUntil:
+    visible: "Send"
+    timeout: 10000
+- tapOn: "Send"
+- extendedWaitUntil:
+    visible: "Dio POST JSON: done"
+    timeout: 30000
+- assertVisible: "echo header x-e2e: original"
+- assertVisible: "echo types: name=String count=int active=bool note=String profile.age=int profile.verified=bool"
+- assertVisible: '.*"profile":\{"age":30,"verified":false\}\}'
+
+# Tap outside the dialog (the 16dp gap at its side; the barrier has no
+# label of its own): the original request goes out.
+- tapOn: "Dio POST JSON"
+- extendedWaitUntil:
+    visible: "Send"
+    timeout: 10000
+- tapOn:
+    point: "2%,50%"
+- extendedWaitUntil:
+    visible: "Dio POST JSON: done"
+    timeout: 30000
+- assertVisible: "echo header x-e2e: original"
+
+# Android back closes the dialog the same way.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - tapOn: "Dio POST JSON"
+      - extendedWaitUntil:
+          visible: "Send"
+          timeout: 10000
+      - pressKey: back
+      - extendedWaitUntil:
+          visible: "Dio POST JSON: done"
+          timeout: 30000
+      - assertVisible: "echo header x-e2e: original"
+      - assertVisible: "Read clipboard"
+
+# Change the method: postman-echo has no PUT /post, so it answers 404.
+- tapOn: "Dio POST JSON"
+- extendedWaitUntil:
+    visible: "Send"
+    timeout: 10000
+- tapOn: "Request Method:.*"
+- tapOn: "PUT"
+- assertVisible: "Request Method:\\s*PUT"
+- tapOn: "Send"
+- extendedWaitUntil:
+    visible: "Dio POST JSON: done"
+    timeout: 30000
+- assertVisible: "status: 404"
+
+# The switch turns the stopper off: nothing stops any more.
+- runFlow: subflows/open_inspector.yaml
+- tapOn: "All"
+- assertVisible: "(?s)PUT.*POST.*https://postman-echo.com/post.*404"
+- tapOn: "Show menu"
+- tapOn:
+    text: "Requests Stopper"
+    point: "88%,50%"
+- assertVisible:
+    text: "Requests Stopper"
+    checked: false
+- tapOn: "Dismiss menu"
+- runFlow: subflows/close_inspector.yaml
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "Dio POST JSON"
+- assertNotVisible: "Send"
+- assertVisible: "echo header x-e2e: original"

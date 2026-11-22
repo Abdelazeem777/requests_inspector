@@ -1,0 +1,66 @@
+# The copy icon of each section on the Request Details tab puts that
+# section on the clipboard and shows "Copied to clipboard".
+# The icons have no accessibility label of their own (they are part of the
+# section's header), so each is tapped inside its header, left of the
+# expand arrow.
+appId: com.example.example
+name: Copy buttons on the details page
+---
+- runFlow: subflows/launch_playground.yaml
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "Dio POST JSON"
+- runFlow: subflows/open_inspector.yaml
+- runFlow:
+    file: subflows/open_request.yaml
+    env:
+      ROW: "(?s)POST.*POST.*https://postman-echo.com/post.*"
+
+# First section: the URL.
+- tapOn:
+    text: "(?s)POST - POST.*"
+    point: "83%,50%"
+- assertVisible: "Copied to clipboard"
+- runFlow: subflows/close_inspector.yaml
+- runFlow: subflows/read_clipboard.yaml
+- assertVisible: 'clipboard text: "?https://postman-echo\.com/post"?'
+
+# Headers.
+- runFlow: subflows/open_inspector.yaml
+- tapOn:
+    text: "Headers"
+    point: "83%,50%"
+- assertVisible: "Copied to clipboard"
+- runFlow: subflows/close_inspector.yaml
+- runFlow: subflows/read_clipboard.yaml
+- assertVisible: '(?s)clipboard text: \{\s+"x-e2e": "original",\s+"content-type": "application/json",\s+"content-length": "\d+"\s+\}'
+
+# Request body.
+- runFlow: subflows/open_inspector.yaml
+- scrollUntilVisible:
+    element: "Request Body"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    text: "Request Body"
+    point: "83%,50%"
+- assertVisible: "Copied to clipboard"
+- runFlow: subflows/close_inspector.yaml
+- runFlow: subflows/read_clipboard.yaml
+- assertVisible: >-
+    (?s)clipboard text: \{\s+"name": "original",\s+"count": 1,\s+"active": true,\s+"note": "it's \\"quoted\\"",\s+"profile": \{\s+"age": 30,\s+"verified": false\s+\}\s+\}
+
+# Response body (postman-echo's answer).
+- runFlow: subflows/open_inspector.yaml
+- scrollUntilVisible:
+    element: "Response Body"
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    text: "Response Body"
+    point: "83%,50%"
+- assertVisible: "Copied to clipboard"
+- runFlow: subflows/close_inspector.yaml
+- runFlow: subflows/read_clipboard.yaml
+- assertVisible: '(?s)clipboard text: \{\s+"args": \{\s+"step": "original"\s+\},.*"json": \{\s+"name": "original",.*\}\s*'

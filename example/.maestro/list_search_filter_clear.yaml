@@ -1,0 +1,97 @@
+# The request list: search by URL (and its clear button), the filters
+# dialog (method and status code, then Clear), and Clear All with its
+# "Are you sure?" dialog (No keeps the requests, Yes removes them).
+# The clear and filter buttons inside the search field have no
+# accessibility label, so they are tapped inside the field: they are the
+# last two 48dp icons at its end.
+appId: com.example.example
+name: List search, filters and Clear All
+---
+- runFlow: subflows/launch_playground.yaml
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "Dio GET"
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "Dio 404"
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "GraphQL query"
+- runFlow: subflows/open_inspector.yaml
+- assertVisible: "(?s)POST.*https://graphqlzero.almansi.me/api.*200"
+- assertVisible: "(?s)GET.*https://postman-echo.com/status/404.*404"
+- assertVisible: "(?s)GET.*https://postman-echo.com/get.*200"
+- assertVisible: "(?s)GET.*https://dummyjson.com/posts.*200"
+
+# Search by URL.
+- tapOn: "Search by URL"
+- inputText: "graphql"
+- assertVisible: "(?s)POST.*https://graphqlzero.almansi.me/api.*200"
+- assertNotVisible: "(?s)GET.*https://postman-echo.com/.*"
+- assertNotVisible: "(?s)GET.*https://dummyjson.com/posts.*"
+- takeScreenshot: list-search
+# Nothing matches. (Erase more than "graphql": the Android keyboard can
+# swallow the first delete.)
+- eraseText: 15
+- inputText: "nothing-matches"
+- assertVisible: "No requests can be found with applied filters"
+# The clear button empties the search.
+- tapOn:
+    text: "nothing-matches"
+    point: "82%,50%"
+- assertVisible: "(?s)GET.*https://postman-echo.com/status/404.*404"
+- assertVisible: "(?s)POST.*https://graphqlzero.almansi.me/api.*200"
+
+# Filters: GET with status 404 leaves only the 404.
+- tapOn:
+    text: "Search by URL"
+    point: "94%,50%"
+- extendedWaitUntil:
+    visible: "Filter requests"
+    timeout: 5000
+- tapOn: "(?s).*Request Method.*"
+- tapOn: "GET"
+- tapOn: "Status code"
+- inputText: "404"
+- tapOn: "Apply"
+- assertVisible: "(?s)GET.*https://postman-echo.com/status/404.*404"
+- assertNotVisible: "(?s)GET.*https://postman-echo.com/get.*"
+- assertNotVisible: "(?s)POST.*https://graphqlzero.almansi.me/api.*"
+- takeScreenshot: list-filtered
+# Clear removes the filters.
+- tapOn:
+    text: "Search by URL"
+    point: "94%,50%"
+- extendedWaitUntil:
+    visible: "Filter requests"
+    timeout: 5000
+- tapOn: "Clear"
+- assertVisible: "(?s)GET.*https://postman-echo.com/get.*200"
+- assertVisible: "(?s)POST.*https://graphqlzero.almansi.me/api.*200"
+
+# Clear All: No keeps everything, Yes removes everything.
+- tapOn: "Clear All"
+- extendedWaitUntil:
+    visible: "This will clear all requests added to the inspector"
+    timeout: 5000
+- tapOn: "No"
+- assertVisible: "(?s)GET.*https://postman-echo.com/get.*200"
+- tapOn: "Clear All"
+- tapOn: "Yes"
+- assertVisible: "No requests added yet"
+- assertNotVisible: "(?s)GET.*https://postman-echo.com/get.*"
+- tapOn: "Request Details"
+- assertVisible: "Please select a request first to view details"
+
+# New requests show up again after clearing.
+- runFlow: subflows/close_inspector.yaml
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "Dio GET"
+- runFlow: subflows/open_inspector.yaml
+- tapOn: "All"
+- assertVisible: "(?s)GET.*https://postman-echo.com/get.*200"

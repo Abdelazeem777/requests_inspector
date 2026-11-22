@@ -1,0 +1,12 @@
+# Starts the example with a clean state and opens the Playground page
+# (lib/playground.dart), which sends requests with every client.
+appId: com.example.example
+---
+- launchApp:
+    clearState: true
+- waitForAnimationToEnd:
+    timeout: 5000
+- tapOn: "Playground"
+- extendedWaitUntil:
+    visible: "Tap a button to send a request"
+    timeout: 10000

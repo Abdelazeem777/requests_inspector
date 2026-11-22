@@ -1,0 +1,7 @@
+# Opens the inspector with a long press on the Playground title.
+appId: com.example.example
+---
+- longPressOn: "Playground"
+- extendedWaitUntil:
+    visible: "Inspector.*"
+    timeout: 10000

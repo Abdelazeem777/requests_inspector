@@ -1,0 +1,111 @@
+# Response stopper: the filter dialog turns it on, only matching responses
+# stop, and the status code and body edited in the stopper dialog are what
+# the app receives, with JSON types kept (numbers stay numbers, bools stay
+# bools, also in nested objects). "Dio GET todo" shows the response it got
+# and the type of every value.
+# Also covers closing the dialog without edits and the switch turning it off.
+appId: com.example.example
+name: Response stopper
+---
+- runFlow: subflows/launch_playground.yaml
+
+# Stop only responses from the todo endpoint (Apply also turns it on).
+- runFlow: subflows/open_inspector.yaml
+- tapOn: "Show menu"
+- tapOn: "Responses Stopper"
+- extendedWaitUntil:
+    visible: "Response Stopper Filters"
+    timeout: 5000
+- tapOn: "URL contains"
+- inputText: "dummyjson.com/todos"
+- tapOn: "Apply"
+- assertVisible:
+    text: "Responses Stopper"
+    checked: true
+- tapOn: "Dismiss menu"
+- runFlow: subflows/close_inspector.yaml
+
+# A response the filter doesn't match is not stopped.
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "Dio GET"
+- assertNotVisible: "Receive"
+
+# Tap outside the dialog (the 16dp gap at its side): the app gets the
+# original response.
+- tapOn: "Dio GET todo"
+- extendedWaitUntil:
+    visible: "Receive"
+    timeout: 15000
+- assertVisible: '(?s)\{.*"completed": false,.*"userId": 152.*'
+- tapOn:
+    point: "2%,50%"
+- extendedWaitUntil:
+    visible: "Dio GET todo: done"
+    timeout: 15000
+- assertVisible: "status: 200"
+- assertVisible: 'body: \{"id":1,"todo":".*","completed":false,"userId":152\}'
+- assertVisible: "types: id=int todo=String completed=bool userId=int"
+
+# Edit the status code and the body (new nested values, a double, bools).
+- tapOn: "Dio GET todo"
+- extendedWaitUntil:
+    visible: "Receive"
+    timeout: 15000
+- runFlow:
+    file: subflows/focus_field_end.yaml
+    env:
+      FIELD: "200"
+- eraseText: 5
+- inputText: "202"
+- assertVisible: "202"
+- runFlow:
+    file: subflows/focus_field_end.yaml
+    env:
+      FIELD: '(?s)\{.*"todo": .*'
+- eraseText: 130
+- inputText: '{"id": 7, "todo": "edited", "completed": true, "userId": 152, "meta": {"score": 9.5, "ok": false, "tags": ["x"]}}'
+- assertVisible: '.*"meta": \{"score": 9.5, "ok": false, "tags": \["x"\]\}\}'
+- takeScreenshot: response-stopper-edited
+- tapOn: "Receive"
+- extendedWaitUntil:
+    visible: "Dio GET todo: done"
+    timeout: 15000
+# What the app received.
+- assertVisible: "status: 202"
+- assertVisible: >-
+    body: \{"id":7,"todo":"edited","completed":true,"userId":152,"meta":\{"score":9.5,"ok":false,"tags":\["x"\]\}\}
+- assertVisible: "types: id=int todo=String completed=bool userId=int meta.score=double meta.ok=bool meta.tags=List"
+- takeScreenshot: response-stopper-received
+
+# The inspector logs the edited response.
+- runFlow: subflows/open_inspector.yaml
+- runFlow:
+    file: subflows/open_request.yaml
+    env:
+      ROW: "(?s)GET.*1.*https://dummyjson.com/todos/1.*202"
+- assertVisible: "(?s).*Status: 202.*"
+- scrollUntilVisible:
+    element: '"score" : 9.5,'
+    direction: DOWN
+- assertVisible: '"completed" : true,'
+- assertVisible: '"ok" : false,'
+
+# The switch turns the stopper off: the response is not stopped any more.
+- tapOn: "Show menu"
+- tapOn:
+    text: "Responses Stopper"
+    point: "88%,50%"
+- assertVisible:
+    text: "Responses Stopper"
+    checked: false
+- tapOn: "Dismiss menu"
+- runFlow: subflows/close_inspector.yaml
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "Dio GET todo"
+- assertNotVisible: "Receive"
+- assertVisible: "status: 200"
+- assertVisible: "types: id=int todo=String completed=bool userId=int"

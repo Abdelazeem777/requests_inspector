@@ -1,0 +1,4 @@
+# `maestro test .maestro` runs the flows in this folder; subflows/ only holds
+# steps they share.
+flows:
+  - "*"
