@@ -11,7 +11,11 @@ carry that version, so the tag and the published package never drift apart.
 CHANGELOG.md gets a `## X.Y.Z` section, taken from (first match wins):
   1. --notes, one entry per line;
   2. an existing `## Unreleased` section, which is renamed;
-  3. the commit subjects since the last tag (merges and release commits skipped).
+  3. the titles of the changes merged into main since the last tag (PR titles for
+     merge commits); ci/test/style/build/chore changes and release commits are skipped.
+
+It also updates this package's own `version:` line in example/pubspec.lock,
+so the example still resolves with `flutter pub get --enforce-lockfile`.
 
 Prints `version=X.Y.Z` and `tag=vX.Y.Z` (also appended to $GITHUB_OUTPUT when set).
 """
@@ -62,25 +66,28 @@ def new_changelog(text, version, notes, last_tag):
     if re.search(rf"^## {re.escape(version)}\s*$", text, re.MULTILINE):
         fail(f"CHANGELOG.md already has a `## {version}` section.")
 
+    unreleased = UNRELEASED_RE.search(text)
+    if unreleased:
+        if notes.strip():
+            fail(
+                "CHANGELOG.md has a `## Unreleased` section. Leave the notes input "
+                "empty to release it, or move its entries into the notes."
+            )
+        body = text[unreleased.end():]
+        next_heading = re.search(r"^## ", body, re.MULTILINE)
+        if not body[: next_heading.start() if next_heading else len(body)].strip():
+            fail("The `## Unreleased` section in CHANGELOG.md is empty.")
+        return text[: unreleased.start()] + f"## {version}" + text[unreleased.end():]
+
     if notes.strip():
         lines = [line.strip() for line in notes.replace("\\n", "\n").splitlines()]
         entries = [l if l.startswith("-") else f"- {l}" for l in lines if l]
-    elif UNRELEASED_RE.search(text):
-        return UNRELEASED_RE.sub(f"## {version}", text, count=1)
     else:
-        subjects = git("log", "--no-merges", "--format=%s", f"{last_tag}..HEAD").splitlines()
-        skip = re.compile(r"^(chore(\(.*\))?: )?release\b", re.IGNORECASE)
-        prefix = re.compile(r"^\w+(\([^)]*\))?!?:\s*")  # conventional-commit "fix(x): "
-        entries = []
-        for subject in subjects:
-            subject = subject.strip()
-            if subject and not skip.match(subject):
-                subject = prefix.sub("", subject)
-                entries.append(f"- {subject[:1].upper()}{subject[1:]}")
+        entries = entries_from_history(last_tag)
     if not entries:
         fail(
             "Nothing to release: no notes given, no `## Unreleased` section in "
-            "CHANGELOG.md, and no commits since the last tag."
+            "CHANGELOG.md, and no user-facing changes merged since the last tag."
         )
 
     section = f"## {version}\n\n" + "\n".join(entries) + "\n\n"
@@ -88,6 +95,47 @@ def new_changelog(text, version, notes, last_tag):
     if first:
         return text[: first.start()] + section + text[first.start():]
     return text.rstrip("\n") + ("\n\n" if text.strip() else "") + section
+
+
+def entries_from_history(last_tag):
+    # --first-parent: one entry per change that landed on main (a squash commit
+    # or a "Merge pull request" commit), not every commit of every branch.
+    log = git("log", "--first-parent", "--format=%s%x1f%b%x1e", f"{last_tag}..HEAD")
+    merge = re.compile(r"^Merge pull request #(\d+) from ")
+    kind = re.compile(r"^(\w+)(\([^)]*\))?!?:\s*")
+    hidden = {"ci", "test", "tests", "style", "build", "chore"}
+    release = re.compile(r"^(chore(\(.*\))?: )?release\b|^revert.*version", re.IGNORECASE)
+    entries = []
+    for record in filter(None, (r.strip("\n") for r in log.split("\x1e"))):
+        subject, _, body = record.partition("\x1f")
+        subject = subject.strip()
+        pr = merge.match(subject)
+        if pr:
+            title = next((l.strip() for l in body.splitlines() if l.strip()), "")
+            if not title:
+                continue
+            subject = f"{title} (#{pr.group(1)})"
+        elif subject.startswith("Merge "):
+            continue
+        typed = kind.match(subject)
+        if release.match(subject) or (typed and typed.group(1).lower() in hidden):
+            continue
+        subject = kind.sub("", subject)
+        entries.append(f"- {subject[:1].upper()}{subject[1:]}")
+    return entries
+
+
+def update_example_lock(name, version):
+    path = os.path.join("example", "pubspec.lock")
+    if not os.path.exists(path):
+        return
+    text = open(path, encoding="utf-8").read()
+    block = re.compile(
+        rf'(^  {re.escape(name)}:\n(?:    .*\n)*?    version: )"[^"]*"', re.MULTILINE
+    )
+    new_text, count = block.subn(rf'\g<1>"{version}"', text, count=1)
+    if count:
+        open(path, "w", encoding="utf-8").write(new_text)
 
 
 def main():
@@ -122,6 +170,8 @@ def main():
     pubspec = pubspec[: match.start(1)] + new + pubspec[match.end(1):]
     open("pubspec.yaml", "w", encoding="utf-8").write(pubspec)
     open("CHANGELOG.md", "w", encoding="utf-8").write(changelog)
+    name = re.search(r"^name:\s*(\S+)", pubspec, re.MULTILINE).group(1)
+    update_example_lock(name, new)
 
     output = f"version={new}\ntag={new_tag}\nprevious={last_tag}\n"
     print(output, end="")

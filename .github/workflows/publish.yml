@@ -1,12 +1,15 @@
 name: Publish to pub.dev
 
-# Runs when a vX.Y.Z tag is pushed (normally by release.yml) and uploads that
+# Runs when a vX.Y.Z tag is pushed (normally by release.yml), uploads that
 # version to pub.dev, then creates the GitHub release from CHANGELOG.md.
+# Safe to re-run: a version that is already on pub.dev is not uploaded again.
 #
 # One-time setup on pub.dev: package page > Admin > Automated publishing >
 # "Enable publishing from GitHub Actions", repository Abdelazeem777/requests_inspector,
-# tag pattern v{{version}}. Optionally also "Require GitHub Actions
-# environment" with the name pub.dev.
+# tag pattern v{{version}}. Optional extra gate: on pub.dev also tick
+# "Require GitHub Actions environment" with the name pub.dev, and in this
+# repo's Settings > Environments > pub.dev add yourself as a required
+# reviewer, so every upload waits for your approval.
 
 on:
   push:
@@ -16,37 +19,57 @@ concurrency:
   group: publish
   cancel-in-progress: false
 
-permissions:
-  contents: write # create the GitHub release
-  id-token: write # pub.dev authenticates the upload with GitHub's OIDC token
+permissions: {}
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     environment: pub.dev
+    permissions:
+      contents: read
+      id-token: write # pub.dev authenticates the upload with GitHub's OIDC token
     steps:
       - uses: actions/checkout@v4
-
-      # Same Flutter as the CI floor job, so formatting matches.
-      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.38.1"
-          channel: stable
-          cache: true
+          fetch-depth: 0
+          persist-credentials: false
 
-      - name: Check that the tag matches pubspec.yaml
+      - name: Check the tag
         run: |
           version=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | tr -d '[:space:]')
           if [ "v$version" != "$GITHUB_REF_NAME" ]; then
             echo "::error::Tag $GITHUB_REF_NAME does not match pubspec.yaml version $version."
             exit 1
           fi
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::Tag $GITHUB_REF_NAME points at a commit that is not on main."
+            exit 1
+          fi
+
+      - name: Skip if this version is already on pub.dev
+        id: published
+        run: |
+          name=$(sed -n 's/^name:[[:space:]]*//p' pubspec.yaml | tr -d '[:space:]')
+          if curl --silent --fail "https://pub.dev/api/packages/$name" \
+              | jq -e --arg v "${GITHUB_REF_NAME#v}" 'any(.versions[]; .version == $v)' > /dev/null; then
+            echo "$name ${GITHUB_REF_NAME#v} is already on pub.dev; skipping the upload."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: subosito/flutter-action@v2
+        if: steps.published.outputs.skip != 'true'
+        with:
+          flutter-version: "3.38.10"
+          channel: stable
+          cache: true
 
       - name: Install dependencies
-        run: flutter pub get
+        if: steps.published.outputs.skip != 'true'
+        run: flutter pub get --enforce-lockfile
 
       # Same steps as dart-lang/setup-dart, which only installs the Dart SDK.
       - name: Get a pub.dev token from GitHub OIDC
+        if: steps.published.outputs.skip != 'true'
         run: |
           token=$(curl --silent --show-error --fail \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
@@ -56,7 +79,18 @@ jobs:
           flutter pub token add https://pub.dev --env-var PUB_TOKEN
 
       - name: Publish
+        if: steps.published.outputs.skip != 'true'
         run: flutter pub publish --force
+
+  github-release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the GitHub release
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Create the GitHub release
         env:

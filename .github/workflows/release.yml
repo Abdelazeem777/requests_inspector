@@ -3,9 +3,9 @@ name: Release
 # Manual release. Run it from the Actions tab ("Release" > "Run workflow").
 #
 # 1. Takes the newest vX.Y.Z tag and bumps it (patch / minor / major).
-# 2. Writes the new version to pubspec.yaml and a section to CHANGELOG.md
-#    (from the "notes" input, else a "## Unreleased" section, else the
-#    commit subjects since the last tag).
+# 2. Writes the new version to pubspec.yaml (and example/pubspec.lock) and a
+#    section to CHANGELOG.md: the "notes" input, else the "## Unreleased"
+#    section, else the titles of the changes merged since the last tag.
 # 3. Runs format, analyze, tests and `flutter pub publish --dry-run`.
 # 4. Pushes the version commit to main and the vX.Y.Z tag in one atomic push.
 #    The tag push starts publish.yml, which uploads the package to pub.dev.
@@ -13,7 +13,12 @@ name: Release
 # Needs a RELEASE_TOKEN repository secret: a fine-grained personal access
 # token of a maintainer who may push to main, with "Contents: read and
 # write" on this repository. GITHUB_TOKEN can't be used: tags pushed with it
-# don't start other workflows, and it can't bypass main's protection.
+# don't start other workflows, and it can't bypass main's protection. The
+# token is only used by the final push step.
+#
+# If publishing fails after this workflow pushed the tag, fix the cause and
+# re-run the failed "Publish to pub.dev" run; don't run Release again (that
+# would skip a version number).
 
 on:
   workflow_dispatch:
@@ -57,12 +62,12 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-          token: ${{ secrets.RELEASE_TOKEN || github.token }}
+          persist-credentials: false
 
-      # Same Flutter as the CI floor job, so formatting matches.
+      # Must match the Flutter that generated the committed lockfiles.
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.38.1"
+          flutter-version: "3.38.10"
           channel: stable
           cache: true
 
@@ -73,21 +78,22 @@ jobs:
           NOTES: ${{ inputs.notes }}
         run: python3 .github/scripts/prepare_release.py --bump "$BUMP" --notes "$NOTES"
 
-      # Before the commit: example/pubspec.lock pins this package's version, so
-      # it changes with the bump and must be part of the release commit.
-      - name: Install dependencies
-        run: |
-          flutter pub get
-          flutter pub get --directory example
-
       - name: Commit
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "chore: release $VERSION"
+          git add pubspec.yaml CHANGELOG.md
+          if [ -f example/pubspec.lock ]; then git add example/pubspec.lock; fi
+          git commit -m "chore: release $VERSION"
           git show --stat HEAD
+
+      # --enforce-lockfile: fail instead of rewriting the committed lockfiles.
+      - name: Install dependencies
+        run: |
+          flutter pub get --enforce-lockfile
+          flutter pub get --enforce-lockfile --directory example
 
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib test
@@ -104,11 +110,13 @@ jobs:
       - name: Push the version commit and tag
         if: ${{ !inputs.dry_run }}
         env:
+          RELEASE_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           TAG: ${{ steps.version.outputs.tag }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
           git tag -a "$TAG" -m "$VERSION"
-          git push --atomic origin HEAD:main "refs/tags/$TAG"
+          git push --atomic "https://x-access-token:${RELEASE_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            HEAD:main "refs/tags/$TAG"
 
       - name: Summary
         env:
