@@ -1,7 +1,16 @@
 # Opens the inspector with a long press on the Playground title.
+# On a heavily loaded emulator a long press can get lost, so it is tried
+# again (only while the inspector isn't shown).
 appId: com.example.example
 ---
-- longPressOn: "Playground"
-- extendedWaitUntil:
-    visible: "Inspector.*"
-    timeout: 10000
+- retry:
+    maxRetries: 2
+    commands:
+      - runFlow:
+          when:
+            notVisible: "Inspector.*"
+          commands:
+            - longPressOn: "Playground"
+      - extendedWaitUntil:
+          visible: "Inspector.*"
+          timeout: 10000
