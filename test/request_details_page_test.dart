@@ -131,18 +131,31 @@ void main() {
         'Response Body',
       ]) {
         expect(
-          tester.getSemantics(find.byTooltip('Copy $section')),
-          containsSemantics(tooltip: 'Copy $section', hasTapAction: true),
+          find.byTooltip('Copy $section'),
+          findsOneWidget,
+          reason: section,
+        );
+        // Its own node, not merged into the section header's node.
+        final copy = find.bySemanticsLabel('Copy $section');
+        expect(copy, findsOneWidget, reason: section);
+        expect(
+          tester.getSemantics(copy),
+          containsSemantics(
+            label: 'Copy $section',
+            isButton: true,
+            hasTapAction: true,
+          ),
           reason: section,
         );
       }
+      expect(find.bySemanticsLabel(RegExp('Headers.*Copy')), findsNothing);
 
       InspectorController().selectedRequest = sampleRequest(
         requestMethod: RequestMethod.POST,
         requestBody: FormData.fromMap({'name': 'John'}),
       );
       await tester.pumpAndSettle();
-      expect(find.byTooltip('Copy Request Body'), findsOneWidget);
+      expect(find.bySemanticsLabel('Copy Request Body'), findsOneWidget);
       semantics.dispose();
     });
 

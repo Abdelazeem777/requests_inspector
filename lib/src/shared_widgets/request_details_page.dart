@@ -349,16 +349,30 @@ class RequestDetailsPage extends StatelessWidget {
                         ),
                       ),
                 ),
+                // The copy icon sits inside the tile's header, so without its
+                // own semantics node its label and tap merge into the header's
+                // node, and screen readers and UI automation tools can't reach
+                // it. The tooltip is excluded so the name isn't read twice.
                 Tooltip(
                   message: 'Copy $copyName',
-                  child: InkWell(
-                    child: const Icon(Icons.copy, color: Colors.grey, size: 20),
-                    onTap: () {
-                      Clipboard.setData(ClipboardData(text: txtCopy));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Copied to clipboard')),
-                      );
-                    },
+                  excludeFromSemantics: true,
+                  child: Semantics(
+                    container: true,
+                    button: true,
+                    label: 'Copy $copyName',
+                    child: InkWell(
+                      child: const Icon(
+                        Icons.copy,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: txtCopy));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Copied to clipboard')),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],
