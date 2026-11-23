@@ -1,5 +1,6 @@
-# Restarts the example and opens the Playground page (lib/playground.dart),
-# which sends requests with every client.
+# Restarts the Playground app (build it with
+# `flutter run -t lib/playground_main.dart`), which sends requests with every
+# client.
 # launchApp stops the app first, and the inspector keeps everything in
 # memory, so each flow starts with no requests and the default settings.
 # (clearState isn't needed, and on a busy emulator the first start of a
@@ -8,9 +9,5 @@ appId: com.example.example
 ---
 - launchApp
 - extendedWaitUntil:
-    visible: "Playground"
-    timeout: 30000
-- tapOn: "Playground"
-- extendedWaitUntil:
     visible: "Tap a button to send a request"
-    timeout: 10000
+    timeout: 30000

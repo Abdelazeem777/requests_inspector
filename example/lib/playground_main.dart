@@ -1,11 +1,44 @@
-part of 'main.dart';
 
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:requests_inspector/requests_inspector.dart';
+
+import 'main.dart'
+    show
+        fetchPostsGraphQlUsingGraphQLFlutterInterceptor,
+        fetchPostsGraphQlWithVariablesUsingGraphQLFlutterInterceptor,
+        Post;
+
+// Run with `flutter run -t lib/playground_main.dart`.
+//
 // The Maestro flows in .maestro/ drive this page. It sends a request with
 // every client the example offers (Dio, FormData, GraphQL, a manual
 // `addNewRequest`) and shows what the app really got back. The POST requests
 // go to https://postman-echo.com, which answers with the request it received,
 // so a flow can check what the request stopper sent and what the response
 // stopper handed to the app (including the JSON type of every value).
+
+final _navigatorKey = GlobalKey<NavigatorState>();
+
+void main() {
+  runApp(
+    RequestsInspector(
+      // Add your `navigatorKey` to enable `Stopper` feature
+      navigatorKey: _navigatorKey,
+      child: MaterialApp(
+        navigatorKey: _navigatorKey,
+        debugShowCheckedModeBanner: false,
+        title: 'Playground',
+        theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: false),
+        home: const PlaygroundPage(),
+      ),
+    ),
+  );
+}
 
 const _echoUrl = 'https://postman-echo.com';
 
@@ -76,8 +109,7 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
   }
 
   Future<List<String>> _dioFormData() async {
-    // The logo is downloaded without the inspector, so only the upload shows.
-    final formData = await _getDummyFormData(Dio());
+    final formData = await _getFormData();
     final response = await _dio.post('$_echoUrl/post', data: formData);
     final data = response.data;
     final files = data is Map ? data['files'] : null;
@@ -86,6 +118,32 @@ class _PlaygroundPageState extends State<PlaygroundPage> {
       'echo form: ${jsonEncode(data is Map ? data['form'] : data)}',
       'echo files: ${files is Map ? files.keys.join(', ') : files}',
     ];
+  }
+
+  /// Fields, a text file and an image (the package logo, downloaded without
+  /// the inspector, so only the upload shows).
+  Future<FormData> _getFormData() async {
+    final logo = await Dio().get<List<int>>(
+      'https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/logo_with_text_right.png',
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return FormData()
+      ..fields.addAll(List.generate(4, (i) => MapEntry('test[$i]', '$i')))
+      ..files.addAll([
+        if (logo.data != null)
+          MapEntry(
+            'test_image',
+            MultipartFile.fromBytes(
+              logo.data!,
+              filename: 'flutter_logo.png',
+              contentType: DioMediaType('image', 'png'),
+            ),
+          ),
+        MapEntry(
+          'test_file',
+          MultipartFile.fromString('test', filename: 'test.txt'),
+        ),
+      ]);
   }
 
   /// A small JSON response (numbers and a bool) for the response stopper.
@@ -240,7 +298,9 @@ String _describeHar(String text) {
   final entry = entries.first as Map;
   final request = entry['request'] as Map;
   final response = entry['response'] as Map;
-  return 'version=${log['version']} entries=${entries.length} '
+  final creator = log['creator'] as Map;
+  return 'version=${log['version']} '
+      'creator=${creator['name']}/${creator['version']} entries=${entries.length} '
       'method=${request['method']} url=${request['url']} '
       'status=${response['status']} '
       'postData=${jsonEncode(request['postData'])}';

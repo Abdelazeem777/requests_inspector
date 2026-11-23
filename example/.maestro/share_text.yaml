@@ -4,7 +4,8 @@
 # Playground shows it, and saves it so the cURL command can be run on the
 # host). The request is a POST with a header, a query parameter and a JSON
 # body whose "note" has both quote characters, so the cURL command has to
-# shell-escape it ('\'').
+# shell-escape it ('\''). The body goes after `--data-raw`, which
+# (unlike `-d`) sends a value starting with @ as it is.
 appId: com.example.example
 name: Share as cURL, Normal Log and Both
 ---
@@ -28,14 +29,14 @@ name: Share as cURL, Normal Log and Both
     visible: "(?s)curl -X POST .*"
     timeout: 10000
 - assertVisible: >-
-    (?s)curl -X POST 'https://postman-echo\.com/post\?step=original' -H 'x-e2e: original' -H 'content-type: application/json' -d '\{"name":"original","count":1,"active":true,"note":"it'\\''s \\"quoted\\"","profile":\{"age":30,"verified":false\}\}' -L -k\s*
+    (?s)curl -X POST 'https://postman-echo\.com/post\?step=original' -H 'x-e2e: original' -H 'content-type: application/json' --data-raw '\{"name":"original","count":1,"active":true,"note":"it'\\''s \\"quoted\\"","profile":\{"age":30,"verified":false\}\}' -L -k\s*
 - takeScreenshot: share-curl-sheet
 - runFlow: subflows/copy_from_share_sheet.yaml
 - runFlow: subflows/close_inspector.yaml
 - runFlow: subflows/read_clipboard.yaml
 - assertVisible: "clipboard kind: curl"
 - assertVisible: >-
-    (?s)clipboard text: curl -X POST 'https://postman-echo\.com/post\?step=original' -H 'x-e2e: original' -H 'content-type: application/json' -d '\{"name":"original","count":1,"active":true,"note":"it'\\''s \\"quoted\\"","profile":\{"age":30,"verified":false\}\}' -L -k\s*
+    (?s)clipboard text: curl -X POST 'https://postman-echo\.com/post\?step=original' -H 'x-e2e: original' -H 'content-type: application/json' --data-raw '\{"name":"original","count":1,"active":true,"note":"it'\\''s \\"quoted\\"","profile":\{"age":30,"verified":false\}\}' -L -k\s*
 
 # Normal Log: one "=[ field ]===" section per field, values as JSON.
 - runFlow: subflows/open_inspector.yaml
@@ -70,3 +71,28 @@ name: Share as cURL, Normal Log and Both
 - assertVisible: "clipboard kind: both"
 - assertVisible: >-
     (?s)clipboard text: =+\[cURL Command\]=+\s+curl -X POST 'https://postman-echo\.com/post\?step=original' .* -L -k\s+=+\[Normal Log\]=+\s+=\[ requestName \]=+\s+"POST".*=\[ receivedTime \]=+.*
+
+# HEAD: shared as `curl -I` (not `-X HEAD`, which makes curl wait for a body).
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "Dio HEAD"
+- runFlow: subflows/open_inspector.yaml
+- runFlow:
+    file: subflows/open_request.yaml
+    env:
+      ROW: "(?s)HEAD.*https://postman-echo.com/get.*"
+- runFlow:
+    file: subflows/share.yaml
+    env:
+      OPTION: "cURL Command"
+- extendedWaitUntil:
+    visible: "(?s)curl -I 'https://postman-echo\\.com/get' .*"
+    timeout: 10000
+- assertNotVisible: "(?s).*-X HEAD.*"
+- takeScreenshot: share-head-sheet
+- runFlow: subflows/copy_from_share_sheet.yaml
+- runFlow: subflows/close_inspector.yaml
+- runFlow: subflows/read_clipboard.yaml
+- assertVisible: "clipboard kind: curl"
+- assertVisible: "(?s)clipboard text: curl -I 'https://postman-echo\\.com/get' .* -L -k\\s*"

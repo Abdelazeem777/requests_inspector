@@ -1,8 +1,6 @@
 # The copy icon of each section on the Request Details tab puts that
 # section on the clipboard and shows "Copied to clipboard".
-# The icons have no accessibility label of their own (they are part of the
-# section's header), so each is tapped inside its header, left of the
-# expand arrow.
+# Each icon is found by its tooltip (Copy URL, Copy Headers, ...).
 appId: com.example.example
 name: Copy buttons on the details page
 ---
@@ -18,23 +16,28 @@ name: Copy buttons on the details page
       ROW: "(?s)POST.*POST.*https://postman-echo.com/post.*"
 
 # First section: the URL.
-- tapOn:
-    text: "(?s)POST - POST.*"
-    point: "83%,50%"
+- tapOn: "Copy URL"
 - assertVisible: "Copied to clipboard"
 - runFlow: subflows/close_inspector.yaml
 - runFlow: subflows/read_clipboard.yaml
-- assertVisible: 'clipboard text: "?https://postman-echo\.com/post"?'
+# The plain URL, without quotes.
+- assertVisible: 'clipboard text: https://postman-echo\.com/post'
 
 # Headers.
 - runFlow: subflows/open_inspector.yaml
-- tapOn:
-    text: "Headers"
-    point: "83%,50%"
+- tapOn: "Copy Headers"
 - assertVisible: "Copied to clipboard"
 - runFlow: subflows/close_inspector.yaml
 - runFlow: subflows/read_clipboard.yaml
 - assertVisible: '(?s)clipboard text: \{\s+"x-e2e": "original",\s+"content-type": "application/json",\s+"content-length": "\d+"\s+\}'
+
+# Query parameters.
+- runFlow: subflows/open_inspector.yaml
+- tapOn: "Copy Query Parameters"
+- assertVisible: "Copied to clipboard"
+- runFlow: subflows/close_inspector.yaml
+- runFlow: subflows/read_clipboard.yaml
+- assertVisible: '(?s)clipboard text: \{\s+"step": "original"\s+\}'
 
 # Request body.
 - runFlow: subflows/open_inspector.yaml
@@ -44,9 +47,7 @@ name: Copy buttons on the details page
     centerElement: true
 # Let the list settle, or the tap can land on the header and collapse it.
 - waitForAnimationToEnd
-- tapOn:
-    text: "Request Body"
-    point: "83%,50%"
+- tapOn: "Copy Request Body"
 - assertVisible: "Copied to clipboard"
 - runFlow: subflows/close_inspector.yaml
 - runFlow: subflows/read_clipboard.yaml
@@ -61,9 +62,7 @@ name: Copy buttons on the details page
     centerElement: true
 # Let the list settle, or the tap can land on the header and collapse it.
 - waitForAnimationToEnd
-- tapOn:
-    text: "Response Body"
-    point: "83%,50%"
+- tapOn: "Copy Response Body"
 - assertVisible: "Copied to clipboard"
 - runFlow: subflows/close_inspector.yaml
 - runFlow: subflows/read_clipboard.yaml

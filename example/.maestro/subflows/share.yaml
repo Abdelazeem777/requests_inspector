@@ -1,10 +1,8 @@
 # On the Request Details tab: taps the share button and picks env OPTION.
-# The share button has no accessibility label (no tooltip), so it is tapped
-# where the floating action button sits, 16dp from the bottom right corner.
+# The share button is found by its "Share" tooltip.
 appId: com.example.example
 ---
-- tapOn:
-    point: "89%,91%"
+- tapOn: "Share"
 - extendedWaitUntil:
     visible: "Choose your preferred share format"
     timeout: 5000

@@ -50,7 +50,6 @@ name: Request stopper
     file: subflows/focus_field_end.yaml
     env:
       FIELD: '(?s)\{.*"step": "original".*'
-      SCROLL: "bit"
 - eraseText: 40
 - inputText: '{"step": "edited", "page": 2}'
 - assertVisible: '\{"step": "edited", "page": 2\}'
@@ -58,7 +57,6 @@ name: Request stopper
     file: subflows/focus_field_end.yaml
     env:
       FIELD: '(?s)\{.*"name": "original".*'
-      SCROLL: "end"
 - eraseText: 160
 - inputText: '{"name": "edited", "count": 2, "active": false, "note": "it''s \"edited\"", "profile": {"age": 31, "verified": true}}'
 - assertVisible: '.*"profile": \{"age": 31, "verified": true\}\}'

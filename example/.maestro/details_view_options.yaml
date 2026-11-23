@@ -60,25 +60,23 @@ name: Details page view options, search and run again
 - tapOn: "Dismiss menu"
 - assertVisible: '"age" : 30,'
 
-# Dark Mode off and on again. The theme changes at once, but the menu that
-# is open keeps showing the old switch state (unlike the two switches
-# above), so the state is checked in a freshly opened menu.
+# Dark Mode off and on again. The switch flips while the menu stays open.
 - tapOn: "Show menu"
 - assertVisible:
     text: "Dark Mode"
     checked: true
 - tapOn: "Dark Mode"
+- assertVisible:
+    text: "Dark Mode"
+    checked: false
+- takeScreenshot: details-light-mode-menu
 - tapOn: "Dismiss menu"
+- takeScreenshot: details-light-mode
 - tapOn: "Show menu"
 - assertVisible:
     text: "Dark Mode"
     checked: false
-- tapOn: "Dismiss menu"
-- takeScreenshot: details-light-mode
-- tapOn: "Show menu"
 - tapOn: "Dark Mode"
-- tapOn: "Dismiss menu"
-- tapOn: "Show menu"
 - assertVisible:
     text: "Dark Mode"
     checked: true

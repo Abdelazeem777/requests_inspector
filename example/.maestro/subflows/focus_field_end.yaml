@@ -1,20 +1,13 @@
 # Puts the cursor at the end of a stopper editor field (env FIELD: a regex
 # of the field's current text), ready for eraseText + inputText.
 #
-# The first tap only focuses the field: opening the keyboard rebuilds the
-# editor, which gives each field a new TextEditingController and drops the
-# cursor, so text typed now goes nowhere (Android) or to the start of the
-# field (iOS). The second tap, with the keyboard already up, puts the cursor
-# at the end: the bottom right corner of the field is past its last line.
-#
-# That corner must be on screen, above the keyboard. Env SCROLL moves the
-# dialog's content first: "end" scrolls to the end (for the last field),
-# "bit" scrolls up a little with a slow swipe inside the dialog (for a field
-# left half-hidden at the keyboard's edge).
+# One tap is enough: the bottom right corner of the field is past its last
+# line, so the cursor lands at the end of the text, and it stays there when
+# the keyboard opens.
 appId: com.example.example
 ---
-# A field below the keyboard is not in the accessibility tree yet: scroll
-# the dialog with slow swipes inside it (not on the keyboard) until it is.
+# A field below the screen's lower part is not in the accessibility tree
+# yet: scroll the dialog with slow swipes inside it until it is.
 - repeat:
     while:
       notVisible: ${FIELD}
@@ -23,33 +16,6 @@ appId: com.example.example
       - swipe:
           start: "50%,30%"
           end: "50%,15%"
-          duration: 1500
-      - waitForAnimationToEnd
-- tapOn:
-    text: ${FIELD}
-- waitForAnimationToEnd
-- runFlow:
-    when:
-      true: ${typeof SCROLL !== 'undefined' && SCROLL == 'end'}
-    # Fling from above the focused field: on iOS a drag that starts on the
-    # focused field moves its cursor instead of scrolling.
-    commands:
-      - swipe:
-          start: "50%,30%"
-          end: "50%,12%"
-          duration: 300
-      - swipe:
-          start: "50%,30%"
-          end: "50%,12%"
-          duration: 300
-      - waitForAnimationToEnd
-- runFlow:
-    when:
-      true: ${typeof SCROLL !== 'undefined' && SCROLL == 'bit'}
-    commands:
-      - swipe:
-          start: "50%,30%"
-          end: "50%,22%"
           duration: 1500
       - waitForAnimationToEnd
 - tapOn:

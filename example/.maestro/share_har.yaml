@@ -2,7 +2,8 @@
 # "HAR file (.har)" shares it as a file.
 # The HAR text is copied from the share sheet and checked on the Playground:
 # it must be valid JSON (HAR 1.2, one entry) with the request's method, URL,
-# JSON body, response status and the cURL command.
+# JSON body, response status and the cURL command, and creator.version must
+# be the package version. The HAR file is shared as request.har.
 appId: com.example.example
 name: Share as HAR text and HAR file
 ---
@@ -27,7 +28,7 @@ name: Share as HAR text and HAR file
     timeout: 5000
 - tapOn: "HAR text copy"
 - extendedWaitUntil:
-    visible: '(?s)\{\s+"log": \{\s+"version": "1\.2",.*'
+    visible: '(?s)\{\s+"log": \{\s+"version": "1\.2",\s+"creator": \{\s+"name": "requests_inspector",\s+"version": "6\.0\.0".*'
     timeout: 10000
 - takeScreenshot: share-har-text-sheet
 - runFlow: subflows/copy_from_share_sheet.yaml
@@ -35,7 +36,7 @@ name: Share as HAR text and HAR file
 - runFlow: subflows/read_clipboard.yaml
 - assertVisible: "clipboard kind: har"
 - assertVisible: >-
-    clipboard har: version=1\.2 entries=1 method=POST url=https://postman-echo\.com/post\?step=original status=200 postData=\{"mimeType":"application/json","text":"\{\\"name\\":\\"original\\",\\"count\\":1,\\"active\\":true,\\"note\\":\\"it's \\\\\\"quoted\\\\\\"\\",\\"profile\\":\{\\"age\\":30,\\"verified\\":false\}\}"\}
+    clipboard har: version=1\.2 creator=requests_inspector/6\.0\.0 entries=1 method=POST url=https://postman-echo\.com/post\?step=original status=200 postData=\{"mimeType":"application/json","text":"\{\\"name\\":\\"original\\",\\"count\\":1,\\"active\\":true,\\"note\\":\\"it's \\\\\\"quoted\\\\\\"\\",\\"profile\\":\{\\"age\\":30,\\"verified\\":false\}\}"\}
 - assertVisible: '(?s)clipboard text: .*"name": "x-e2e",\s+"value": "original".*"comment": "cURL: curl -X POST .*'
 
 # HAR file: the share sheet offers a file instead of text.
