@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 import '../requests_inspector.dart';
+import 'version.dart';
 
 class HarGenerator {
   const HarGenerator();
@@ -24,7 +25,7 @@ class HarGenerator {
     final Map<String, dynamic> har = {
       'log': {
         'version': '1.2',
-        'creator': {'name': 'requests_inspector', 'version': '5.1.1'},
+        'creator': {'name': 'requests_inspector', 'version': packageVersion},
         'pages': [
           {
             'startedDateTime': startedDateTime,
@@ -45,7 +46,8 @@ class HarGenerator {
               'cookies': [],
               'headers': requestHeaders,
               'queryString': queryString,
-              'postData': postData,
+              // Optional in HAR 1.2: left out when there is no body.
+              if (postData != null) 'postData': postData,
               'headersSize': -1,
               'bodySize': _bodySize(postData),
             },

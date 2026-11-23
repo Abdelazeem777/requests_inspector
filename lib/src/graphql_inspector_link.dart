@@ -50,15 +50,8 @@ class GraphQLInspectorLink extends Link {
         );
         yield response;
       }
-    } on HttpLinkServerException catch (exception) {
-      _logHttpServerException(
-        request: request,
-        link: link,
-        sentTime: requestHandlerStartedAt,
-        exception: exception,
-      );
-      rethrow;
     } on ServerException catch (exception) {
+      // Also catches its subclass HttpLinkServerException.
       _logHttpServerException(
         request: request,
         link: link,

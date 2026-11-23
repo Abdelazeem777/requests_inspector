@@ -138,43 +138,43 @@ class RequestsInspectorInterceptor extends Interceptor {
     return null;
   }
 
+  /// The request as shown in the Request Stopper editor: the URL without its
+  /// query, and the whole query (the parameters written in the path and
+  /// [RequestOptions.queryParameters]) in `queryParameters`, so the query is
+  /// edited in one place.
   RequestDetails? _convertToRequestDetails(RequestOptions options) {
     final method = _parseMethod(options.method);
     if (method == null) return null;
+    final pathQuery = (Uri.tryParse(options.path)?.queryParametersAll ?? {})
+        .map(
+          (k, v) => MapEntry<String, dynamic>(k, v.length == 1 ? v.first : v),
+        );
     return RequestDetails(
       requestMethod: method,
-      url: options.uri.toString(),
+      url: options.uri.toString().split('?').first,
       headers: options.headers,
-      queryParameters: options.queryParameters,
+      queryParameters: {...pathQuery, ...options.queryParameters},
       requestBody: options.data,
       sentTime: DateTime.now(),
     );
   }
 
+  /// Sends [requestDetails] exactly as edited: its URL (with whatever query
+  /// was typed into it) and its query parameters, nothing merged back from
+  /// the original request.
   RequestOptions _copyRequestToNewOptions(
     RequestOptions options,
     RequestDetails requestDetails,
   ) {
-    // `requestDetails.url` already contains the query string, so it is split
-    // off and merged into `queryParameters`; otherwise Dio would append the
-    // query a second time (`?a=1&a=1`).
-    final url = requestDetails.url;
-    final queryStart = url.indexOf('?');
-    final urlQuery = queryStart == -1
-        ? const <String, dynamic>{}
-        : (Uri.tryParse(url)?.queryParametersAll ?? const {}).map(
-            (k, v) => MapEntry<String, dynamic>(k, v.length == 1 ? v.first : v),
-          );
     final editedQuery = requestDetails.queryParameters;
     return options.copyWith(
       method: requestDetails.requestMethod.name,
       headers: requestDetails.headers,
-      queryParameters: {
-        ...urlQuery,
-        if (editedQuery is Map) ...editedQuery.cast<String, dynamic>(),
-      },
+      queryParameters: editedQuery is Map
+          ? Map<String, dynamic>.from(editedQuery)
+          : <String, dynamic>{},
       data: requestDetails.requestBody,
-      path: queryStart == -1 ? url : url.substring(0, queryStart),
+      path: requestDetails.url,
       extra: {...options.extra, 'startTime': DateTime.now()},
     );
   }

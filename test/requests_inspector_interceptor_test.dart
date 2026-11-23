@@ -187,13 +187,38 @@ void main() {
 
       await inspectedDio(adapter).get('/users', queryParameters: {'a': '1'});
 
-      expect(stopped!.url, 'https://api.example.com/users?a=1');
+      expect(stopped!.url, 'https://api.example.com/users');
       expect(stopped!.queryParameters, {'a': '1'});
       expect(
         adapter.requests.single.uri.toString(),
         'https://api.example.com/users?a=1',
       );
     });
+
+    test(
+      'shows the URL without its query and the whole query to edit',
+      () async {
+        RequestDetails? stopped;
+        controller.dispose();
+        controller = createController(
+          onStoppingRequest: (details) async {
+            stopped = details;
+            return null;
+          },
+        )..requestStopperEnabled = true;
+
+        await inspectedDio(
+          FakeHttpClientAdapter.json({}),
+        ).get('/users?lang=en&tag=a&tag=b', queryParameters: {'page': 2});
+
+        expect(stopped!.url, 'https://api.example.com/users');
+        expect(stopped!.queryParameters, {
+          'lang': 'en',
+          'tag': ['a', 'b'],
+          'page': 2,
+        });
+      },
+    );
 
     test('sends the edited request', () async {
       controller.dispose();
@@ -216,6 +241,70 @@ void main() {
       expect(sent.data, {'edited': true});
       expect(onlyLogged().requestMethod, RequestMethod.PUT);
       expect(onlyLogged().url, 'https://other.example.com/edited');
+    });
+
+    Future<String> sentUri(
+      Future<RequestDetails?> Function(RequestDetails details) edit,
+    ) async {
+      controller.dispose();
+      controller = createController(onStoppingRequest: edit)
+        ..requestStopperEnabled = true;
+      final adapter = FakeHttpClientAdapter.json({});
+
+      await inspectedDio(
+        adapter,
+      ).get('/users?lang=en', queryParameters: {'a': '1'});
+
+      return adapter.requests.single.uri.toString();
+    }
+
+    test('sends no query when the query parameters are cleared', () async {
+      expect(
+        await sentUri(
+          (details) async =>
+              details.copyWith(queryParameters: <String, dynamic>{}),
+        ),
+        'https://api.example.com/users',
+      );
+    });
+
+    test('sends the query parameters exactly as edited', () async {
+      expect(
+        await sentUri(
+          (details) async => details.copyWith(queryParameters: {'a': '2'}),
+        ),
+        'https://api.example.com/users?a=2',
+      );
+    });
+
+    test('sends the edited URL with the query parameters', () async {
+      expect(
+        await sentUri(
+          (details) async =>
+              details.copyWith(url: 'https://other.example.com/v2/users'),
+        ),
+        'https://other.example.com/v2/users?lang=en&a=1',
+      );
+    });
+
+    test('sends an unedited request as it was', () async {
+      Future<String> send({required bool stop}) async {
+        controller.dispose();
+        controller = createController(onStoppingRequest: (d) async => d)
+          ..requestStopperEnabled = stop;
+        final adapter = FakeHttpClientAdapter.json({});
+        await inspectedDio(adapter).get(
+          '/search?lang=en&tag=a&tag=b',
+          queryParameters: {
+            'q': 'a b&c',
+            'page': 2,
+            'ids': [1, 2],
+          },
+        );
+        return adapter.requests.single.uri.toString();
+      }
+
+      expect(await send(stop: true), await send(stop: false));
     });
 
     test('keeps query parameters when the edited request is sent', () async {

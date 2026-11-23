@@ -55,6 +55,33 @@ void main() {
       }
     });
 
+    test('uses -X OPTIONS for OPTIONS requests', () {
+      expect(curlArgs(bare(method: RequestMethod.OPTIONS)), [
+        'curl',
+        '-X',
+        'OPTIONS',
+        'https://api.example.com/users',
+        '-L',
+        '-k',
+      ]);
+    });
+
+    test('uses -I for HEAD requests', () {
+      // With `-X HEAD`, curl waits for a response body that never comes.
+      expect(curlArgs(bare(method: RequestMethod.HEAD)), [
+        'curl',
+        '-I',
+        'https://api.example.com/users',
+        '-L',
+        '-k',
+      ]);
+      // curl refuses a body together with -I.
+      expect(
+        curlArgs(bare(method: RequestMethod.HEAD, body: {'a': 1})),
+        isNot(contains('--data-raw')),
+      );
+    });
+
     test('rejects WebSocket requests', () {
       expect(() => curlFor(bare(method: RequestMethod.WS)), throwsException);
     });
@@ -109,11 +136,15 @@ void main() {
             },
           ),
         ),
-        containsAllInOrder(['-d', '{"name":"John","tags":["a"]}', '-L']),
+        containsAllInOrder([
+          '--data-raw',
+          '{"name":"John","tags":["a"]}',
+          '-L',
+        ]),
       );
       expect(
         curlArgs(bare(method: RequestMethod.POST, body: [1, 2])),
-        containsAllInOrder(['-d', '[1,2]']),
+        containsAllInOrder(['--data-raw', '[1,2]']),
       );
     });
 
@@ -133,7 +164,7 @@ void main() {
           ),
         ),
         containsAllInOrder([
-          '-d',
+          '--data-raw',
           '{"active":true,"n":1,"d":1.5,"x":null,"nested":{"off":false}}',
         ]),
       );
@@ -149,11 +180,14 @@ void main() {
           ),
         );
 
-        expect(args, containsAllInOrder(['-d', 'name=John+Doe&age=30']));
+        expect(
+          args,
+          containsAllInOrder(['--data-raw', 'name=John+Doe&age=30']),
+        );
       }
     });
 
-    test('uses -F for multipart form data', () {
+    test('uses --form-string for form fields and -F for files', () {
       final formData = FormData.fromMap({'field': 'value'})
         ..files.add(
           MapEntry(
@@ -174,7 +208,7 @@ void main() {
       expect(
         args,
         containsAllInOrder([
-          '-F',
+          '--form-string',
           'field=value',
           '-F',
           'avatar=@me.png',
@@ -193,7 +227,35 @@ void main() {
         ),
       );
 
+      expect(args, isNot(contains('--data-raw')));
+      expect(args, isNot(contains('--form-string')));
+      expect(args, isNot(contains('-F')));
+    });
+
+    // With -d or -F, curl reads `@file` values from the local file system.
+    test('sends a body that starts with @ as text', () {
+      final args = curlArgs(
+        bare(
+          method: RequestMethod.POST,
+          headers: {'content-type': 'text/plain'},
+          body: '@/etc/passwd',
+        ),
+      );
+
+      expect(args, containsAllInOrder(['--data-raw', '@/etc/passwd']));
       expect(args, isNot(contains('-d')));
+    });
+
+    test('sends a form field that starts with @ as text', () {
+      final args = curlArgs(
+        bare(
+          method: RequestMethod.POST,
+          headers: {'content-type': 'multipart/form-data; boundary=x'},
+          body: FormData.fromMap({'note': '@secret.txt'}),
+        ),
+      );
+
+      expect(args, containsAllInOrder(['--form-string', 'note=@secret.txt']));
       expect(args, isNot(contains('-F')));
     });
 
@@ -206,7 +268,7 @@ void main() {
         ),
       );
 
-      expect(args, containsAllInOrder(['-d', '{"msg":"it\'s"}']));
+      expect(args, containsAllInOrder(['--data-raw', '{"msg":"it\'s"}']));
     });
 
     test(r'quotes header values that contain " or $', () {
@@ -229,7 +291,7 @@ void main() {
             body: 'plain text',
           ),
         ),
-        containsAllInOrder(['-d', 'plain text']),
+        containsAllInOrder(['--data-raw', 'plain text']),
       );
       expect(
         curlArgs(
@@ -239,7 +301,7 @@ void main() {
             body: '{"a":1}',
           ),
         ),
-        containsAllInOrder(['-d', '{"a":1}']),
+        containsAllInOrder(['--data-raw', '{"a":1}']),
       );
     });
 
