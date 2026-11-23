@@ -11,7 +11,7 @@ class CurlCommandGenerator {
   CurlCommandGenerator(this.details);
 
   String generate() {
-    StringBuffer curlCommand = StringBuffer("curl -X ");
+    StringBuffer curlCommand = StringBuffer("curl ");
 
     // Adding Method Type
     _addMethodType(curlCommand);
@@ -34,25 +34,26 @@ class CurlCommandGenerator {
   void _addMethodType(StringBuffer curlCommand) {
     switch (details.requestMethod) {
       case RequestMethod.GET:
-        curlCommand.write("GET ");
+        curlCommand.write("-X GET ");
         break;
       case RequestMethod.POST:
-        curlCommand.write("POST ");
+        curlCommand.write("-X POST ");
         break;
       case RequestMethod.PATCH:
-        curlCommand.write("PATCH ");
+        curlCommand.write("-X PATCH ");
         break;
       case RequestMethod.PUT:
-        curlCommand.write("PUT ");
+        curlCommand.write("-X PUT ");
         break;
       case RequestMethod.DELETE:
-        curlCommand.write("DELETE ");
+        curlCommand.write("-X DELETE ");
         break;
       case RequestMethod.HEAD:
-        curlCommand.write("HEAD ");
+        // With `-X HEAD`, curl waits for a response body that never comes.
+        curlCommand.write("-I ");
         break;
       case RequestMethod.OPTIONS:
-        curlCommand.write("OPTIONS ");
+        curlCommand.write("-X OPTIONS ");
         break;
       default:
         throw Exception("Invalid Request Method");
@@ -88,7 +89,11 @@ class CurlCommandGenerator {
     return '?${params.join('&')}';
   }
 
+  // `--data-raw` and `--form-string` (unlike `-d` and `-F`) send a value that
+  // starts with `@` as is, instead of reading the local file it names.
   void _addRequestBody(StringBuffer curlCommand) {
+    // curl can't send a body with `-I` (HEAD).
+    if (details.requestMethod == RequestMethod.HEAD) return;
     if (details.requestBody != null) {
       String contentType =
           details.headers?['content-type'] ??
@@ -106,13 +111,13 @@ class CurlCommandGenerator {
           0,
           bodyString.length - 1,
         ); // Remove last &
-        curlCommand.write("-d ${_quote(bodyString)} ");
+        curlCommand.write("--data-raw ${_quote(bodyString)} ");
       } else if (contentType.contains('multipart/form-data')) {
         if (details.requestBody is FormData) {
           FormData formData = details.requestBody as FormData;
           for (var mapEntry in formData.fields) {
             curlCommand.write(
-              "-F ${_quote('${mapEntry.key}=${mapEntry.value}')} ",
+              "--form-string ${_quote('${mapEntry.key}=${mapEntry.value}')} ",
             );
           }
 
@@ -124,7 +129,7 @@ class CurlCommandGenerator {
       } else {
         final body = details.requestBody;
         final bodyString = body is String ? body : jsonEncode(body);
-        curlCommand.write("-d ${_quote(bodyString)} ");
+        curlCommand.write("--data-raw ${_quote(bodyString)} ");
       }
     }
   }

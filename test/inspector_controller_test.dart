@@ -110,19 +110,12 @@ void main() {
       }
     });
 
-    test(
-      'a disabled controller can be disposed',
-      () {
-        // Same defaults as an `InspectorController()` call made before the
-        // RequestsInspector widget created the configured instance.
-        final controller = InspectorController();
-        expect(controller.dispose, returnsNormally);
-      },
-      skip:
-          'Known bug: dispose() reads `late _shakeDetector`, which is only '
-          'assigned when enabled, so a disabled controller with the default '
-          'ShowInspectorOn.Shaking throws LateInitializationError.',
-    );
+    test('a disabled controller can be disposed', () {
+      // Same defaults as an `InspectorController()` call made before the
+      // RequestsInspector widget created the configured instance.
+      final controller = InspectorController();
+      expect(controller.dispose, returnsNormally);
+    });
 
     test(
       'uses the configuration of the RequestsInspector even when '

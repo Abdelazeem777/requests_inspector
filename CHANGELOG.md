@@ -2,24 +2,32 @@
 
 ### Breaking changes
 
-- The minimum supported versions are now Dart `3.10` and Flutter `3.38.1` (required by `share_plus ^13.1.0`).
+- The minimum supported versions, Dart `3.10` and Flutter `3.38.1`, are now declared explicitly in `pubspec.yaml`. 5.5.1 already needed them through `share_plus ^13.1.0`, so this is not a new restriction.
+- `sensors_plus` is now `^7.0.0` (was `^6.1.1`). If your app, or another package it uses, depends on `sensors_plus` 6, upgrade it to 7 or dependency resolution fails.
+- `graphql_flutter`, `connectivity_plus` and `collection` are no longer dependencies (the package never used them). If you relied on getting them transitively through `requests_inspector`, add them to your own `pubspec.yaml`.
 - `RequestMethod` has two new values, `HEAD` and `OPTIONS`. If you have an exhaustive `switch` over `RequestMethod`, add the new cases.
-- The generated `cURL` commands now quote every argument with single quotes (URL, headers and body, e.g. `curl -X GET 'https://x/y' -H 'k: v'`), and `String` bodies are sent as they are instead of being JSON-encoded a second time. If you compare against the old output, update it.
+- `onStoppingRequest`: the `RequestDetails` your callback receives now has the URL without its query string; all query parameters, including the ones written in the URL, are in `queryParameters`. If your callback reads or rewrites the query in `url`, use `queryParameters` instead.
+- The generated `cURL` commands now quote every argument with single quotes (URL, headers and body, e.g. `curl -X GET 'https://x/y' -H 'k: v'`), send bodies with `--data-raw` instead of `-d` and multipart text fields with `--form-string` instead of `-F`, use `curl -I` for `HEAD` requests (without a body, which curl can't send with `-I`), and send `String` bodies as they are instead of JSON-encoding them a second time. If you compare against the old output, update it.
 
 ### Fixes and improvements
 
 - Fix the type mismatch crash when a response body is a plain `bool`, `int` or `double`, and keep String bodies intact after editing them in the Stopper. Special thanks to [Nourhan Sabrii](https://github.com/NourSabry) for this fix! 🎉
-- Update the dependencies (including `sensors_plus` to `^7.0.0`) and resolve the lint warnings and deprecations. Special thanks to [Sahad2701](https://github.com/Sahad2701) for this contribution! 🎉
+- Update the dependencies and resolve the lint warnings and deprecations. Special thanks to [Sahad2701](https://github.com/Sahad2701) for this contribution! 🎉
 - Failed GraphQL `HttpLink` requests (e.g. a `400` response) are now logged by `GraphQLInspectorLink` instead of looking as if nothing was sent (fixes [#69](https://github.com/Abdelazeem777/requests_inspector/issues/69)), and GraphQL requests now show their durations. Special thanks to [MAlazhariy](https://github.com/MAlazhariy) for this contribution! 🎉
 - Search on the request details page now shows the correct match count and no longer highlights overlapping matches.
-- Add support for `HEAD` and `OPTIONS` requests. Requests with an unknown method (e.g. `TRACE`) are no longer logged, but they don't break your request anymore.
-- The Request Stopper no longer duplicates the query parameters when it sends an edited request.
-- Generated `cURL` commands are now shell-safe: quotes, `$` and backticks in the URL, headers or body no longer break the command.
-- Keep the host app accessible (VoiceOver, TalkBack and UI automation tools) while the inspector is enabled, and add a `Close inspector` tooltip to the close button.
-- Android back button: it now closes the inspector's dialogs and menus first and then the inspector itself, instead of popping the page behind it. Predictive back is supported too.
+- Add support for `HEAD` and `OPTIONS` requests: they are logged and can be shared as a log, a `cURL` command (`curl -I` for `HEAD`) or HAR. Requests with an unknown method (e.g. `TRACE`) no longer crash; they are sent as usual, just not logged.
+- Request Stopper: the editor now shows the URL without its query and the whole query (including parameters written in the URL) in the query parameters field, and the request is sent with exactly the edited query parameters. Parameters are no longer duplicated, and deleting keys (or replacing the content with `{}`) really removes them from the request. An empty or invalid query parameters field still keeps the last valid value.
+- The Stopper editors no longer lose the cursor, or an edit in progress, when the keyboard opens or changes size.
+- Generated `cURL` commands are now shell-safe: quotes, `$` and backticks in the URL, headers or body no longer break the command, and a body or form field that starts with `@` is sent as text instead of making curl read a local file.
+- HAR export: `creator.version` is now the real package version (it was always `5.1.1`), `postData` is left out for requests without a body (as HAR 1.2 expects), and the shared HAR file is named `request.har` instead of a random `<uuid>.json`.
+- The URL copy icon on the request details page copies the plain URL, without quotes.
+- The Dark Mode switch in the inspector menu now updates as soon as you toggle it.
+- Disposing a disabled `InspectorController` (e.g. one created by calling `InspectorController()` before `RequestsInspector`) no longer throws a `LateInitializationError`.
+- Keep the host app accessible (VoiceOver, TalkBack and UI automation tools) while the inspector is enabled, and add tooltips, also read by screen readers, to the close button (`Close inspector`), the share button (`Share`) and the copy icons of the request details sections (`Copy URL`, `Copy Headers`, ...). Each copy icon is now its own button for screen readers and UI automation tools, instead of being merged into its section header.
+- Android back button: it now closes the inspector's dialogs and menus first and then the inspector itself, instead of popping the page behind it. Known limitation: with Android predictive back, a back swipe while a page is pushed in the host app pops that hidden page and leaves the inspector open.
 - `ShowInspectorOn.Shaking` now falls back to long press on web and desktop, where shaking isn't available.
-- README: wrap the whole `MaterialApp` with `RequestsInspector` rather than using `MaterialApp.builder` so the back button works as described above, and fix the code samples.
-- Add a full test suite, a Maestro smoke test and CI (Flutter `3.38.1` and stable), and fix the example app build on current Android, iOS and macOS toolchains.
+- README: wrap the whole `MaterialApp` with `RequestsInspector` rather than using `MaterialApp.builder` so the back button works as described above, fix the code samples and the images that showed up as text.
+- Add the repository, issue tracker and topics to the package metadata.
 
 ## 5.5.1
 

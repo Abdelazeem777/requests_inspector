@@ -143,10 +143,15 @@ class Inspector extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Dark Mode'),
-                  InspectorOptionSwitch(
-                    value: isDarkMode,
-                    onChanged: (value) =>
-                        InspectorController().toggleInspectorTheme(),
+                  Selector<InspectorController, bool>(
+                    selector: (_, controller) => controller.isDarkMode,
+                    builder: (context, isDarkMode, __) {
+                      return InspectorOptionSwitch(
+                        value: isDarkMode,
+                        onChanged: (value) =>
+                            InspectorController().toggleInspectorTheme(),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -417,14 +422,13 @@ class Inspector extends StatelessWidget {
           ? FloatingActionButton(
               backgroundColor: Colors.black,
               foregroundColor: Colors.white,
+              tooltip: 'Share',
               child: const Icon(Icons.share),
               onPressed: () async {
                 final box = context.findRenderObject() as RenderBox?;
 
                 final selectedRequest = InspectorController().selectedRequest!;
                 final isHttp = _isHttp(selectedRequest);
-
-                if (!context.mounted) return;
 
                 var shareType = isHttp
                     ? await _showDialogShareType(context)
@@ -452,11 +456,7 @@ class Inspector extends StatelessWidget {
   }
 
   bool _isHttp(RequestDetails selectedRequest) {
-    return selectedRequest.requestMethod == RequestMethod.GET ||
-        selectedRequest.requestMethod == RequestMethod.POST ||
-        selectedRequest.requestMethod == RequestMethod.PUT ||
-        selectedRequest.requestMethod == RequestMethod.PATCH ||
-        selectedRequest.requestMethod == RequestMethod.DELETE;
+    return selectedRequest.requestMethod != RequestMethod.WS;
   }
 
   Future<ShareType?> _showDialogShareType(BuildContext context) {

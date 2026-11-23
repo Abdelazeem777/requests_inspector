@@ -130,7 +130,7 @@ Future<List<Post>> fetchPosts() async {
 
 ### Finaly, `Shake` your phone to get the `Inspector`
 
-\<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests\_inspector/main/images/mobile\_list.jpg" width ="280" /\> \<img src = "https://raw.githubusercontent.com/Abdelazeem777/requests\_inspector/main/images/mobile\_request.jpg" width ="280" /\>
+<img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/mobile_list.jpg" width="280"/> <img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/mobile_request.jpg" width="280"/>
 
 ---
 
@@ -203,7 +203,7 @@ Widget build(BuildContext context) {
 
 - Second, just enable it from Inspector and it will stop all your requests and responses.
 
-\<img src="https://raw.githubusercontent.com/Abdelazeem777/requests\_inspector/main/images/stopper\_feature.gif" width="280"/\>
+<img src="https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/stopper_feature.gif" width="280"/>
 
 ---
 
@@ -371,7 +371,7 @@ To add yourself as a contributor, simply follow the contribution guidelines and 
 - [x] Click to Copy Content of each section.
 - [ ] Add search inside the request details page.
 - [ ] Add Http Interceptor.
-- [x] 'WillPopScope' is deprecated and shouldn't be used. Use PopScope instead. The Android predictive back feature will not work with WillPopScope.
+- [ ] Android predictive back. The back button closes the inspector, but a predictive back swipe while a page is pushed in your app pops that hidden page and leaves the inspector open (known limitation).
 
 ---
 

@@ -101,23 +101,16 @@ void main() {
     );
   });
 
-  test(
-    'HarFile names the shared file request.har',
-    () async {
-      final params = await share(ShareType.HarFile);
+  test('HarFile names the shared file request.har', () async {
+    final params = await share(ShareType.HarFile);
 
-      // On dart:io, XFile.fromData ignores `name`; share_plus then invents a
-      // random "<uuid>.json" name unless fileNameOverrides is given.
-      expect(
-        params.fileNameOverrides?.single ?? params.files!.single.name,
-        'request.har',
-      );
-    },
-    skip:
-        'Known bug: on Android/iOS the file is shared as "<uuid>.json" '
-        'because XFile.fromData(name:) is ignored on dart:io and no '
-        'fileNameOverrides is passed (inspector_controller.dart:374).',
-  );
+    // On dart:io, XFile.fromData ignores `name`; share_plus then invents a
+    // random "<uuid>.json" name unless fileNameOverrides is given.
+    expect(
+      params.fileNameOverrides?.single ?? params.files!.single.name,
+      'request.har',
+    );
+  });
 
   test('passes the share position origin through', () async {
     const origin = Rect.fromLTWH(1, 2, 3, 4);

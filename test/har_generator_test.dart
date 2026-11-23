@@ -135,32 +135,25 @@ void main() {
       expect(har['log']['creator']['name'], 'requests_inspector');
     });
 
-    test(
-      'produces valid HAR 1.2 for a request without a body',
-      () => expectValidHar12(harFor(sampleRequest(requestBody: null))),
-      skip:
-          'Known bug: postData is emitted as null when there is no body; '
-          'HAR 1.2 expects the optional object to be omitted.',
-    );
+    test('produces valid HAR 1.2 for a request without a body', () {
+      final har = harFor(sampleRequest(requestBody: null));
 
-    test(
-      'reports the package version as the creator version',
-      () {
-        final pubspec = File('pubspec.yaml').readAsStringSync();
-        final version = RegExp(
-          r'^version:\s*(\S+)',
-          multiLine: true,
-        ).firstMatch(pubspec)!;
+      expectValidHar12(har);
+      expect(entryOf(har)['request'], isNot(contains('postData')));
+    });
 
-        expect(
-          harFor(sampleRequest())['log']['creator']['version'],
-          version.group(1),
-        );
-      },
-      skip:
-          "Known bug: creator.version is hard-coded to '5.1.1' in "
-          'har_generator.dart.',
-    );
+    test('reports the package version as the creator version', () {
+      final pubspec = File('pubspec.yaml').readAsStringSync();
+      final version = RegExp(
+        r'^version:\s*(\S+)',
+        multiLine: true,
+      ).firstMatch(pubspec)!;
+
+      expect(
+        harFor(sampleRequest())['log']['creator']['version'],
+        version.group(1),
+      );
+    });
 
     test('uses the request id and name for the page', () {
       final request = sampleRequest();

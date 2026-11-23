@@ -101,6 +101,64 @@ void main() {
       expect(find.text('Copied to clipboard'), findsOneWidget);
     });
 
+    testWidgets('copies the URL as is, without quotes', (tester) async {
+      FakeClipboard.install();
+      await showDetails(tester, needles);
+
+      await tester.tap(
+        find.descendant(
+          of: find.ancestor(
+            of: find.text('GET - NEEDLE'),
+            matching: find.byType(ExpansionTile),
+          ),
+          matching: find.byIcon(Icons.copy),
+        ),
+      );
+      await tester.pump();
+
+      expect(FakeClipboard.text, 'https://api.example.com/needle');
+    });
+
+    testWidgets('labels the copy icons for accessibility', (tester) async {
+      final semantics = tester.ensureSemantics();
+      await showDetails(tester, sampleRequest(graphqlRequestVars: {'id': 1}));
+
+      for (final section in [
+        'URL',
+        'Headers',
+        'Query Parameters',
+        'GraphQL Request Vars',
+        'Response Body',
+      ]) {
+        expect(
+          find.byTooltip('Copy $section'),
+          findsOneWidget,
+          reason: section,
+        );
+        // Its own node, not merged into the section header's node.
+        final copy = find.bySemanticsLabel('Copy $section');
+        expect(copy, findsOneWidget, reason: section);
+        expect(
+          tester.getSemantics(copy),
+          containsSemantics(
+            label: 'Copy $section',
+            isButton: true,
+            hasTapAction: true,
+          ),
+          reason: section,
+        );
+      }
+      expect(find.bySemanticsLabel(RegExp('Headers.*Copy')), findsNothing);
+
+      InspectorController().selectedRequest = sampleRequest(
+        requestMethod: RequestMethod.POST,
+        requestBody: FormData.fromMap({'name': 'John'}),
+      );
+      await tester.pumpAndSettle();
+      expect(find.bySemanticsLabel('Copy Request Body'), findsOneWidget);
+      semantics.dispose();
+    });
+
     testWidgets('renders bodies as text when the tree view is off', (
       tester,
     ) async {

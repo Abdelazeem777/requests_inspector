@@ -65,7 +65,8 @@ class InspectorController extends ChangeNotifier {
 
   late final bool _enabled;
   late final ShowInspectorOn _showInspectorOn;
-  late final ShakeDetector _shakeDetector;
+  // Only created when the inspector is enabled and shaking is allowed.
+  ShakeDetector? _shakeDetector;
   StoppingRequestCallback? _onStoppingRequest;
   StoppingResponseCallback? _onStoppingResponse;
 
@@ -379,7 +380,13 @@ class InspectorController extends ChangeNotifier {
       );
 
       SharePlus.instance.share(
-        ShareParams(files: [file], sharePositionOrigin: sharePositionOrigin),
+        ShareParams(
+          files: [file],
+          // Outside the web `XFile.fromData` ignores `name`, so share_plus
+          // would name the file "<uuid>.json".
+          fileNameOverrides: const ['request.har'],
+          sharePositionOrigin: sharePositionOrigin,
+        ),
       );
       return;
     } else {
@@ -402,7 +409,7 @@ class InspectorController extends ChangeNotifier {
 
   @override
   void dispose() {
-    if (_allowShaking) _shakeDetector.stopListening();
+    _shakeDetector?.stopListening();
     _singleton = null;
     super.dispose();
   }

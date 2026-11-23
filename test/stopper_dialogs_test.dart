@@ -64,6 +64,29 @@ Future<void> retypeSameText(WidgetTester tester, Finder field) async {
   await tester.enterText(field, text);
 }
 
+/// Types [chars] like a soft keyboard: at the cursor of the focused [field].
+Future<void> typeAtCursor(
+  WidgetTester tester,
+  Finder field,
+  String chars,
+) async {
+  final value = tester.widget<TextField>(field).controller!.value;
+  final at = value.selection.baseOffset;
+  tester.testTextInput.updateEditingValue(
+    TextEditingValue(
+      text: value.text.replaceRange(at, at, chars),
+      selection: TextSelection.collapsed(offset: at + chars.length),
+    ),
+  );
+  await tester.pump();
+}
+
+/// Opens (or resizes) the soft keyboard: the app rebuilds with new insets.
+Future<void> setKeyboardHeight(WidgetTester tester, double height) async {
+  tester.view.viewInsets = FakeViewPadding(bottom: height);
+  await tester.pumpAndSettle();
+}
+
 /// `==` treats `1 == 1.0`; the JSON encoding also tells `true` from `"true"`,
 /// `1` from `"1"` and `null` from `""`.
 void expectSameJson(dynamic actual, dynamic expected) {
@@ -197,6 +220,49 @@ void main() {
       await tester.pumpAndSettle();
 
       expectSameJson(result()!.requestBody, {...typedBody, 'name': 'Jo'});
+    });
+
+    testWidgets('keeps the cursor and the edits when the keyboard opens', (
+      tester,
+    ) async {
+      final result = await showTestDialog<RequestDetails>(
+        tester,
+        RequestStopperEditorDialog(requestDetails: request),
+      );
+
+      final url = fieldAfter('URL: ');
+      await tester.tap(url);
+      await tester.pump();
+      final tapped = tester.widget<TextField>(url).controller!.selection;
+      expect(tapped.isValid, isTrue);
+      expect(tapped.baseOffset, greaterThan(0));
+
+      await setKeyboardHeight(tester, 400);
+
+      expect(tester.widget<TextField>(url).controller!.selection, tapped);
+      await typeAtCursor(tester, url, 'X');
+      final original = request.url;
+      final expectedUrl = original.replaceRange(
+        tapped.baseOffset,
+        tapped.baseOffset,
+        'X',
+      );
+      expect(textOf(tester, url), expectedUrl);
+
+      // An edit that isn't valid JSON yet survives the keyboard resizing.
+      final headers = fieldAfter('Headers: ');
+      await tester.tap(headers);
+      await tester.pump();
+      await typeAtCursor(tester, headers, ',');
+      final editedHeaders = textOf(tester, headers);
+      await setKeyboardHeight(tester, 350);
+
+      expect(textOf(tester, headers), editedHeaders);
+      expect(textOf(tester, url), expectedUrl);
+      await tester.tap(find.text('Send'));
+      await tester.pumpAndSettle();
+
+      expect(result()!.url, expectedUrl);
     });
 
     for (final edit in <List<Object>>[
@@ -385,6 +451,34 @@ void main() {
       expect(
         InspectorController().requestsList.single.url,
         'https://x.io/edited',
+      );
+    });
+
+    testWidgets('the request stopper edits the whole query in one place', (
+      tester,
+    ) async {
+      await pumpInspectorApp(tester, navigatorKey: navigatorKey);
+      InspectorController().requestStopperEnabled = true;
+
+      final future = dio.get('/users?lang=en', queryParameters: {'a': '1'});
+      await tester.pumpAndSettle();
+
+      expect(
+        textOf(tester, fieldAfter('URL: ')),
+        'https://api.example.com/users',
+      );
+      expect(jsonDecode(textOf(tester, fieldAfter('Query Parameters: '))), {
+        'lang': 'en',
+        'a': '1',
+      });
+      await tester.enterText(fieldAfter('Query Parameters: '), '{}');
+      await tester.tap(find.text('Send'));
+      await tester.pumpAndSettle();
+      await future;
+
+      expect(
+        adapter.requests.single.uri.toString(),
+        'https://api.example.com/users',
       );
     });
 

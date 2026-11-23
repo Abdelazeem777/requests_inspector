@@ -188,7 +188,8 @@ class RequestDetailsPage extends StatelessWidget {
               children: [
                 _buildExpandableSection(
                   context: context,
-                  txtCopy: JsonPrettyConverter().convert(request.url),
+                  txtCopy: request.url,
+                  copyName: 'URL',
                   titleWidget: _buildRequestNameAndStatus(
                     method: request.requestMethod,
                     requestName: request.requestName,
@@ -209,6 +210,7 @@ class RequestDetailsPage extends StatelessWidget {
                   _buildExpandableSection(
                     context: context,
                     txtCopy: headersPretty,
+                    copyName: 'Headers',
                     title: 'Headers',
                     children: _buildDataBlock(
                       request.headers,
@@ -223,6 +225,7 @@ class RequestDetailsPage extends StatelessWidget {
                   _buildExpandableSection(
                     context: context,
                     txtCopy: queryParamsPretty,
+                    copyName: 'Query Parameters',
                     title: 'Query Parameters',
                     children: _buildDataBlock(
                       request.queryParameters,
@@ -238,6 +241,7 @@ class RequestDetailsPage extends StatelessWidget {
                   _buildExpandableSection(
                     context: context,
                     txtCopy: requestBodyPretty,
+                    copyName: 'Request Body',
                     title:
                         'Request Body${request.requestBody is FormData ? " (Form Data)" : ""}',
                     children: _buildDataBlock(
@@ -254,6 +258,7 @@ class RequestDetailsPage extends StatelessWidget {
                   _buildExpandableSection(
                     context: context,
                     txtCopy: graphqlVarsPretty,
+                    copyName: 'GraphQL Request Vars',
                     title: 'GraphQL Request Vars',
                     children: _buildDataBlock(
                       request.graphqlRequestVars,
@@ -268,6 +273,7 @@ class RequestDetailsPage extends StatelessWidget {
                   _buildExpandableSection(
                     context: context,
                     txtCopy: responseBodyPretty,
+                    copyName: 'Response Body',
                     title: 'Response Body',
                     children: _buildDataBlock(
                       request.responseBody,
@@ -293,6 +299,9 @@ class RequestDetailsPage extends StatelessWidget {
     required BuildContext context,
     String? title,
     required String txtCopy,
+
+    /// Names the section in the copy icon's tooltip ("Copy [copyName]").
+    required String copyName,
     Widget? titleWidget,
     required List<Widget> children,
     bool initiallyExpanded = true,
@@ -340,14 +349,31 @@ class RequestDetailsPage extends StatelessWidget {
                         ),
                       ),
                 ),
-                InkWell(
-                  child: const Icon(Icons.copy, color: Colors.grey, size: 20),
-                  onTap: () {
-                    Clipboard.setData(ClipboardData(text: txtCopy));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Copied to clipboard')),
-                    );
-                  },
+                // The copy icon sits inside the tile's header, so without its
+                // own semantics node its label and tap merge into the header's
+                // node, and screen readers and UI automation tools can't reach
+                // it. The tooltip is excluded so the name isn't read twice.
+                Tooltip(
+                  message: 'Copy $copyName',
+                  excludeFromSemantics: true,
+                  child: Semantics(
+                    container: true,
+                    button: true,
+                    label: 'Copy $copyName',
+                    child: InkWell(
+                      child: const Icon(
+                        Icons.copy,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: txtCopy));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Copied to clipboard')),
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ],
             ),

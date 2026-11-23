@@ -136,7 +136,7 @@ class _ResponseStopperEditorDialogState
         const Text('Response Headers: '),
         const SizedBox(height: 4.0),
         InspectorDialogTextField(
-          text: JsonPrettyConverter().convert(_newResponseDetails.headers),
+          text: JsonPrettyConverter().convert(widget.responseDetails.headers),
           onChanged: (value) =>
               _newResponseDetails = _newResponseDetails.copyWith(
                 headers: JsonPrettyConverter().deconvertFrom(
@@ -156,7 +156,11 @@ class _ResponseStopperEditorDialogState
         const Text('Response Body: '),
         const SizedBox(height: 4.0),
         InspectorDialogTextField(
-          text: JsonPrettyConverter().convert(_newResponseDetails.responseBody),
+          // The initial value: a rebuild must not replace what the user is
+          // typing with a re-formatted copy of it.
+          text: JsonPrettyConverter().convert(
+            widget.responseDetails.responseBody,
+          ),
           onChanged: (value) =>
               _newResponseDetails = _newResponseDetails.copyWith(
                 responseBody: JsonPrettyConverter().deconvertFrom(

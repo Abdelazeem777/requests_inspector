@@ -104,8 +104,10 @@ class _RequestStopperEditorDialogState
           ),
           const Text('URL: '),
           const SizedBox(height: 4.0),
+          // The fields get the initial values: a rebuild must not replace
+          // what the user is typing with a re-formatted copy of it.
           InspectorDialogTextField(
-            text: _newRequestDetails?.url ?? '',
+            text: widget._requestDetails?.url ?? '',
             onChanged: (value) =>
                 _newRequestDetails = _newRequestDetails?.copyWith(url: value),
           ),
@@ -113,7 +115,9 @@ class _RequestStopperEditorDialogState
           const Text('Headers: '),
           const SizedBox(height: 4.0),
           InspectorDialogTextField(
-            text: JsonPrettyConverter().convert(_newRequestDetails?.headers),
+            text: JsonPrettyConverter().convert(
+              widget._requestDetails?.headers,
+            ),
             onChanged: (value) =>
                 _newRequestDetails = _newRequestDetails?.copyWith(
                   headers: JsonPrettyConverter().deconvertFrom(
@@ -127,7 +131,7 @@ class _RequestStopperEditorDialogState
           const SizedBox(height: 4.0),
           InspectorDialogTextField(
             text: JsonPrettyConverter().convert(
-              _newRequestDetails?.queryParameters,
+              widget._requestDetails?.queryParameters,
             ),
             onChanged: (value) =>
                 _newRequestDetails = _newRequestDetails?.copyWith(
@@ -142,7 +146,7 @@ class _RequestStopperEditorDialogState
           const SizedBox(height: 4.0),
           InspectorDialogTextField(
             text: JsonPrettyConverter().convert(
-              _newRequestDetails?.requestBody,
+              widget._requestDetails?.requestBody,
             ),
             onChanged: (value) =>
                 _newRequestDetails = _newRequestDetails?.copyWith(

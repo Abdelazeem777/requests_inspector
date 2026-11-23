@@ -234,6 +234,28 @@ void main() {
       expect(InspectorController().isDarkMode, isTrue);
     });
 
+    testWidgets(
+      'the Dark Mode switch follows the theme while the menu is open',
+      (tester) async {
+        await pumpInspectorApp(tester);
+        await openInspector(tester);
+        await openMenu(tester);
+        bool darkModeSwitch() =>
+            tester.widget<Switch>(find.byType(Switch).first).value;
+        expect(darkModeSwitch(), isTrue);
+
+        await tester.tap(find.text('Dark Mode'));
+        await tester.pumpAndSettle();
+        expect(InspectorController().isDarkMode, isFalse);
+        expect(darkModeSwitch(), isFalse);
+
+        await tester.tap(find.byType(Switch).first);
+        await tester.pumpAndSettle();
+        expect(InspectorController().isDarkMode, isTrue);
+        expect(darkModeSwitch(), isTrue);
+      },
+    );
+
     testWidgets('toggles the JSON tree view and child expansion', (
       tester,
     ) async {
@@ -430,6 +452,32 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(FakeShareChannel.calls, isEmpty);
+    });
+
+    for (final method in [RequestMethod.HEAD, RequestMethod.OPTIONS]) {
+      testWidgets('shares ${method.name} requests', (tester) async {
+        await openDetails(tester, sampleRequest(requestMethod: method));
+
+        await shareAs(tester, 'cURL Command');
+
+        expect(
+          FakeShareChannel.lastSharedText,
+          startsWith(
+            method == RequestMethod.HEAD ? 'curl -I ' : 'curl -X OPTIONS ',
+          ),
+        );
+      });
+    }
+
+    testWidgets('the share button has a tooltip', (tester) async {
+      final semantics = tester.ensureSemantics();
+      await openDetails(tester, createOrder);
+
+      expect(
+        tester.getSemantics(find.byTooltip('Share')),
+        containsSemantics(isButton: true, tooltip: 'Share'),
+      );
+      semantics.dispose();
     });
 
     testWidgets('WebSocket requests are not shared', (tester) async {
