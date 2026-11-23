@@ -43,7 +43,7 @@ appId: com.example.example
     commands:
       - swipe:
           start: "50%,30%"
-          end: "50%,22%"
+          end: "50%,16%"
           duration: 1500
       - waitForAnimationToEnd
 - tapOn:

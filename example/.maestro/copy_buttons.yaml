@@ -31,7 +31,7 @@ name: Copy buttons on the details page
 # Headers.
 - runFlow: subflows/open_inspector.yaml
 - tapOn:
-    text: "Headers"
+    text: "(?s)Headers.*"
     point: "83%,50%"
 - assertVisible: "Copied to clipboard"
 - runFlow: subflows/close_inspector.yaml
@@ -41,7 +41,7 @@ name: Copy buttons on the details page
 # Query parameters.
 - runFlow: subflows/open_inspector.yaml
 - tapOn:
-    text: "Query Parameters"
+    text: "(?s)Query Parameters.*"
     point: "83%,50%"
 - assertVisible: "Copied to clipboard"
 - runFlow: subflows/close_inspector.yaml
@@ -51,13 +51,13 @@ name: Copy buttons on the details page
 # Request body.
 - runFlow: subflows/open_inspector.yaml
 - scrollUntilVisible:
-    element: "Request Body"
+    element: "(?s)Request Body.*"
     direction: DOWN
     centerElement: true
 # Let the list settle, or the tap can land on the header and collapse it.
 - waitForAnimationToEnd
 - tapOn:
-    text: "Request Body"
+    text: "(?s)Request Body.*"
     point: "83%,50%"
 - assertVisible: "Copied to clipboard"
 - runFlow: subflows/close_inspector.yaml
@@ -68,13 +68,13 @@ name: Copy buttons on the details page
 # Response body (postman-echo's answer).
 - runFlow: subflows/open_inspector.yaml
 - scrollUntilVisible:
-    element: "Response Body"
+    element: "(?s)Response Body.*"
     direction: DOWN
     centerElement: true
 # Let the list settle, or the tap can land on the header and collapse it.
 - waitForAnimationToEnd
 - tapOn:
-    text: "Response Body"
+    text: "(?s)Response Body.*"
     point: "83%,50%"
 - assertVisible: "Copied to clipboard"
 - runFlow: subflows/close_inspector.yaml

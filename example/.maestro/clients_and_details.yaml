@@ -76,21 +76,21 @@ name: Every client is logged, with its details
     index: 1
 - assertVisible: "(?s)POST - POST.*Status: 200.*"
 - assertVisible: "(?s)Sent at: .*Received at: .*Duration: .*URL: https://postman-echo.com/post"
-- assertVisible: "Headers"
+- assertVisible: "(?s)Headers.*"
 - assertVisible: '"x-e2e" : "original",'
-- assertVisible: "Query Parameters"
+- assertVisible: "(?s)Query Parameters.*"
 - assertVisible: '"step" : "original",'
 - scrollUntilVisible:
     element: '"verified" : false,'
     direction: DOWN
-- assertVisible: "Request Body"
+- assertVisible: "(?s)Request Body.*"
 - assertVisible: '"name" : "original",'
 - assertVisible: '"count" : 1,'
 - assertVisible: '"active" : true,'
 - assertVisible: '"profile" : \{.*'
 - assertVisible: '"age" : 30,'
 - scrollUntilVisible:
-    element: "Response Body"
+    element: "(?s)Response Body.*"
     direction: DOWN
 - scrollUntilVisible:
     element: '"url" : "https://postman-echo.com/post\?step=original",'
@@ -103,7 +103,7 @@ name: Every client is logged, with its details
     env:
       ROW: "(?s)POST.*POST.*https://postman-echo.com/post.*"
 - scrollUntilVisible:
-    element: "Request Body \\(Form Data\\)"
+    element: "(?s)Request Body \\(Form Data\\).*"
     direction: DOWN
 - scrollUntilVisible:
     element: '"test_file" : "\(0\.0 kb\) - test\.txt",'
@@ -120,7 +120,7 @@ name: Every client is logged, with its details
       ROW: "(?s)POST.*API.*https://graphqlzero.almansi.me/api.*"
 - assertVisible: "(?s)POST - API.*Status: 200.*"
 - scrollUntilVisible:
-    element: "GraphQL Request Vars"
+    element: "(?s)GraphQL Request Vars.*"
     direction: DOWN
 - assertVisible: '"query GetPost\(\$id: ID!\) \{.*'
 - scrollUntilVisible:
@@ -142,9 +142,9 @@ name: Every client is logged, with its details
     element: '"(query )?\{.*post\(id: 1\).*'
     direction: DOWN
 - scrollUntilVisible:
-    element: "Response Body"
+    element: "(?s)Response Body.*"
     direction: DOWN
-- assertNotVisible: "GraphQL Request Vars"
+- assertNotVisible: "(?s)GraphQL Request Vars.*"
 
 # The manual addNewRequest entry keeps the name and headers it was given.
 - runFlow:
