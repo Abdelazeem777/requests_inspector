@@ -1,0 +1,14 @@
+# In the inspector list: opens the first row matching env ROW.
+appId: com.example.example
+---
+- tapOn: "All"
+- scrollUntilVisible:
+    element:
+      text: ${ROW}
+    direction: DOWN
+    timeout: 10000
+- tapOn:
+    text: ${ROW}
+- extendedWaitUntil:
+    visible: "(?s).*Status: .*"
+    timeout: 5000

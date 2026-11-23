@@ -1,0 +1,120 @@
+# The Request Details tab's options: the menu's JSON Tree View, Expand
+# Children and Dark Mode switches, searching inside the request (match
+# counter, next/previous match, close) and Run, which sends the request again.
+appId: com.example.example
+name: Details page view options, search and run again
+---
+- runFlow: subflows/launch_playground.yaml
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "Dio POST JSON"
+- runFlow: subflows/open_inspector.yaml
+- runFlow:
+    file: subflows/open_request.yaml
+    env:
+      ROW: "(?s)POST.*POST.*https://postman-echo.com/post.*"
+- scrollUntilVisible:
+    element: '"verified" : false,'
+    direction: DOWN
+
+# JSON Tree View off: the body is shown as pretty-printed JSON text.
+- tapOn: "Show menu"
+- assertVisible:
+    text: "JSON Tree View"
+    checked: true
+- tapOn: "JSON Tree View"
+- assertVisible:
+    text: "JSON Tree View"
+    checked: false
+- tapOn: "Dismiss menu"
+- assertNotVisible: '"count" : 1,'
+- scrollUntilVisible:
+    element: '\s*"count": 1,'
+    direction: DOWN
+- assertVisible: '\s*"verified": false'
+- takeScreenshot: details-text-view
+- tapOn: "Show menu"
+- tapOn: "JSON Tree View"
+- assertVisible:
+    text: "JSON Tree View"
+    checked: true
+- tapOn: "Dismiss menu"
+- scrollUntilVisible:
+    element: '"count" : 1,'
+    direction: DOWN
+
+# Expand Children off: nested objects start collapsed.
+- assertVisible: '"age" : 30,'
+- tapOn: "Show menu"
+- tapOn: "Expand Children"
+- assertVisible:
+    text: "Expand Children"
+    checked: false
+- tapOn: "Dismiss menu"
+- assertVisible: '"count" : 1,'
+- assertNotVisible: '"age" : 30,'
+- takeScreenshot: details-collapsed
+- tapOn: "Show menu"
+- tapOn: "Expand Children"
+- tapOn: "Dismiss menu"
+- assertVisible: '"age" : 30,'
+
+# Dark Mode off and on again. The switch flips while the menu stays open.
+- tapOn: "Show menu"
+- assertVisible:
+    text: "Dark Mode"
+    checked: true
+- tapOn: "Dark Mode"
+- assertVisible:
+    text: "Dark Mode"
+    checked: false
+- takeScreenshot: details-light-mode-menu
+- tapOn: "Dismiss menu"
+- takeScreenshot: details-light-mode
+- tapOn: "Show menu"
+- assertVisible:
+    text: "Dark Mode"
+    checked: false
+- tapOn: "Dark Mode"
+- assertVisible:
+    text: "Dark Mode"
+    checked: true
+- tapOn: "Dismiss menu"
+
+# Search inside the request: "original" is in the header, the query
+# parameter, the body and postman-echo's answer.
+- tapOn: "Search"
+- tapOn: "Search..."
+- inputText: "original"
+- extendedWaitUntil:
+    visible: "1 / [2-9][0-9]*"
+    timeout: 5000
+- tapOn: "Next match"
+- assertVisible: "2 / [2-9][0-9]*"
+- tapOn: "Previous match"
+- assertVisible: "1 / [2-9][0-9]*"
+- takeScreenshot: details-search
+- tapOn: "Close"
+- assertNotVisible: "Search..."
+- assertNotVisible: "1 / [0-9]+"
+
+# Run sends the request again and shows the new exchange.
+- scrollUntilVisible:
+    element: "(?s)Sent at: .*"
+    direction: UP
+- copyTextFrom:
+    text: "(?s)Sent at: .*"
+- evalScript: ${output.firstRun = maestro.copiedText}
+- tapOn: "Run"
+# The button shows a spinner until the response arrives.
+- retry:
+    maxRetries: 10
+    commands:
+      - extendedWaitUntil:
+          visible: "Run"
+          timeout: 20000
+      - copyTextFrom:
+          text: "(?s)Sent at: .*"
+      - assertTrue: ${maestro.copiedText != output.firstRun}
+- assertVisible: "(?s)POST - POST.*Status: 200.*"

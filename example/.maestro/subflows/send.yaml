@@ -1,0 +1,7 @@
+# Taps a Playground button (env NAME) and waits for its result.
+appId: com.example.example
+---
+- tapOn: ${NAME}
+- extendedWaitUntil:
+    visible: "${NAME}: done"
+    timeout: 30000

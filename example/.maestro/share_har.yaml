@@ -1,0 +1,72 @@
+# Sharing a request as HAR: "HAR text copy" shares the HAR JSON as text,
+# "HAR file (.har)" shares it as a file.
+# The HAR text is copied from the share sheet and checked on the Playground:
+# it must be valid JSON (HAR 1.2, one entry) with the request's method, URL,
+# JSON body, response status and the cURL command, and creator.version must
+# be the package version. The HAR file is shared as request.har.
+appId: com.example.example
+name: Share as HAR text and HAR file
+---
+- runFlow: subflows/launch_playground.yaml
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "Dio POST JSON"
+- runFlow: subflows/open_inspector.yaml
+- runFlow:
+    file: subflows/open_request.yaml
+    env:
+      ROW: "(?s)POST.*POST.*https://postman-echo.com/post.*"
+
+# HAR text.
+- runFlow:
+    file: subflows/share.yaml
+    env:
+      OPTION: "HAR"
+- extendedWaitUntil:
+    visible: "HAR format"
+    timeout: 5000
+- tapOn: "HAR text copy"
+- extendedWaitUntil:
+    visible: '(?s)\{\s+"log": \{\s+"version": "1\.2",\s+"creator": \{\s+"name": "requests_inspector",\s+"version": "6\.0\.0".*'
+    timeout: 10000
+- takeScreenshot: share-har-text-sheet
+- runFlow: subflows/copy_from_share_sheet.yaml
+- runFlow: subflows/close_inspector.yaml
+- runFlow: subflows/read_clipboard.yaml
+- assertVisible: "clipboard kind: har"
+- assertVisible: >-
+    clipboard har: version=1\.2 creator=requests_inspector/6\.0\.0 entries=1 method=POST url=https://postman-echo\.com/post\?step=original status=200 postData=\{"mimeType":"application/json","text":"\{\\"name\\":\\"original\\",\\"count\\":1,\\"active\\":true,\\"note\\":\\"it's \\\\\\"quoted\\\\\\"\\",\\"profile\\":\{\\"age\\":30,\\"verified\\":false\}\}"\}
+- assertVisible: '(?s)clipboard text: .*"name": "x-e2e",\s+"value": "original".*"comment": "cURL: curl -X POST .*'
+
+# HAR file: the share sheet offers a file instead of text.
+- runFlow: subflows/open_inspector.yaml
+- runFlow:
+    file: subflows/share.yaml
+    env:
+      OPTION: "HAR"
+- extendedWaitUntil:
+    visible: "HAR format"
+    timeout: 5000
+- tapOn: "HAR file \\(\\.har\\)"
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - extendedWaitUntil:
+          visible: "Sharing 1 file"
+          timeout: 10000
+      - takeScreenshot: share-har-file-sheet
+      - pressKey: back
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - extendedWaitUntil:
+          visible: "Save to Files"
+          timeout: 10000
+      - takeScreenshot: share-har-file-sheet
+      - tapOn: "Close"
+- extendedWaitUntil:
+    visible: "Inspector.*"
+    timeout: 5000

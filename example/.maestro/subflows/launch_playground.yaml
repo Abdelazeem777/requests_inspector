@@ -1,0 +1,13 @@
+# Restarts the Playground app (build it with
+# `flutter run -t lib/playground_main.dart`), which sends requests with every
+# client.
+# launchApp stops the app first, and the inspector keeps everything in
+# memory, so each flow starts with no requests and the default settings.
+# (clearState isn't needed, and on a busy emulator the first start of a
+# debug build after clearing its data can exceed Android's start timeout.)
+appId: com.example.example
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Tap a button to send a request"
+    timeout: 30000
