@@ -42,11 +42,19 @@ jobs:
         if: matrix.name != 'stable'
         run: dart format --output=none --set-exit-if-changed lib test
 
-      # Infos (mostly deprecations: Share, WillPopScope, withOpacity, ...)
-      # already exist on main, so only warnings and errors fail the build.
+      # Test against the newest versions pubspec.yaml allows, not the ones
+      # pinned in pubspec.lock (the lock file is not committed back).
+      - name: Upgrade dependencies
+        if: matrix.name == 'stable'
+        run: flutter pub upgrade
+
       # example/ is built in the other job instead of analyzed here.
+      # Infos fail the build on the floor version. On stable they don't: newer
+      # Flutter deprecates APIs the floor still needs (for example
+      # package:flutter/material.dart in favour of package:material_ui), and
+      # moving to the replacements would break the floor.
       - name: Analyze
-        run: flutter analyze --no-fatal-infos lib test
+        run: flutter analyze lib test ${{ matrix.name == 'stable' && '--no-fatal-infos' || '' }}
 
       - name: Run tests
         run: flutter test --coverage
@@ -57,6 +65,18 @@ jobs:
         with:
           name: coverage
           path: coverage/lcov.info
+
+      # Lower bounds in pubspec.yaml must still compile. Tests are not run on
+      # the downgraded versions: a transitive dependency (platform 3.0.0) does
+      # not compile with this Flutter version, so the tests can't build.
+      # This is the last step of the job, so the downgrade is not restored.
+      - name: Downgrade dependencies
+        if: matrix.name != 'stable'
+        run: flutter pub downgrade
+
+      - name: Analyze lower bounds
+        if: matrix.name != 'stable'
+        run: flutter analyze lib
 
   example:
     name: Example app
