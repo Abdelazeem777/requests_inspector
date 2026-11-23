@@ -1,0 +1,9 @@
+# On the Request Details tab: taps the share button and picks env OPTION.
+# The share button is found by its "Share" tooltip.
+appId: com.example.example
+---
+- tapOn: "Share"
+- extendedWaitUntil:
+    visible: "Choose your preferred share format"
+    timeout: 5000
+- tapOn: ${OPTION}

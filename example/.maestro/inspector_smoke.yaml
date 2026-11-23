@@ -1,8 +1,7 @@
-# Smoke test for the example app: log a few requests, open the inspector
+# Smoke test for the Playground app: log a few requests, open the inspector
 # with a long press (shaking is not reliable on simulators), open a
 # request's details, go back to the list and close the inspector (and, on
 # Android, close it again with the back button).
-# The example calls the real https://dummyjson.com/posts endpoint.
 #
 # Every step finds its element in the accessibility tree (no screen
 # positions), so the flow also checks that RequestsInspector keeps the host
@@ -10,36 +9,33 @@
 appId: com.example.example
 name: Requests inspector smoke test
 ---
-- launchApp:
-    clearState: true
-- waitForAnimationToEnd:
-    timeout: 5000
-
-- assertVisible: "Fetch Data Example"
-
-# A second request: the refresh icon at the start of the app bar.
-- tapOn: "Refresh"
+- runFlow: subflows/launch_playground.yaml
+- assertVisible: "Playground"
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "Dio GET"
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "Dio GET todo"
 
 # ShowInspectorOn.Both (the default): long press anywhere on the host app.
-- longPressOn: "Fetch Data Example"
+- longPressOn: "Playground"
 - extendedWaitUntil:
     visible: "Inspector.*"
     timeout: 10000
 - assertVisible: "Clear All"
 
-# Both requests show up as rows once their responses arrive. A row is one
-# accessibility element: "GET\n<duration>\nPOSTS\n<url>\n<status>".
-- extendedWaitUntil:
-    visible:
-      text: "(?s)GET.*POSTS.*https://dummyjson.com/posts.*"
-      index: 1
-    timeout: 30000
+# Both requests show up as rows. A row is one accessibility element:
+# "GET\n<duration>\n<name>\n<url>\n<status>".
+- assertVisible: "(?s)GET.*https://dummyjson.com/todos/1.*200"
+- assertVisible: "(?s)GET.*GET.*https://postman-echo.com/get.*200"
 
 # Request details.
 - tapOn:
-    text: "(?s)GET.*POSTS.*"
-    index: 0
-- assertVisible: "(?s).*GET - POSTS.*"
+    text: "(?s)GET.*GET.*https://postman-echo.com/get.*"
+- assertVisible: "(?s).*GET - GET.*"
 - assertVisible: "(?s).*Status: .*"
 - assertVisible: "(?s).*Headers.*"
 - assertVisible: "(?s).*Query Parameters.*"
@@ -50,22 +46,18 @@ name: Requests inspector smoke test
 
 # Back to the list.
 - tapOn: "All"
-- assertVisible:
-    text: "(?s)GET.*POSTS.*"
-    index: 1
+- assertVisible: "(?s)GET.*https://dummyjson.com/todos/1.*200"
 
 # Close the inspector with the X at the start of its app bar.
 - tapOn: "Close inspector"
 - waitForAnimationToEnd
 - assertNotVisible: "Clear All"
-- assertVisible: "Fetch Data Example"
+- assertVisible: "Dio GET todo: done"
 
 # It opens again with the same requests.
-- longPressOn: "Fetch Data Example"
+- longPressOn: "Playground"
 - extendedWaitUntil:
-    visible:
-      text: "(?s)GET.*POSTS.*"
-      index: 1
+    visible: "(?s)GET.*https://dummyjson.com/todos/1.*200"
     timeout: 10000
 
 # Android: system back closes the inspector, not the app behind it.
@@ -75,4 +67,4 @@ name: Requests inspector smoke test
     commands:
       - pressKey: back
       - assertNotVisible: "Clear All"
-      - assertVisible: "Fetch Data Example"
+      - assertVisible: "Dio GET todo: done"

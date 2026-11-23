@@ -1,0 +1,7 @@
+# Closes the inspector with the X in its app bar.
+appId: com.example.example
+---
+- tapOn: "Close inspector"
+- extendedWaitUntil:
+    visible: "Read clipboard"
+    timeout: 5000

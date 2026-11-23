@@ -227,10 +227,10 @@ Future<FormData> _getDummyFormData(final Dio dio) async {
   return formData;
 }
 
-/// Gets Flutter logo image in bytes from the server
+/// Gets an image (the package logo) in bytes from the server
 Future<List<int>?> _getFlutterImageBytes(final Dio dio) async {
   const imageUrl =
-      "https://storage.googleapis.com/cms-storage-bucket/0dbfcc7a59cd1cf16282.png";
+      "https://raw.githubusercontent.com/Abdelazeem777/requests_inspector/main/images/logo_with_text_right.png";
   final imgResp = await dio.get<List<int>>(
     imageUrl,
     options: Options(responseType: ResponseType.bytes),

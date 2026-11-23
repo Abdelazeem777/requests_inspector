@@ -1,0 +1,14 @@
+# On the Playground: shows what is on the clipboard (and saves it to the
+# app's temp dir as e2e_clipboard_<kind>.txt for checks on the host).
+appId: com.example.example
+---
+- tapOn: "Read clipboard"
+# iOS may ask before an app reads what another process copied.
+- runFlow:
+    when:
+      visible: "Allow Paste"
+    commands:
+      - tapOn: "Allow Paste"
+- extendedWaitUntil:
+    visible: "Read clipboard: done"
+    timeout: 10000

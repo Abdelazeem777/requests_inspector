@@ -1,0 +1,9 @@
+# Taps Copy in the system share sheet (Android's chooser and iOS's share
+# sheet both offer it); the sheet closes.
+appId: com.example.example
+---
+- tapOn: "Copy"
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible: "Inspector.*"
+    timeout: 5000

@@ -1,0 +1,98 @@
+# Sharing a request as text: cURL Command, Normal Log and Both.
+# For each one, the system share sheet must show the right text, and its
+# Copy action must put that text on the clipboard ("Read clipboard" on the
+# Playground shows it, and saves it so the cURL command can be run on the
+# host). The request is a POST with a header, a query parameter and a JSON
+# body whose "note" has both quote characters, so the cURL command has to
+# shell-escape it ('\''). The body goes after `--data-raw`, which
+# (unlike `-d`) sends a value starting with @ as it is.
+appId: com.example.example
+name: Share as cURL, Normal Log and Both
+---
+- runFlow: subflows/launch_playground.yaml
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "Dio POST JSON"
+- runFlow: subflows/open_inspector.yaml
+- runFlow:
+    file: subflows/open_request.yaml
+    env:
+      ROW: "(?s)POST.*POST.*https://postman-echo.com/post.*"
+
+# cURL Command.
+- runFlow:
+    file: subflows/share.yaml
+    env:
+      OPTION: "cURL Command"
+- extendedWaitUntil:
+    visible: "(?s)curl -X POST .*"
+    timeout: 10000
+- assertVisible: >-
+    (?s)curl -X POST 'https://postman-echo\.com/post\?step=original' -H 'x-e2e: original' -H 'content-type: application/json' --data-raw '\{"name":"original","count":1,"active":true,"note":"it'\\''s \\"quoted\\"","profile":\{"age":30,"verified":false\}\}' -L -k\s*
+- takeScreenshot: share-curl-sheet
+- runFlow: subflows/copy_from_share_sheet.yaml
+- runFlow: subflows/close_inspector.yaml
+- runFlow: subflows/read_clipboard.yaml
+- assertVisible: "clipboard kind: curl"
+- assertVisible: >-
+    (?s)clipboard text: curl -X POST 'https://postman-echo\.com/post\?step=original' -H 'x-e2e: original' -H 'content-type: application/json' --data-raw '\{"name":"original","count":1,"active":true,"note":"it'\\''s \\"quoted\\"","profile":\{"age":30,"verified":false\}\}' -L -k\s*
+
+# Normal Log: one "=[ field ]===" section per field, values as JSON.
+- runFlow: subflows/open_inspector.yaml
+- runFlow:
+    file: subflows/share.yaml
+    env:
+      OPTION: "Normal Log"
+- extendedWaitUntil:
+    visible: '(?s)=\[ requestName \].*'
+    timeout: 10000
+- takeScreenshot: share-log-sheet
+- runFlow: subflows/copy_from_share_sheet.yaml
+- runFlow: subflows/close_inspector.yaml
+- runFlow: subflows/read_clipboard.yaml
+- assertVisible: "clipboard kind: log"
+- assertVisible: >-
+    (?s)clipboard text: =\[ requestName \]=+\s+"POST"\s+=\[ requestMethod \]=+\s+"POST"\s+=\[ url \]=+\s+"https://postman-echo\.com/post"\s+=\[ statusCode \]=+\s+200\s+=\[ headers \]=+\s+\{.*"x-e2e": "original",.*\}\s+=\[ queryParameters \]=+\s+\{\s+"step": "original"\s+\}\s+=\[ requestBody \]=+\s+\{\s+"name": "original",\s+"count": 1,\s+"active": true,\s+"note": "it's \\"quoted\\"",\s+"profile": \{\s+"age": 30,\s+"verified": false\s+\}\s+\}\s+=\[ responseBody \]=+\s+\{.*"json": \{.*\}\s+=\[ sentTime \]=+\s+"[0-9T:.-]+"\s+=\[ receivedTime \]=+\s+"[0-9T:.-]+"\s*
+
+# Both: the cURL command, then the normal log.
+- runFlow: subflows/open_inspector.yaml
+- runFlow:
+    file: subflows/share.yaml
+    env:
+      OPTION: "Both"
+- extendedWaitUntil:
+    visible: '(?s)=+\[cURL Command\]=+.*'
+    timeout: 10000
+- takeScreenshot: share-both-sheet
+- runFlow: subflows/copy_from_share_sheet.yaml
+- runFlow: subflows/close_inspector.yaml
+- runFlow: subflows/read_clipboard.yaml
+- assertVisible: "clipboard kind: both"
+- assertVisible: >-
+    (?s)clipboard text: =+\[cURL Command\]=+\s+curl -X POST 'https://postman-echo\.com/post\?step=original' .* -L -k\s+=+\[Normal Log\]=+\s+=\[ requestName \]=+\s+"POST".*=\[ receivedTime \]=+.*
+
+# HEAD: shared as `curl -I` (not `-X HEAD`, which makes curl wait for a body).
+- runFlow:
+    file: subflows/send.yaml
+    env:
+      NAME: "Dio HEAD"
+- runFlow: subflows/open_inspector.yaml
+- runFlow:
+    file: subflows/open_request.yaml
+    env:
+      ROW: "(?s)HEAD.*https://postman-echo.com/get.*"
+- runFlow:
+    file: subflows/share.yaml
+    env:
+      OPTION: "cURL Command"
+- extendedWaitUntil:
+    visible: "(?s)curl -I 'https://postman-echo\\.com/get' .*"
+    timeout: 10000
+- assertNotVisible: "(?s).*-X HEAD.*"
+- takeScreenshot: share-head-sheet
+- runFlow: subflows/copy_from_share_sheet.yaml
+- runFlow: subflows/close_inspector.yaml
+- runFlow: subflows/read_clipboard.yaml
+- assertVisible: "clipboard kind: curl"
+- assertVisible: "(?s)clipboard text: curl -I 'https://postman-echo\\.com/get' -L -k\\s*"
