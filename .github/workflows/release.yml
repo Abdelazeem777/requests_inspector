@@ -10,6 +10,12 @@ name: Release
 # 4. Pushes the version commit to main and the vX.Y.Z tag in one atomic push.
 #    The tag push starts publish.yml, which uploads the package to pub.dev.
 #
+# The newest vX.Y.Z tag must point at the commit of the version that is on
+# pub.dev, and pubspec.yaml must carry that version. If the repo has no tag
+# yet, tag that commit by hand first (git tag -a vX.Y.Z <commit> -m X.Y.Z;
+# git push origin vX.Y.Z); publish.yml then skips the upload because that
+# version is already on pub.dev.
+#
 # Needs a RELEASE_TOKEN repository secret: a fine-grained personal access
 # token of a maintainer who may push to main, with "Contents: read and
 # write" on this repository. GITHUB_TOKEN can't be used: tags pushed with it
@@ -86,6 +92,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add pubspec.yaml CHANGELOG.md
           if [ -f example/pubspec.lock ]; then git add example/pubspec.lock; fi
+          if [ -f lib/src/version.dart ]; then git add lib/src/version.dart; fi
           git commit -m "chore: release $VERSION"
           git show --stat HEAD
 

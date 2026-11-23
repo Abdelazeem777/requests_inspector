@@ -15,7 +15,8 @@ CHANGELOG.md gets a `## X.Y.Z` section, taken from (first match wins):
      merge commits); ci/test/style/build/chore changes and release commits are skipped.
 
 It also updates this package's own `version:` line in example/pubspec.lock,
-so the example still resolves with `flutter pub get --enforce-lockfile`.
+so the example still resolves with `flutter pub get --enforce-lockfile`, and the
+`const packageVersion = '...';` line in lib/src/version.dart when that file exists.
 
 Prints `version=X.Y.Z` and `tag=vX.Y.Z` (also appended to $GITHUB_OUTPUT when set).
 """
@@ -138,6 +139,21 @@ def update_example_lock(name, version):
         open(path, "w", encoding="utf-8").write(new_text)
 
 
+VERSION_FILE = os.path.join("lib", "src", "version.dart")
+VERSION_CONST_RE = re.compile(r"^(const packageVersion = ')[^']*(';)$", re.MULTILINE)
+
+
+def new_version_file(version):
+    """New text of lib/src/version.dart with `packageVersion` set, or None if absent."""
+    if not os.path.exists(VERSION_FILE):
+        return None
+    text = open(VERSION_FILE, encoding="utf-8").read()
+    new_text, count = VERSION_CONST_RE.subn(rf"\g<1>{version}\g<2>", text, count=1)
+    if not count:
+        fail(f"{VERSION_FILE} has no `const packageVersion = '...';` line.")
+    return new_text
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--bump", choices=["patch", "minor", "major"], required=True)
@@ -166,12 +182,15 @@ def main():
     path = "CHANGELOG.md"
     text = open(path, encoding="utf-8").read() if os.path.exists(path) else ""
     changelog = new_changelog(text, new, args.notes, last_tag)
+    version_file = new_version_file(new)
 
     pubspec = pubspec[: match.start(1)] + new + pubspec[match.end(1):]
     open("pubspec.yaml", "w", encoding="utf-8").write(pubspec)
     open("CHANGELOG.md", "w", encoding="utf-8").write(changelog)
     name = re.search(r"^name:\s*(\S+)", pubspec, re.MULTILINE).group(1)
     update_example_lock(name, new)
+    if version_file is not None:
+        open(VERSION_FILE, "w", encoding="utf-8").write(version_file)
 
     output = f"version={new}\ntag={new_tag}\nprevious={last_tag}\n"
     print(output, end="")
