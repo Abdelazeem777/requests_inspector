@@ -49,8 +49,12 @@ jobs:
         run: flutter pub upgrade
 
       # example/ is built in the other job instead of analyzed here.
+      # Infos fail the build on the floor version. On stable they don't: newer
+      # Flutter deprecates APIs the floor still needs (for example
+      # package:flutter/material.dart in favour of package:material_ui), and
+      # moving to the replacements would break the floor.
       - name: Analyze
-        run: flutter analyze lib test
+        run: flutter analyze lib test ${{ matrix.name == 'stable' && '--no-fatal-infos' || '' }}
 
       - name: Run tests
         run: flutter test --coverage
