@@ -23,7 +23,7 @@
 - The URL copy icon on the request details page copies the plain URL, without quotes.
 - The Dark Mode switch in the inspector menu now updates as soon as you toggle it.
 - Disposing a disabled `InspectorController` (e.g. one created by calling `InspectorController()` before `RequestsInspector`) no longer throws a `LateInitializationError`.
-- Keep the host app accessible (VoiceOver, TalkBack and UI automation tools) while the inspector is enabled, and add tooltips, also read by screen readers, to the close button (`Close inspector`), the share button (`Share`) and the copy icons of the request details sections (`Copy URL`, `Copy Headers`, ...).
+- Keep the host app accessible (VoiceOver, TalkBack and UI automation tools) while the inspector is enabled, and add tooltips, also read by screen readers, to the close button (`Close inspector`), the share button (`Share`) and the copy icons of the request details sections (`Copy URL`, `Copy Headers`, ...). Each copy icon is now its own button for screen readers and UI automation tools, instead of being merged into its section header.
 - Android back button: it now closes the inspector's dialogs and menus first and then the inspector itself, instead of popping the page behind it. Known limitation: with Android predictive back, a back swipe while a page is pushed in the host app pops that hidden page and leaves the inspector open.
 - `ShowInspectorOn.Shaking` now falls back to long press on web and desktop, where shaking isn't available.
 - README: wrap the whole `MaterialApp` with `RequestsInspector` rather than using `MaterialApp.builder` so the back button works as described above, fix the code samples and the images that showed up as text.
