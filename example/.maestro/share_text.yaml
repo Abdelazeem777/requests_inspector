@@ -95,4 +95,4 @@ name: Share as cURL, Normal Log and Both
 - runFlow: subflows/close_inspector.yaml
 - runFlow: subflows/read_clipboard.yaml
 - assertVisible: "clipboard kind: curl"
-- assertVisible: "(?s)clipboard text: curl -I 'https://postman-echo\\.com/get' .* -L -k\\s*"
+- assertVisible: "(?s)clipboard text: curl -I 'https://postman-echo\\.com/get' -L -k\\s*"

@@ -29,9 +29,10 @@ flutter run -d <device-id> -t lib/playground_main.dart   # installs the app; qui
 maestro --device <device-id> test .maestro
 ```
 
-The flows find the share button and the copy icons by their tooltips (`Share`,
-`Copy URL`, `Copy Headers`, ...), so they need a version of the package that
-has them.
+The flows find the share button by its `Share` tooltip, so they need a version
+of the package that has it. The copy icons' tooltips (`Copy URL`, ...) are not
+reachable through accessibility, so those icons are tapped by position inside
+their section header.
 
 The Playground sends a request with every client the example offers and shows
 what the app received. Its POST requests go to postman-echo, which echoes the

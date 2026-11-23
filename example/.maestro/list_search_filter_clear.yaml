@@ -24,14 +24,12 @@ name: List search, filters and Clear All
 - assertVisible: "(?s)POST.*https://graphqlzero.almansi.me/api.*200"
 - assertVisible: "(?s)GET.*https://postman-echo.com/status/404.*404"
 - assertVisible: "(?s)GET.*https://postman-echo.com/get.*200"
-- assertVisible: "(?s)GET.*https://dummyjson.com/posts.*200"
 
 # Search by URL.
 - tapOn: "Search by URL"
 - inputText: "graphql"
 - assertVisible: "(?s)POST.*https://graphqlzero.almansi.me/api.*200"
 - assertNotVisible: "(?s)GET.*https://postman-echo.com/.*"
-- assertNotVisible: "(?s)GET.*https://dummyjson.com/posts.*"
 - takeScreenshot: list-search
 # Nothing matches. (Erase more than "graphql": the Android keyboard can
 # swallow the first delete.)

@@ -1,6 +1,9 @@
 # The copy icon of each section on the Request Details tab puts that
 # section on the clipboard and shows "Copied to clipboard".
-# Each icon is found by its tooltip (Copy URL, Copy Headers, ...).
+# The icons' tooltips (Copy URL, Copy Headers, ...) are not reachable through
+# accessibility (Android doesn't expose them; iOS merges them into the
+# section header's label), so each icon is tapped inside its header, left of
+# the expand arrow.
 appId: com.example.example
 name: Copy buttons on the details page
 ---
@@ -16,7 +19,9 @@ name: Copy buttons on the details page
       ROW: "(?s)POST.*POST.*https://postman-echo.com/post.*"
 
 # First section: the URL.
-- tapOn: "Copy URL"
+- tapOn:
+    text: "(?s)POST - POST.*"
+    point: "83%,50%"
 - assertVisible: "Copied to clipboard"
 - runFlow: subflows/close_inspector.yaml
 - runFlow: subflows/read_clipboard.yaml
@@ -25,7 +30,9 @@ name: Copy buttons on the details page
 
 # Headers.
 - runFlow: subflows/open_inspector.yaml
-- tapOn: "Copy Headers"
+- tapOn:
+    text: "Headers"
+    point: "83%,50%"
 - assertVisible: "Copied to clipboard"
 - runFlow: subflows/close_inspector.yaml
 - runFlow: subflows/read_clipboard.yaml
@@ -33,7 +40,9 @@ name: Copy buttons on the details page
 
 # Query parameters.
 - runFlow: subflows/open_inspector.yaml
-- tapOn: "Copy Query Parameters"
+- tapOn:
+    text: "Query Parameters"
+    point: "83%,50%"
 - assertVisible: "Copied to clipboard"
 - runFlow: subflows/close_inspector.yaml
 - runFlow: subflows/read_clipboard.yaml
@@ -47,7 +56,9 @@ name: Copy buttons on the details page
     centerElement: true
 # Let the list settle, or the tap can land on the header and collapse it.
 - waitForAnimationToEnd
-- tapOn: "Copy Request Body"
+- tapOn:
+    text: "Request Body"
+    point: "83%,50%"
 - assertVisible: "Copied to clipboard"
 - runFlow: subflows/close_inspector.yaml
 - runFlow: subflows/read_clipboard.yaml
@@ -62,7 +73,9 @@ name: Copy buttons on the details page
     centerElement: true
 # Let the list settle, or the tap can land on the header and collapse it.
 - waitForAnimationToEnd
-- tapOn: "Copy Response Body"
+- tapOn:
+    text: "Response Body"
+    point: "83%,50%"
 - assertVisible: "Copied to clipboard"
 - runFlow: subflows/close_inspector.yaml
 - runFlow: subflows/read_clipboard.yaml

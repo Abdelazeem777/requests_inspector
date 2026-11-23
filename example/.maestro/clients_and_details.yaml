@@ -62,7 +62,7 @@ name: Every client is logged, with its details
 - assertVisible: "(?s)GET.*404.*https://postman-echo.com/status/404.*404"
 - assertVisible: "(?s)HEAD.*GET.*https://postman-echo.com/get.*200"
 - scrollUntilVisible:
-    element: "(?s)GET.*POSTS.*https://dummyjson.com/posts.*200"
+    element: "(?s)GET.*GET.*https://postman-echo.com/get.*200"
     direction: DOWN
 - assertVisible:
     text: "(?s)POST.*POST.*https://postman-echo.com/post.*200"

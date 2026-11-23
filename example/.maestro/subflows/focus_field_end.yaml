@@ -4,6 +4,12 @@
 # One tap is enough: the bottom right corner of the field is past its last
 # line, so the cursor lands at the end of the text, and it stays there when
 # the keyboard opens.
+#
+# The corner must be on screen, above the keyboard (which may already be up
+# from the previous field). Env SCROLL moves the dialog's content first:
+# "end" scrolls to the end (for the last field), "bit" scrolls up a little
+# with a slow swipe inside the dialog (for a field left half-hidden at the
+# keyboard's edge).
 appId: com.example.example
 ---
 # A field below the screen's lower part is not in the accessibility tree
@@ -16,6 +22,28 @@ appId: com.example.example
       - swipe:
           start: "50%,30%"
           end: "50%,15%"
+          duration: 1500
+      - waitForAnimationToEnd
+- runFlow:
+    when:
+      true: ${typeof SCROLL !== 'undefined' && SCROLL == 'end'}
+    commands:
+      - swipe:
+          start: "50%,30%"
+          end: "50%,12%"
+          duration: 300
+      - swipe:
+          start: "50%,30%"
+          end: "50%,12%"
+          duration: 300
+      - waitForAnimationToEnd
+- runFlow:
+    when:
+      true: ${typeof SCROLL !== 'undefined' && SCROLL == 'bit'}
+    commands:
+      - swipe:
+          start: "50%,30%"
+          end: "50%,22%"
           duration: 1500
       - waitForAnimationToEnd
 - tapOn:
